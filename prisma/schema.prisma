@@ -1,0 +1,122 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ── Usuários e unidades ──────────────────────────────────────────
+
+model Usuario {
+  id        String   @id @default(cuid())
+  nome      String
+  email     String   @unique
+  senha     String
+  perfil    String // SINDICO | ADMINISTRATIVO | PORTARIA | MORADOR
+  telefone  String?
+  ativo     Boolean  @default(true)
+  unidadeId String?
+  unidade   Unidade? @relation(fields: [unidadeId], references: [id])
+  criadoEm  DateTime @default(now())
+
+  comunicados  Comunicado[]
+  reservas     Reserva[]
+  encomendas   Encomenda[]
+  autorizacoes Autorizacao[]
+  documentos   Documento[]
+}
+
+model Unidade {
+  id        String    @id @default(cuid())
+  bloco     String
+  numero    String
+  moradores Usuario[]
+}
+
+// ── Comunicados ──────────────────────────────────────────────────
+
+model Comunicado {
+  id         String   @id @default(cuid())
+  titulo     String
+  conteudo   String
+  categoria  String // GERAL | MANUTENCAO | EVENTO | SEGURANCA | OBRA
+  prioridade String   @default("NORMAL") // BAIXA | NORMAL | ALTA
+  autorId    String
+  autor      Usuario  @relation(fields: [autorId], references: [id])
+  criadoEm   DateTime @default(now())
+}
+
+// ── Reservas de espaços comuns ───────────────────────────────────
+
+model Reserva {
+  id            String   @id @default(cuid())
+  espaco        String // SALAO_FESTAS | CHURRASQUEIRA | QUADRA | PISCINA
+  data          String // yyyy-MM-dd
+  horario       String // ex.: "14:00 – 18:00"
+  observacoes   String?
+  status        String   @default("PENDENTE") // PENDENTE | CONFIRMADA | REJEITADA | CANCELADA
+  solicitanteId String
+  solicitante   Usuario  @relation(fields: [solicitanteId], references: [id])
+  criadoEm      DateTime @default(now())
+}
+
+// ── Encomendas (código de retirada na portaria) ─────────────────
+
+model Encomenda {
+  id             String    @id @default(cuid())
+  descricao      String
+  remetente      String?
+  categoria      String    @default("CORREIO") // CORREIO | TRANSPORTADORA | FARMACIA | MERCADO | OUTRO
+  codigo         String    @unique
+  status         String    @default("AGUARDANDO") // AGUARDANDO | RETIRADA
+  destinatarioId String
+  destinatario   Usuario   @relation(fields: [destinatarioId], references: [id])
+  recebidaEm     DateTime  @default(now())
+  retiradaEm     DateTime?
+}
+
+// ── Autorizações de acesso (morador → portaria) ─────────────────
+
+model Autorizacao {
+  id            String   @id @default(cuid())
+  visitanteNome String
+  tipo          String // VISITANTE | PRESTADOR
+  documento     String?
+  veiculo       String?
+  dataInicio    String // yyyy-MM-dd
+  dataFim       String // yyyy-MM-dd
+  status        String   @default("ATIVA") // ATIVA | UTILIZADA | CANCELADA
+  moradorId     String
+  morador       Usuario  @relation(fields: [moradorId], references: [id])
+  criadoEm      DateTime @default(now())
+}
+
+// ── Documentos ───────────────────────────────────────────────────
+
+model Documento {
+  id            String   @id @default(cuid())
+  titulo        String
+  categoria     String // ATA | CONVENCAO | REGIMENTO | PRESTACAO_CONTAS | OUTRO
+  nomeArquivo   String
+  tamanhoBytes  Int      @default(0)
+  enviadoPorId  String
+  enviadoPor    Usuario  @relation(fields: [enviadoPorId], references: [id])
+  criadoEm      DateTime @default(now())
+}
+
+// ── Assembleias ──────────────────────────────────────────────────
+
+model Assembleia {
+  id        String   @id @default(cuid())
+  titulo    String
+  descricao String?
+  tipo      String // ORDINARIA | EXTRAORDINARIA
+  data      String // yyyy-MM-dd
+  horario   String // HH:mm
+  local     String // SALAO_FESTAS | VIRTUAL
+  status    String   @default("AGENDADA") // AGENDADA | REALIZADA | CANCELADA
+  pauta     String?
+  criadoEm  DateTime @default(now())
+}
