@@ -16,7 +16,10 @@ import {
   ROTULO_CATEGORIA_COMUNICADO,
   ROTULO_CATEGORIA_DOCUMENTO,
   ROTULO_CATEGORIA_ENCOMENDA,
+  ROTULO_CATEGORIA_OCORRENCIA,
   ROTULO_ESPACO,
+  ROTULO_PERIODICIDADE,
+  ROTULO_PRIORIDADE_OCORRENCIA,
   dataHoraCurta,
   formatarData,
 } from "@/lib/rotulos";
@@ -26,7 +29,10 @@ export {
   ROTULO_CATEGORIA_COMUNICADO,
   ROTULO_CATEGORIA_DOCUMENTO,
   ROTULO_CATEGORIA_ENCOMENDA,
+  ROTULO_CATEGORIA_OCORRENCIA,
   ROTULO_ESPACO,
+  ROTULO_PERIODICIDADE,
+  ROTULO_PRIORIDADE_OCORRENCIA,
   formatarData,
   dataHoraCurta,
 };
@@ -198,6 +204,27 @@ export function tomStatusAssembleia(status: string): TomBadge {
 
 export function rotuloStatusAssembleia(status: string) {
   return { AGENDADA: "Agendada", REALIZADA: "Realizada", CANCELADA: "Cancelada" }[status] ?? status;
+}
+
+export function tomStatusOcorrencia(status: string): TomBadge {
+  if (status === "RESOLVIDA") return "verde";
+  if (status === "ABERTA") return "vermelho";
+  return "neutro";
+}
+
+export function rotuloStatusOcorrencia(status: string) {
+  return { ABERTA: "Aberta", EM_ATENDIMENTO: "Em atendimento", RESOLVIDA: "Resolvida" }[status] ?? status;
+}
+
+/** Situação da manutenção preventiva, calculada pelo servidor. */
+export function tomSituacaoManutencao(situacao: string): TomBadge {
+  if (situacao === "EM_DIA") return "verde";
+  if (situacao === "VENCIDA") return "vermelho";
+  return "neutro";
+}
+
+export function rotuloSituacaoManutencao(situacao: string) {
+  return { VENCIDA: "Vencida", A_VENCER: "A vencer", EM_DIA: "Em dia" }[situacao] ?? situacao;
 }
 
 // ── Botões da identidade ─────────────────────────────────────

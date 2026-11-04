@@ -16,7 +16,7 @@ import {
 
 export async function POST(req: Request) {
   const chave = ipDaRequisicao(req);
-  if (!permitirTentativa(chave)) {
+  if (!(await permitirTentativa(chave))) {
     return Response.json(
       { erro: "Muitas tentativas incorretas. Aguarde alguns minutos antes de tentar novamente." },
       { status: 429 },
@@ -41,7 +41,7 @@ export async function POST(req: Request) {
     ? candidatos.find((u) => u.condominioId === String(condominioId)) ?? candidatos[0] ?? null
     : candidatos[0] ?? null;
   if (!alvo || !conferirSenha(String(senha), alvo.senha)) {
-    registrarFalha(chave);
+    await registrarFalha(chave);
     return Response.json({ erro: "E-mail ou senha incorretos." }, { status: 401 });
   }
 
@@ -69,7 +69,7 @@ export async function POST(req: Request) {
       vinculos[0].condominioId;
   }
 
-  limparTentativas(chave);
+  await limparTentativas(chave);
 
   const loja = await cookies();
   // Login novo começa limpo: encerra qualquer simulação anterior (o delete

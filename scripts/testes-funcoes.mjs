@@ -51,6 +51,8 @@ async function entrar(email, senha, condominioId) {
   return cookieDaResposta(res);
 }
 
+const NOME_FUNCAO = `Zeladoria (teste ${Date.now().toString(36)})`;
+
 async function main() {
   console.log(`Suíte de funções personalizadas contra ${BASE}\n`);
 
@@ -74,7 +76,7 @@ async function main() {
   const { res: criada, corpo: funcaoCriada } = await chamar(cookieAdmin, "/api/funcoes", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ nome: "Zeladoria (teste)", descricao: "Teste automatizado", permissoes: ["encomendas", "comunicados"] }),
+    body: JSON.stringify({ nome: NOME_FUNCAO, descricao: "Teste automatizado", permissoes: ["encomendas", "comunicados"] }),
   });
   verificar("plataforma cria função (200)", criada.status === 200, `status=${criada.status}`);
   const funcaoId = funcaoCriada?.funcao?.id;
@@ -83,7 +85,7 @@ async function main() {
   const { res: duplicada } = await chamar(cookieAdmin, "/api/funcoes", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ nome: "Zeladoria (teste)", permissoes: [] }),
+    body: JSON.stringify({ nome: NOME_FUNCAO, permissoes: [] }),
   });
   verificar("função duplicada no mesmo condomínio é rejeitada (409)", duplicada.status === 409, `status=${duplicada.status}`);
 
@@ -122,7 +124,7 @@ async function main() {
   const cookieEquipe = await entrar(`equipe.teste.${sufixo}@email.com`, "teste1234", california.id);
   const { corpo: sessaoEquipe } = await chamar(cookieEquipe, "/api/auth/verificar");
   verificar("equipe autentica com perfil FUNCAO", sessaoEquipe?.usuario?.perfil === "FUNCAO");
-  verificar("sessão traz nome da função", sessaoEquipe?.usuario?.funcaoNome === "Zeladoria (teste)");
+  verificar("sessão traz nome da função", sessaoEquipe?.usuario?.funcaoNome === NOME_FUNCAO);
   verificar("permissões contêm encomendas e comunicados", sessaoEquipe?.usuario?.permissoes?.includes("encomendas") && sessaoEquipe?.usuario?.permissoes?.includes("comunicados"));
   verificar("permissões NÃO contêm módulos não concedidos", !sessaoEquipe?.usuario?.permissoes?.includes("moradores") && !sessaoEquipe?.usuario?.permissoes?.includes("auditoria"));
 
@@ -154,7 +156,7 @@ async function main() {
   });
   const cookieAdminFl = cookieDaResposta(trocaOk2) || cookieAdmin;
   const { corpo: listaFl } = await chamar(cookieAdminFl, "/api/funcoes");
-  const existeNaFlorida = listaFl?.lista?.some((f) => f.nome === "Zeladoria (teste)");
+  const existeNaFlorida = listaFl?.lista?.some((f) => f.nome === NOME_FUNCAO);
   verificar("função do California NÃO aparece na Florida", existeNaFlorida === false);
 
   // 6. Excluir função sem vínculos ativos funciona

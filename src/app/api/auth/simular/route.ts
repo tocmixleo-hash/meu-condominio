@@ -22,8 +22,8 @@ const ROTULO: Record<string, string> = {
 const DESCRICAO: Record<string, string> = {
   SINDICO: "Gestão completa do condomínio, identidade visual e auditoria",
   ADMINISTRATIVO: "Rotina administrativa: comunicados, reservas, encomendas, documentos e equipe",
-  PORTARIA: "Encomendas, autorizações de entrada e consulta de moradores",
-  MORADOR: "Uso pessoal: comunicados, reservas, encomendas e autorizações da própria unidade",
+  PORTARIA: "Encomendas, autorizações de entrada, ocorrências do dia a dia e consulta de moradores",
+  MORADOR: "Uso pessoal: comunicados, reservas, encomendas, autorizações e ocorrências da própria unidade",
 };
 
 // Rótulos amigáveis dos módulos (para descrever funções personalizadas)
@@ -32,6 +32,8 @@ const ROTULO_MODULO: Record<string, string> = {
   reservas: "Reservas",
   encomendas: "Encomendas",
   autorizacoes: "Autorizações",
+  ocorrencias: "Ocorrências",
+  manutencao: "Manutenção",
   documentos: "Documentos",
   assembleias: "Assembleias",
   moradores: "Moradores",
@@ -68,8 +70,8 @@ export async function GET() {
         p === "SINDICO" || p === "ADMINISTRATIVO"
           ? m !== "condominios" && m !== "funcoes"
           : p === "PORTARIA"
-            ? ["inicio", "encomendas", "autorizacoes", "moradores"].includes(m)
-            : ["inicio", "comunicados", "reservas", "encomendas", "autorizacoes", "documentos", "assembleias"].includes(m),
+            ? ["inicio", "encomendas", "autorizacoes", "ocorrencias", "moradores"].includes(m)
+            : ["inicio", "comunicados", "reservas", "encomendas", "autorizacoes", "ocorrencias", "documentos", "assembleias"].includes(m),
       ),
     })),
     funcoes: funcoes.map((f) => {

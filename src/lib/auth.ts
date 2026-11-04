@@ -131,20 +131,21 @@ export type UsuarioSessao = {
 // são exclusivos do PLATAFORMA — nunca concedíveis a funções.
 export const MODULOS_TODOS = [
   "inicio", "comunicados", "reservas", "encomendas", "autorizacoes",
-  "documentos", "assembleias", "moradores", "auditoria", "identidade",
-  "condominios", "funcoes",
+  "ocorrencias", "manutencao", "documentos", "assembleias", "moradores",
+  "auditoria", "identidade", "condominios", "funcoes",
 ] as const;
 
 export const MODULOS_CONCEDIVEIS = [
   "comunicados", "reservas", "encomendas", "autorizacoes",
-  "documentos", "assembleias", "moradores", "auditoria", "identidade",
+  "ocorrencias", "manutencao", "documentos", "assembleias", "moradores",
+  "auditoria", "identidade",
 ] as const;
 
 const PERMISSOES_FIXAS: Record<string, string[]> = {
   SINDICO: [...MODULOS_TODOS.filter((m) => m !== "condominios" && m !== "funcoes")],
   ADMINISTRATIVO: [...MODULOS_TODOS.filter((m) => m !== "condominios" && m !== "funcoes")],
-  PORTARIA: ["inicio", "encomendas", "autorizacoes", "moradores"],
-  MORADOR: ["inicio", "comunicados", "reservas", "encomendas", "autorizacoes", "documentos", "assembleias"],
+  PORTARIA: ["inicio", "encomendas", "autorizacoes", "ocorrencias", "moradores"],
+  MORADOR: ["inicio", "comunicados", "reservas", "encomendas", "autorizacoes", "ocorrencias", "documentos", "assembleias"],
 };
 
 /** O usuário pode usar o módulo no condomínio ativo? (enforcement do backend) */

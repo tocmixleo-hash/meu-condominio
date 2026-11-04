@@ -1,7 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import { LoaderCircle } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { ChevronLeft, ChevronRight, LoaderCircle } from "lucide-react";
 import {
   Badge,
   BotaoPrimario,
@@ -30,6 +30,15 @@ type Reserva = {
   solicitante: { nome: string; unidade?: { bloco: string; numero: string } | null };
 };
 
+type Regra = {
+  espaco: string;
+  rotulo: string;
+  antecedenciaMaxDias: number;
+  limiteMensalUnidade: number;
+  regrasTexto: string;
+  padrao: boolean;
+};
+
 type Form = { espaco: string; data: string; horario: string; observacoes: string };
 
 const hojeISO = () => new Date().toISOString().slice(0, 10);
@@ -45,12 +54,27 @@ const HORARIOS = [
   "09:00 – 12:00",
 ];
 
+const DIAS_SEMANA = ["D", "S", "T", "Q", "Q", "S", "S"];
+
+function mesISO(offset = 0) {
+  const d = new Date();
+  d.setDate(1);
+  d.setMonth(d.getMonth() + offset);
+  return d;
+}
+
 export default function Reservas({ perfil }: { perfil: Perfil }) {
   const [lista, setLista] = useState<Reserva[] | null>(null);
+  const [regras, setRegras] = useState<Regra[]>([]);
+  const [visao, setVisao] = useState<"lista" | "calendario">("lista");
+  const [mesRef, setMesRef] = useState(0); // 0 = mês atual
   const [aberto, setAberto] = useState(false);
   const [form, setForm] = useState<Form>(VAZIO);
   const [erro, setErro] = useState("");
   const [enviando, setEnviando] = useState(false);
+  // Regras (gestão)
+  const [editandoRegra, setEditandoRegra] = useState<Regra | null>(null);
+  const [regraForm, setRegraForm] = useState({ antecedenciaMaxDias: 60, limiteMensalUnidade: 2, regrasTexto: "" });
   const ehGestao = perfil === "SINDICO" || perfil === "ADMINISTRATIVO";
 
   const carregar = useCallback(() => {
@@ -58,9 +82,15 @@ export default function Reservas({ perfil }: { perfil: Perfil }) {
       .then(async (r) => (r.ok ? r.json() : null))
       .then((d) => d && setLista(d.lista))
       .catch(() => null);
+    fetch("/api/reservas/regras")
+      .then(async (r) => (r.ok ? r.json() : null))
+      .then((d) => d && setRegras(d.lista ?? []))
+      .catch(() => null);
   }, []);
 
   useEffect(carregar, [carregar]);
+
+  const regraDoEspaco = (espaco: string) => regras.find((r) => r.espaco === espaco);
 
   async function criar() {
     setErro("");
@@ -93,67 +123,231 @@ export default function Reservas({ perfil }: { perfil: Perfil }) {
     carregar();
   }
 
+  async function salvarRegra() {
+    if (!editandoRegra) return;
+    setErro("");
+    setEnviando(true);
+    try {
+      const r = await fetch("/api/reservas/regras", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ espaco: editandoRegra.espaco, ...regraForm }),
+      });
+      const corpo = await corpoJson(r);
+      if (!corpo) throw new Error(mensagemRede(r.status));
+      if (!r.ok) throw new Error(corpo.erro || "Falha ao salvar as regras.");
+      setEditandoRegra(null);
+      carregar();
+    } catch (e) {
+      setErro(mensagemDeErro(e, "Falha ao salvar as regras."));
+    } finally {
+      setEnviando(false);
+    }
+  }
+
+  // ── Grade do mês (calendário) ──
+  const grade = useMemo(() => {
+    const base = mesISO(mesRef);
+    const ano = base.getFullYear();
+    const mes = base.getMonth();
+    const primeiroDiaSemana = new Date(ano, mes, 1).getDay();
+    const diasNoMes = new Date(ano, mes + 1, 0).getDate();
+    const celulas: (string | null)[] = Array(primeiroDiaSemana).fill(null);
+    for (let d = 1; d <= diasNoMes; d++) {
+      celulas.push(`${ano}-${String(mes + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`);
+    }
+    const rotulo = base.toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
+    return { celulas, rotulo };
+  }, [mesRef]);
+
+  const reservasPorDia = useMemo(() => {
+    const mapa = new Map<string, Reserva[]>();
+    (lista ?? []).forEach((r) => {
+      if (r.status === "REJEITADA" || r.status === "CANCELADA") return;
+      const arr = mapa.get(r.data) ?? [];
+      arr.push(r);
+      mapa.set(r.data, arr);
+    });
+    return mapa;
+  }, [lista]);
+
   return (
     <div className="space-y-6">
-      <Secao
-        titulo={ehGestao ? "Todas as reservas" : "Minhas reservas"}
-        acao={
-          perfil === "MORADOR" && (
-            <BotaoPrimario onClick={() => setAberto(true)}>Nova reserva</BotaoPrimario>
-          )
-        }
-      >
-        {!lista ? (
-          <Carregando />
-        ) : lista.length === 0 ? (
-          <EstadoVazio
-            mensagem={
-              perfil === "MORADOR"
-                ? "Você ainda não fez reservas. Toque em “Nova reserva”."
-                : "Nenhuma reserva registrada."
-            }
-          />
-        ) : (
-          <Lista className="border-t border-[var(--cor-neutra)]">
-            {lista.map((r) => (
-              <LinhaLista
-                key={r.id}
-                principal={`${ROTULO_ESPACO[r.espaco] ?? r.espaco} · ${formatarData(r.data)}`}
-                secundaria={
-                  ehGestao
-                    ? `${r.solicitante.nome}${
-                        r.solicitante.unidade
-                          ? ` · Un. ${r.solicitante.unidade.bloco}-${r.solicitante.unidade.numero}`
-                          : ""
-                      } · ${r.horario}`
-                    : r.horario
-                }
-                detalhe={r.observacoes ?? undefined}
-                direita={
-                  <div className="flex items-center gap-3">
-                    <Badge tom={tomStatusReserva(r.status)}>{rotuloStatusReserva(r.status)}</Badge>
-                    {ehGestao && r.status === "PENDENTE" && (
-                      <>
-                        <BotaoTexto tom="verde" onClick={() => alterarStatus(r.id, "CONFIRMADA")}>
-                          Aprovar
-                        </BotaoTexto>
-                        <BotaoTexto tom="vermelho" onClick={() => alterarStatus(r.id, "REJEITADA")}>
-                          Rejeitar
-                        </BotaoTexto>
-                      </>
-                    )}
-                    {!ehGestao && r.status === "PENDENTE" && (
-                      <BotaoTexto tom="vermelho" onClick={() => alterarStatus(r.id, "CANCELADA")}>
-                        Cancelar
-                      </BotaoTexto>
+      <div className="flex items-center justify-between gap-3">
+        <div className="inline-flex rounded-md border border-[var(--cor-neutra-2)] bg-white p-0.5">
+          {(["lista", "calendario"] as const).map((v) => (
+            <button
+              key={v}
+              onClick={() => setVisao(v)}
+              className={`h-8 rounded px-3 text-sm font-medium transition ${
+                visao === v
+                  ? "bg-[var(--cor-tema)] text-[var(--cor-fundo)]"
+                  : "text-stone-600 hover:bg-[var(--cor-neutra)]"
+              }`}
+            >
+              {v === "lista" ? "Lista" : "Calendário"}
+            </button>
+          ))}
+        </div>
+        {perfil === "MORADOR" && visao === "lista" && (
+          <BotaoPrimario onClick={() => setAberto(true)}>Nova reserva</BotaoPrimario>
+        )}
+      </div>
+
+      {visao === "calendario" ? (
+        <Secao titulo={`Calendário — ${grade.rotulo}`}>
+          <div className="mb-2 flex items-center gap-2">
+            <button
+              aria-label="Mês anterior"
+              onClick={() => setMesRef((m) => m - 1)}
+              className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-[var(--cor-neutra-2)] bg-white text-stone-600 transition hover:bg-[var(--cor-neutra)]"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+            <button
+              aria-label="Mês seguinte"
+              onClick={() => setMesRef((m) => m + 1)}
+              className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-[var(--cor-neutra-2)] bg-white text-stone-600 transition hover:bg-[var(--cor-neutra)]"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+            <span className="ml-1 text-xs text-stone-400">
+              {ehGestao ? "Todas as reservas ativas do condomínio" : "Suas reservas ativas"}
+            </span>
+          </div>
+          <div className="grid grid-cols-7 gap-px overflow-hidden rounded-md border border-[var(--cor-neutra)] bg-[var(--cor-neutra)] text-center">
+            {DIAS_SEMANA.map((d, i) => (
+              <div key={`d${i}`} className="bg-white py-1.5 text-[11px] font-semibold uppercase tracking-wide text-stone-400">
+                {d}
+              </div>
+            ))}
+            {grade.celulas.map((iso, i) => {
+              if (!iso) return <div key={`v${i}`} className="bg-[var(--cor-neutra)]/40" />;
+              const doDia = reservasPorDia.get(iso) ?? [];
+              const passou = iso < hojeISO();
+              return (
+                <div
+                  key={iso}
+                  className={`min-h-[64px] bg-white p-1 text-left sm:min-h-[76px] ${
+                    passou ? "opacity-45" : ""
+                  }`}
+                >
+                  <p className={`text-[11px] tabular-nums ${iso === hojeISO() ? "font-bold text-[var(--cor-tema)]" : "text-stone-400"}`}>
+                    {Number(iso.slice(8))}
+                  </p>
+                  <div className="mt-0.5 space-y-0.5">
+                    {doDia.slice(0, 3).map((r) => (
+                      <p
+                        key={r.id}
+                        title={`${ROTULO_ESPACO[r.espaco] ?? r.espaco} · ${r.horario} · ${r.solicitante?.nome ?? ""}`}
+                        className={`truncate rounded px-1 py-0.5 text-[10px] leading-tight ${
+                          r.status === "CONFIRMADA"
+                            ? "bg-green-50 text-green-800"
+                            : "bg-[var(--cor-neutra)] text-stone-600"
+                        }`}
+                      >
+                        {(ROTULO_ESPACO[r.espaco] ?? r.espaco).split(" ")[0]}
+                      </p>
+                    ))}
+                    {doDia.length > 3 && (
+                      <p className="px-1 text-[10px] text-stone-400">+{doDia.length - 3}</p>
                     )}
                   </div>
+                </div>
+              );
+            })}
+          </div>
+          <p className="mt-2 text-xs text-stone-400">
+            Verde: confirmada · Cinza: aguardando aprovação
+          </p>
+        </Secao>
+      ) : (
+        <Secao titulo={ehGestao ? "Todas as reservas" : "Minhas reservas"}>
+          {!lista ? (
+            <Carregando />
+          ) : lista.length === 0 ? (
+            <EstadoVazio
+              mensagem={
+                perfil === "MORADOR"
+                  ? "Você ainda não fez reservas. Toque em “Nova reserva”."
+                  : "Nenhuma reserva registrada."
+              }
+            />
+          ) : (
+            <Lista className="border-t border-[var(--cor-neutra)]">
+              {lista.map((r) => (
+                <LinhaLista
+                  key={r.id}
+                  principal={`${ROTULO_ESPACO[r.espaco] ?? r.espaco} · ${formatarData(r.data)}`}
+                  secundaria={
+                    ehGestao
+                      ? `${r.solicitante.nome}${
+                          r.solicitante.unidade
+                            ? ` · Un. ${r.solicitante.unidade.bloco}-${r.solicitante.unidade.numero}`
+                            : ""
+                        } · ${r.horario}`
+                      : r.horario
+                  }
+                  detalhe={r.observacoes ?? undefined}
+                  direita={
+                    <div className="flex items-center gap-3">
+                      <Badge tom={tomStatusReserva(r.status)}>{rotuloStatusReserva(r.status)}</Badge>
+                      {ehGestao && r.status === "PENDENTE" && (
+                        <>
+                          <BotaoTexto tom="verde" onClick={() => alterarStatus(r.id, "CONFIRMADA")}>
+                            Aprovar
+                          </BotaoTexto>
+                          <BotaoTexto tom="vermelho" onClick={() => alterarStatus(r.id, "REJEITADA")}>
+                            Rejeitar
+                          </BotaoTexto>
+                        </>
+                      )}
+                      {!ehGestao && r.status === "PENDENTE" && (
+                        <BotaoTexto tom="vermelho" onClick={() => alterarStatus(r.id, "CANCELADA")}>
+                          Cancelar
+                        </BotaoTexto>
+                      )}
+                    </div>
+                  }
+                />
+              ))}
+            </Lista>
+          )}
+        </Secao>
+      )}
+
+      {/* Regras dos espaços — exibidas a todos; editáveis pela gestão */}
+      {regras.length > 0 && (
+        <Secao titulo="Regras dos espaços" acao={ehGestao ? <span className="text-xs text-stone-400">Toque em “Editar” para ajustar</span> : undefined}>
+          <Lista className="border-t border-[var(--cor-neutra)]">
+            {regras.map((r) => (
+              <LinhaLista
+                key={r.espaco}
+                principal={r.rotulo}
+                secundaria={`Até ${r.antecedenciaMaxDias} dia(s) de antecedência · ${r.limiteMensalUnidade} reserva(s)/mês por unidade`}
+                detalhe={r.regrasTexto || undefined}
+                direita={
+                  ehGestao && (
+                    <BotaoTexto
+                      onClick={() => {
+                        setEditandoRegra(r);
+                        setRegraForm({
+                          antecedenciaMaxDias: r.antecedenciaMaxDias,
+                          limiteMensalUnidade: r.limiteMensalUnidade,
+                          regrasTexto: r.regrasTexto,
+                        });
+                        setErro("");
+                      }}
+                    >
+                      Editar
+                    </BotaoTexto>
+                  )
                 }
               />
             ))}
           </Lista>
-        )}
-      </Secao>
+        </Secao>
+      )}
 
       {aberto && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -166,6 +360,12 @@ export default function Reservas({ perfil }: { perfil: Perfil }) {
             <h3 className="text-base font-semibold text-stone-900">Nova reserva</h3>
             <p className="mt-0.5 text-sm text-stone-500">
               A reserva fica pendente até a aprovação da administração.
+              {(() => {
+                const rg = regraDoEspaco(form.espaco);
+                return rg
+                  ? ` ${ROTULO_ESPACO[form.espaco] ?? form.espaco}: até ${rg.antecedenciaMaxDias} dia(s) de antecedência e ${rg.limiteMensalUnidade} reserva(s) por mês.${rg.regrasTexto ? ` ${rg.regrasTexto}` : ""}`
+                  : "";
+              })()}
             </p>
             <div className="mt-4 space-y-3">
               <select
@@ -184,6 +384,14 @@ export default function Reservas({ perfil }: { perfil: Perfil }) {
               <input
                 type="date"
                 min={hojeISO()}
+                max={
+                  (() => {
+                    const rg = regraDoEspaco(form.espaco);
+                    return new Date(Date.now() + (rg?.antecedenciaMaxDias ?? 60) * 86400000)
+                      .toISOString()
+                      .slice(0, 10);
+                  })()
+                }
                 value={form.data}
                 onChange={(e) => setForm({ ...form, data: e.target.value })}
                 className="h-10 w-full rounded-md border border-[var(--cor-neutra-2)] bg-white px-3 text-sm outline-none focus:border-[var(--cor-tema-suave)]"
@@ -212,6 +420,67 @@ export default function Reservas({ perfil }: { perfil: Perfil }) {
               <BotaoSecundario onClick={() => setAberto(false)}>Cancelar</BotaoSecundario>
               <BotaoPrimario onClick={criar} disabled={enviando || !form.data}>
                 {enviando && <LoaderCircle className="h-4 w-4 animate-spin" />} Solicitar
+              </BotaoPrimario>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {editandoRegra && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <button
+            aria-label="Fechar"
+            className="absolute inset-0 bg-black/40"
+            onClick={() => setEditandoRegra(null)}
+          />
+          <div className="relative w-full max-w-md rounded-lg border border-[var(--cor-neutra)] bg-white p-6 shadow-xl">
+            <h3 className="text-base font-semibold text-stone-900">
+              Regras — {editandoRegra.rotulo}
+            </h3>
+            <div className="mt-4 space-y-3">
+              <label className="block">
+                <span className="mb-1 block text-[11px] font-semibold uppercase tracking-[0.12em] text-stone-500">
+                  Antecedência máxima (dias)
+                </span>
+                <input
+                  type="number"
+                  min={0}
+                  max={365}
+                  value={regraForm.antecedenciaMaxDias}
+                  onChange={(e) => setRegraForm({ ...regraForm, antecedenciaMaxDias: Number(e.target.value) })}
+                  className="h-10 w-full rounded-md border border-[var(--cor-neutra-2)] bg-white px-3 text-sm outline-none focus:border-[var(--cor-tema-suave)]"
+                />
+              </label>
+              <label className="block">
+                <span className="mb-1 block text-[11px] font-semibold uppercase tracking-[0.12em] text-stone-500">
+                  Reservas por mês por unidade
+                </span>
+                <input
+                  type="number"
+                  min={1}
+                  max={31}
+                  value={regraForm.limiteMensalUnidade}
+                  onChange={(e) => setRegraForm({ ...regraForm, limiteMensalUnidade: Number(e.target.value) })}
+                  className="h-10 w-full rounded-md border border-[var(--cor-neutra-2)] bg-white px-3 text-sm outline-none focus:border-[var(--cor-tema-suave)]"
+                />
+              </label>
+              <label className="block">
+                <span className="mb-1 block text-[11px] font-semibold uppercase tracking-[0.12em] text-stone-500">
+                  Regras exibidas ao morador (taxa de limpeza, horários…)
+                </span>
+                <textarea
+                  rows={3}
+                  value={regraForm.regrasTexto}
+                  onChange={(e) => setRegraForm({ ...regraForm, regrasTexto: e.target.value })}
+                  className="w-full rounded-md border border-[var(--cor-neutra-2)] px-3 py-2 text-sm outline-none focus:border-[var(--cor-tema-suave)] focus:ring-2 focus:ring-[var(--cor-tema-suave)]/30"
+                />
+              </label>
+              {erro && <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{erro}</p>}
+            </div>
+            <div className="mt-5 flex justify-end gap-2">
+              <BotaoSecundario onClick={() => setEditandoRegra(null)}>Cancelar</BotaoSecundario>
+              <BotaoPrimario onClick={salvarRegra} disabled={enviando}>
+                {enviando && <LoaderCircle className="h-4 w-4 animate-spin" />} Salvar regras
               </BotaoPrimario>
             </div>
           </div>

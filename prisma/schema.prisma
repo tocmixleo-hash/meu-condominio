@@ -51,6 +51,9 @@ model Condominio {
   assembleias  Assembleia[]
   notificacoes Notificacao[]
   auditorias   Auditoria[]
+  ocorrencias  Ocorrencia[]
+  manutencoes  Manutencao[]
+  regrasReserva RegraReserva[]
 }
 
 // Galeria de fotografias do condomínio (áreas comuns e institucionais)
@@ -128,6 +131,8 @@ model Usuario {
   documentos   Documento[]
   notificacoes Notificacao[]
   auditorias   Auditoria[]
+  ocorrencias  Ocorrencia[]
+  redefinicoes RedefinicaoSenha[]
 
   @@unique([condominioId, email])
   @@index([condominioId])
@@ -209,6 +214,7 @@ model Autorizacao {
   tipo          String // VISITANTE | PRESTADOR
   documento     String?
   veiculo       String?
+  codigo        String? // código curto impresso no QR Code de entrada (único por condomínio)
   dataInicio    String // yyyy-MM-dd
   dataFim       String // yyyy-MM-dd
   status        String     @default("ATIVA") // ATIVA | UTILIZADA | CANCELADA
@@ -216,6 +222,7 @@ model Autorizacao {
   morador       Usuario    @relation(fields: [moradorId], references: [id])
   criadoEm      DateTime   @default(now())
 
+  @@unique([condominioId, codigo])
   @@index([condominioId, status])
 }
 
@@ -254,6 +261,86 @@ model Assembleia {
   criadoEm     DateTime   @default(now())
 
   @@index([condominioId, data])
+}
+
+// ── Ocorrências (chamados do condomínio) ─────────────────────────
+
+model Ocorrencia {
+  id           String     @id @default(cuid())
+  condominioId String
+  condominio   Condominio @relation(fields: [condominioId], references: [id])
+  titulo       String
+  descricao    String
+  categoria    String     @default("OUTROS") // INFRAESTRUTURA | ELETRICA | HIDRAULICA | ELEVADOR | SEGURANCA | LIMPEZA | OUTROS
+  prioridade   String     @default("NORMAL") // BAIXA | NORMAL | ALTA | URGENTE
+  local        String? // ex.: "Bloco A — corredor do 3º andar"
+  status       String     @default("ABERTA") // ABERTA | EM_ATENDIMENTO | RESOLVIDA
+  abertaPorId  String
+  abertaPor    Usuario    @relation(fields: [abertaPorId], references: [id])
+  resolucao    String? // como foi resolvida (registro da equipe)
+  resolvidaEm  DateTime?
+  atualizadaEm DateTime   @default(now()) @updatedAt
+  criadoEm     DateTime   @default(now())
+
+  @@index([condominioId, status, criadoEm])
+}
+
+// ── Manutenção preventiva (agenda recorrente do condomínio) ─────
+
+model Manutencao {
+  id            String     @id @default(cuid())
+  condominioId  String
+  condominio    Condominio @relation(fields: [condominioId], references: [id])
+  titulo        String
+  descricao     String?
+  periodicidade String     @default("SEMESTRAL") // MENSAL | BIMESTRAL | TRIMESTRAL | SEMESTRAL | ANUAL
+  proximaData   String // yyyy-MM-dd
+  ultimaData    String? // yyyy-MM-dd (última realização registrada)
+  responsavel   String? // empresa ou pessoa encarregada
+  ativo         Boolean    @default(true)
+  criadoEm      DateTime   @default(now())
+
+  @@index([condominioId, proximaData])
+}
+
+// ── Regras de reserva por espaço (por condomínio) ────────────────
+
+model RegraReserva {
+  id                  String     @id @default(cuid())
+  condominioId        String
+  condominio          Condominio @relation(fields: [condominioId], references: [id])
+  espaco              String // SALAO_FESTAS | CHURRASQUEIRA | QUADRA | PISCINA
+  antecedenciaMaxDias Int        @default(60) // quantos dias à frente o morador pode reservar
+  limiteMensalUnidade Int        @default(2) // reservas por mês por morador/unidade
+  regrasTexto         String? // regras do espaço exibidas ao morador (taxas, horários…)
+  ativo               Boolean    @default(true)
+  criadoEm            DateTime   @default(now())
+
+  @@unique([condominioId, espaco])
+}
+
+// ── Redefinição de senha (token de uso único, 1 hora) ───────────
+
+model RedefinicaoSenha {
+  id        String    @id @default(cuid())
+  usuarioId String
+  usuario   Usuario   @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  tokenHash String    @unique // SHA-256 do token — o valor puro só viaja por e-mail/notificação
+  expiraEm  DateTime
+  usadaEm   DateTime?
+  criadoEm  DateTime  @default(now())
+
+  @@index([usuarioId])
+}
+
+// ── Tentativas de login falhas (rate limit compartilhado) ───────
+
+model TentativaLogin {
+  id       String   @id @default(cuid())
+  chave    String // IP do cliente
+  criadoEm DateTime @default(now())
+
+  @@index([chave, criadoEm])
 }
 
 // ── Notificações in-app (sino) ───────────────────────────────────

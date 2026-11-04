@@ -30,6 +30,8 @@ const MODULOS: { id: string; rotulo: string; descricao: string }[] = [
   { id: "reservas", rotulo: "Reservas", descricao: "Confirmar e rejeitar reservas" },
   { id: "encomendas", rotulo: "Encomendas", descricao: "Registrar encomendas e dar baixa" },
   { id: "autorizacoes", rotulo: "Autorizações", descricao: "Ver autorizações de acesso" },
+  { id: "ocorrencias", rotulo: "Ocorrências", descricao: "Ver todas e atender chamados" },
+  { id: "manutencao", rotulo: "Manutenção", descricao: "Agenda de manutenção preventiva" },
   { id: "documentos", rotulo: "Documentos", descricao: "Enviar e excluir documentos" },
   { id: "assembleias", rotulo: "Assembleias", descricao: "Agendar e atualizar assembleias" },
   { id: "moradores", rotulo: "Moradores", descricao: "Cadastrar moradores e equipe" },

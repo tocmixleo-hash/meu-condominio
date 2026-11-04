@@ -22,10 +22,11 @@ git push -u origin main
 | `TURSO_DATABASE_URL` | Sim (produção) | Endereço `libsql://` do banco Turso — ativa o modo persistente |
 | `TURSO_AUTH_TOKEN` | Sim (produção) | Token de acesso do Turso (usado só no backend) |
 | `SEGREDO_SESSAO` | Sim | Segredo HMAC dos cookies de sessão (`openssl rand -hex 32`) |
+| `RESEND_API_KEY` + `EMAIL_REMETENTE` | Opcional | Ativa o envio real de e-mails (avisos + redefinição de senha via Resend); sem elas, os avisos continuam no sino do portal e o link de senha chega como notificação do próprio usuário |
+| `ORIGEM_PUBLICA` | Opcional | Origem usada nos links de redefinição de senha (padrão: https://parque-california.vercel.app) |
 | `BLOB_READ_WRITE_TOKEN` | Recomendada | Documentos, logotipos e fotografias no Vercel Blob (por condomínio) |
 | `DATABASE_URL` | Desenvolvimento | Arquivo SQLite local (`file:...`) — ignorada quando Turso está ativo |
 | `SENHA_ADMIN` | Uso único | Senha provisória do administrador no seed de produção |
-| `RESEND_API_KEY` + `EMAIL_REMETENTE` | Opcional | Notificações também por e-mail (Resend) |
 
 ## 4. Banco de produção em Turso (libSQL) — passo a passo
 
@@ -40,9 +41,15 @@ destrutiva é necessária.
    turso db show meu-condominio   # copia a URL libsql://
    turso db tokens create meu-condominio
    ```
-2. **Aplicar o schema** (da sua máquina, uma vez):
+2. **Aplicar o schema** (da sua máquina, uma vez — banco novo):
    ```bash
    TURSO_DATABASE_URL="libsql://..." TURSO_AUTH_TOKEN="..." bun scripts/aplicar-schema-turso.mjs
+   ```
+   Em banco que JÁ existe e precisa das tabelas da fase 2 (ocorrências,
+   manutenção, regras de reserva, redefinição de senha, tentativas de login
+   e QR das autorizações), use a migração incremental e idempotente:
+   ```bash
+   TURSO_DATABASE_URL="libsql://..." TURSO_AUTH_TOKEN="..." bun scripts/migrar-turso-fase2.mjs
    ```
 3. **Semear a base real** (2 condomínios + administrador, sem dados fictícios):
    ```bash
@@ -68,6 +75,14 @@ destrutiva é necessária.
    O material semeado: comunicados, reservas, encomendas, autorizações de visita e
    assembleia em cada condomínio, com datas relativas ao dia da execução (visitas
    valendo hoje, assembleia na próxima semana) para nunca "envelhecer".
+   Para o material da fase 2 (ocorrências em diferentes estágios e agenda de
+   manutenção preventiva — vencida, a vencer e em dia):
+   ```bash
+   bun scripts/semear-ocorrencias-demo.mjs                       # demo local
+   TURSO_DATABASE_URL="libsql://..." TURSO_AUTH_TOKEN="..." bun scripts/semear-ocorrencias-demo.mjs --producao
+   ```
+   O script também dá código QR às autorizações ativas antigas que ainda não
+   possuem código.
 
 O modo demonstração (SQLite + elenco fictício + acessos rápidos) continua disponível para
 desenvolvimento local e previews, sem interferir na produção. Na produção real, a tela de
@@ -79,7 +94,7 @@ apenas pelo e-mail e senha próprios.
 
 - A cada *cold start* a instância volta ao banco de demonstração — cadastros podem desaparecer após inatividade.
 - Uploads sem `BLOB_READ_WRITE_TOKEN` ficam em `/tmp`, sujeitos ao mesmo reset.
-- O rate limit de login é em memória (por instância); para bloqueio global use um store compartilhado (ex. Upstash Redis).
+- O rate limit do login fica no banco (`TentativaLogin`) e vale entre instâncias; a janela é de 10 minutos com no máximo 8 falhas por IP.
 
 ## 6. Escopo desta versão
 
@@ -87,8 +102,22 @@ apenas pelo e-mail e senha próprios.
   por vínculo, perfil **PLATAFORMA** (administrador geral) e troca de ambiente auditada.
 - Identidade visual administrável por condomínio (paleta, logotipos de menu/cabeçalho,
   fotografias, textos institucionais e contatos) — painel "Identidade visual".
+- **Fase 2**: módulos **Ocorrências** (morador abre; equipe atende/resolve com registro) e
+  **Manutenção preventiva** (agenda recorrente com situação calculada e próxima data automática);
+  **QR Code** na autorização de visita (portaria registra a entrada pelo código em
+  `/validar/<código>`) e na retirada de encomendas; **regras de reserva por espaço**
+  (antecedência máxima e limite mensal por unidade, configuráveis pela gestão) com
+  **calendário mensal** das reservas; **redefinição de senha** por token de uso único
+  (e-mail via Resend ou notificação in-app na demonstração); rate limit do login
+  persistido no banco (vale entre todas as instâncias); simulação de perfis do
+  administrador estendida aos módulos novos.
+- PWA instalável (manifest + service worker) com cache leve.
 - Armazenamento organizado por condomínio no Blob e documentos entregues por streaming
   autenticado (a URL do armazenamento não é exposta ao navegador).
-- Suíte de isolamento entre condomínios: `bun scripts/testes-isolamento.mjs`.
+- Suítes de teste: `bun scripts/testes-isolamento.mjs` (20), `testes-simulacao.mjs` (19),
+  `testes-funcoes.mjs` (17) e `testes-fase2.mjs` (36 — ocorrências, manutenção, regras,
+  QR e redefinição de senha).
+- Backup completo do banco: `bun scripts/backup-turso.mjs` (JSON em `backups/`, agende
+  diariamente no seu CI/cron; execução é somente leitura e segura a qualquer momento).
 - Módulo financeiro: **fora do escopo** por decisão do cliente (empresa externa cuida do
   financeiro; a arquitetura de vínculos por condomínio fica pronta para integração futura).

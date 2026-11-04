@@ -31,6 +31,46 @@ export async function POST(req: Request) {
     return Response.json({ erro: "Informe espaço, data e horário." }, { status: 400 });
   }
 
+  // ── Regras do espaço (antecedência máxima e limite mensal) ──
+  const regra = await db.regraReserva.findUnique({
+    where: { condominioId_espaco: { condominioId: eu.condominio.id, espaco } },
+  });
+  const antecedenciaMaxDias = regra?.antecedenciaMaxDias ?? 60;
+  const limiteMensalUnidade = regra?.limiteMensalUnidade ?? 2;
+  const hoje = new Date().toISOString().slice(0, 10);
+  const limiteData = new Date(Date.now() + antecedenciaMaxDias * 86_400_000)
+    .toISOString()
+    .slice(0, 10);
+  if (data < hoje) {
+    return Response.json({ erro: "A data da reserva já passou." }, { status: 400 });
+  }
+  if (data > limiteData) {
+    return Response.json(
+      {
+        erro: `${ROTULO_ESPACO[espaco] ?? espaco} aceita reservas com até ${antecedenciaMaxDias} dia(s) de antecedência.`,
+      },
+      { status: 400 },
+    );
+  }
+  const mes = data.slice(0, 7); // yyyy-MM
+  const noMes = await db.reserva.count({
+    where: {
+      condominioId: eu.condominio.id,
+      espaco,
+      solicitanteId: eu.id,
+      data: { startsWith: mes },
+      status: { in: ["PENDENTE", "CONFIRMADA"] },
+    },
+  });
+  if (noMes >= limiteMensalUnidade) {
+    return Response.json(
+      {
+        erro: `Você já atingiu o limite de ${limiteMensalUnidade} reserva(s) de ${ROTULO_ESPACO[espaco] ?? espaco} neste mês.`,
+      },
+      { status: 409 },
+    );
+  }
+
   const conflito = await db.reserva.findFirst({
     where: {
       condominioId: eu.condominio.id,

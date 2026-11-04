@@ -114,6 +114,11 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
   const [erro, setErro] = useState("");
   const [enviando, setEnviando] = useState(false);
   const [MODO_DEMO, setModoDemo] = useState(false);
+  // Recuperação de senha
+  const [recuperando, setRecuperando] = useState(false);
+  const [emailRecuperacao, setEmailRecuperacao] = useState("");
+  const [avisoRecuperacao, setAvisoRecuperacao] = useState("");
+  const [enviandoRecuperacao, setEnviandoRecuperacao] = useState(false);
 
   useEffect(() => {
     fetch("/api/ambiente")
@@ -148,6 +153,26 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
       setErro(mensagemDeErro(e, "Falha ao entrar."));
     } finally {
       setEnviando(false);
+    }
+  }
+
+  async function solicitarRecuperacao() {
+    setAvisoRecuperacao("");
+    setEnviandoRecuperacao(true);
+    try {
+      const r = await fetch("/api/auth/recuperar", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: emailRecuperacao }),
+      });
+      const corpo = await corpoJson<{ mensagem?: string; erro?: string }>(r);
+      setAvisoRecuperacao(
+        corpo?.mensagem || corpo?.erro || "Se o e-mail estiver cadastrado, você receberá as instruções.",
+      );
+    } catch {
+      setAvisoRecuperacao("Não foi possível enviar agora. Tente novamente em instantes.");
+    } finally {
+      setEnviandoRecuperacao(false);
     }
   }
 
@@ -350,6 +375,46 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
                   "Entrar"
                 )}
               </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setRecuperando((v) => !v);
+                  setAvisoRecuperacao("");
+                }}
+                className="w-full text-center text-sm font-medium text-stone-500 underline-offset-4 transition hover:text-stone-700 hover:underline"
+              >
+                Esqueci minha senha
+              </button>
+
+              {recuperando && (
+                <div className="rounded-xl border border-stone-200 bg-stone-50 p-3.5">
+                  <p className="text-sm text-stone-600">
+                    Informe o e-mail da conta — enviaremos um link para escolher uma nova senha
+                    (vale 1 hora).
+                  </p>
+                  <div className="mt-2.5 flex gap-2">
+                    <input
+                      type="email"
+                      placeholder="seu@email.com"
+                      value={emailRecuperacao}
+                      onChange={(e) => setEmailRecuperacao(e.target.value)}
+                      className="h-10 flex-1 rounded-lg border border-stone-200 bg-white px-3 text-sm text-stone-900 outline-none transition placeholder:text-stone-400 focus:border-stone-400 focus:ring-4 focus:ring-stone-400/10"
+                    />
+                    <button
+                      type="button"
+                      onClick={solicitarRecuperacao}
+                      disabled={enviandoRecuperacao || !emailRecuperacao.trim()}
+                      className="inline-flex h-10 items-center gap-1.5 rounded-lg bg-stone-800 px-3.5 text-sm font-semibold text-white transition hover:bg-stone-700 disabled:opacity-50"
+                    >
+                      {enviandoRecuperacao && <LoaderCircle className="h-4 w-4 animate-spin" />} Enviar
+                    </button>
+                  </div>
+                  {avisoRecuperacao && (
+                    <p className="mt-2 rounded-lg bg-white px-3 py-2 text-sm text-stone-700">{avisoRecuperacao}</p>
+                  )}
+                </div>
+              )}
             </form>
           </div>
 

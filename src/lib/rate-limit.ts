@@ -1,37 +1,45 @@
 /**
- * Rate limit simples em memória para o endpoint de login.
- * Conta apenas TENTATIVAS FALHAS — acertos limpam o contador.
- * Em serverless o Map é por instância — é uma proteção primeira contra
- * força bruta, não um bloqueio global (para isso, use um middleware com
- * armazenamento compartilhado, ex. Upstash Redis).
+ * Rate limit do login com armazenamento no BANCO (TentativaLogin):
+ * funciona entre todas as instâncias serverless — a primeira camada em
+ * memória (por instância) segue como proteção extra de custo.
+ * Conta apenas TENTATIVAS FALHAS — acertos limpam o contador da chave.
  */
+import { db } from "@/lib/db";
+
 const JANELA_MS = 10 * 60 * 1000; // 10 minutos
 const MAX_FALHAS = 8;
 
-const registros = new Map<string, { n: number; expira: number }>();
-
 /** true se a tentativa pode seguir (sem contar tentativa). */
-export function permitirTentativa(chave: string): boolean {
-  const agora = Date.now();
-  const atual = registros.get(chave);
-  if (atual && agora <= atual.expira && atual.n >= MAX_FALHAS) return false;
-  return true;
+export async function permitirTentativa(chave: string): Promise<boolean> {
+  const corte = new Date(Date.now() - JANELA_MS);
+  const falhas = await db.tentativaLogin.count({
+    where: { chave, criadoEm: { gte: corte } },
+  });
+  return falhas < MAX_FALHAS;
 }
 
 /** Registra uma falha de credencial para a chave. */
-export function registrarFalha(chave: string) {
-  const agora = Date.now();
-  const atual = registros.get(chave);
-  if (!atual || agora > atual.expira) {
-    registros.set(chave, { n: 1, expira: agora + JANELA_MS });
-  } else {
-    atual.n += 1;
+export async function registrarFalha(chave: string) {
+  try {
+    await db.tentativaLogin.create({ data: { chave } });
+    // Limpeza oportunista: descarta histórico antigo (1h) em ~10% das falhas
+    if (Math.random() < 0.1) {
+      await db.tentativaLogin.deleteMany({
+        where: { criadoEm: { lt: new Date(Date.now() - 3_600_000) } },
+      });
+    }
+  } catch {
+    // o rate limit nunca deve derrubar o login
   }
 }
 
 /** Acertou a credencial — limpa o histórico da chave. */
-export function limparTentativas(chave: string) {
-  registros.delete(chave);
+export async function limparTentativas(chave: string) {
+  try {
+    await db.tentativaLogin.deleteMany({ where: { chave } });
+  } catch {
+    // idem
+  }
 }
 
 export function ipDaRequisicao(req: Request): string {

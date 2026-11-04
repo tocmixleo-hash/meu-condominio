@@ -1,7 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { LoaderCircle } from "lucide-react";
+import { LoaderCircle, QrCode } from "lucide-react";
+import QRCode from "qrcode";
 import {
   Badge,
   BotaoPrimario,
@@ -48,6 +49,7 @@ export default function Encomendas({ perfil }: { perfil: Perfil }) {
   const [liberar, setLiberar] = useState<Encomenda | null>(null);
   const [codigo, setCodigo] = useState("");
   const [erroCodigo, setErroCodigo] = useState("");
+  const [qr, setQr] = useState<{ descricao: string; codigo: string; imagem: string } | null>(null);
 
   const naPortaria = perfil === "PORTARIA" || perfil === "SINDICO" || perfil === "ADMINISTRATIVO";
 
@@ -113,6 +115,15 @@ export default function Encomendas({ perfil }: { perfil: Perfil }) {
     }
   }
 
+  async function mostrarQR(e: Encomenda) {
+    const imagem = await QRCode.toDataURL(e.codigo, {
+      width: 320,
+      margin: 1,
+      color: { dark: "#1c1917", light: "#ffffff" },
+    });
+    setQr({ descricao: e.descricao, codigo: e.codigo, imagem });
+  }
+
   return (
     <div className="space-y-6">
       <Secao
@@ -159,6 +170,13 @@ export default function Encomendas({ perfil }: { perfil: Perfil }) {
                       </span>
                     )}
                     <Badge tom={tomStatusEncomenda(e.status)}>{rotuloStatusEncomenda(e.status)}</Badge>
+                    {!naPortaria && e.status === "AGUARDANDO" && (
+                      <BotaoTexto onClick={() => mostrarQR(e)}>
+                        <span className="inline-flex items-center gap-1">
+                          <QrCode className="h-4 w-4" /> QR
+                        </span>
+                      </BotaoTexto>
+                    )}
                     {naPortaria && e.status === "AGUARDANDO" && (
                       <BotaoTexto
                         onClick={() => {
@@ -238,6 +256,33 @@ export default function Encomendas({ perfil }: { perfil: Perfil }) {
               <BotaoPrimario onClick={criar} disabled={enviando || !form.destinatarioId}>
                 {enviando && <LoaderCircle className="h-4 w-4 animate-spin" />} Registrar
               </BotaoPrimario>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {qr && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <button
+            aria-label="Fechar"
+            className="absolute inset-0 bg-black/40"
+            onClick={() => setQr(null)}
+          />
+          <div className="relative w-full max-w-xs rounded-lg border border-[var(--cor-neutra)] bg-white p-6 text-center shadow-xl">
+            <h3 className="text-base font-semibold text-stone-900">{qr.descricao}</h3>
+            <p className="mt-0.5 text-xs text-stone-500">
+              Mostre este QR na portaria para liberar a retirada.
+            </p>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={qr.imagem} alt={`QR Code de retirada da encomenda ${qr.descricao}`} className="mx-auto mt-3 h-56 w-56" />
+            <p className="mt-3 text-2xl font-bold tracking-[0.3em] tabular-nums text-stone-900">
+              {qr.codigo}
+            </p>
+            <p className="mt-1 text-[11px] uppercase tracking-[0.14em] text-stone-400">
+              Código de retirada
+            </p>
+            <div className="mt-4 flex justify-center">
+              <BotaoSecundario onClick={() => setQr(null)}>Fechar</BotaoSecundario>
             </div>
           </div>
         </div>

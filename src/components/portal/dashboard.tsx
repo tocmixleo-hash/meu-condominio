@@ -13,13 +13,16 @@ import {
   LinhaLista,
   Lista,
   ROTULO_CATEGORIA_COMUNICADO,
+  ROTULO_CATEGORIA_OCORRENCIA,
   ROTULO_ESPACO,
   rotuloStatusAutorizacao,
   rotuloStatusEncomenda,
+  rotuloStatusOcorrencia,
   rotuloStatusReserva,
   Secao,
   tomStatusAutorizacao,
   tomStatusEncomenda,
+  tomStatusOcorrencia,
   tomStatusReserva,
 } from "@/components/portal/ui";
 import type { ModuloId, Perfil } from "@/components/portal/app-shell";
@@ -60,6 +63,16 @@ type Comunicado = {
   criadoEm: string;
 };
 
+type Ocorrencia = {
+  id: string;
+  titulo: string;
+  categoria: string;
+  prioridade: string;
+  status: string;
+  criadoEm: string;
+  abertaPor?: { nome: string; unidade?: { bloco: string; numero: string } | null };
+};
+
 type Assembleia = {
   id: string;
   titulo: string;
@@ -79,6 +92,7 @@ type DashboardData = {
   autorizacoesRecentes?: Autorizacao[];
   comunicadosRecentes?: Comunicado[];
   assembleiasProximas?: Assembleia[];
+  ocorrenciasRecentes?: Ocorrencia[];
 };
 
 function saudacao() {
@@ -108,18 +122,20 @@ const DESCRICAO_PERFIL: Record<Perfil, string> = {
     "Movimentação do dia: encomendas recebidas e autorizações de acesso válidas na guarita.",
   PLATAFORMA:
     "Console da plataforma: você está operando no condomínio ativo do seletor — gerencie ambientes, identidades visuais e auditoria.",
+  FUNCAO:
+    "Painel da sua função no condomínio — os módulos concedidos pela administração aparecem no menu.",
 };
 
 const ACOES: Record<Perfil, { rotulo: string; destino: ModuloId }[]> = {
   MORADOR: [
     { rotulo: "Nova reserva", destino: "reservas" },
     { rotulo: "Autorizar visitante", destino: "autorizacoes" },
-    { rotulo: "Ver comunicados", destino: "comunicados" },
+    { rotulo: "Reportar problema", destino: "ocorrencias" },
   ],
   SINDICO: [
     { rotulo: "Publicar comunicado", destino: "comunicados" },
     { rotulo: "Aprovar reservas", destino: "reservas" },
-    { rotulo: "Nova assembleia", destino: "assembleias" },
+    { rotulo: "Ocorrências", destino: "ocorrencias" },
   ],
   ADMINISTRATIVO: [
     { rotulo: "Publicar comunicado", destino: "comunicados" },
@@ -133,6 +149,9 @@ const ACOES: Record<Perfil, { rotulo: string; destino: ModuloId }[]> = {
   PLATAFORMA: [
     { rotulo: "Gerenciar condomínios", destino: "condominios" },
     { rotulo: "Identidade visual", destino: "identidade" },
+  ],
+  FUNCAO: [
+    { rotulo: "Ocorrências", destino: "ocorrencias" },
   ],
 };
 
@@ -307,6 +326,25 @@ export default function Dashboard({
                   )}
                 </Lista>
               </Secao>
+
+              <Secao titulo="Minhas ocorrências">
+                <Lista className="border-t border-[var(--cor-neutra)]">
+                  {dados.ocorrenciasRecentes?.length ? (
+                    dados.ocorrenciasRecentes.slice(0, 3).map((o) => (
+                      <LinhaLista
+                        key={o.id}
+                        principal={o.titulo}
+                        secundaria={ROTULO_CATEGORIA_OCORRENCIA[o.categoria] ?? o.categoria}
+                        direita={
+                          <Badge tom={tomStatusOcorrencia(o.status)}>{rotuloStatusOcorrencia(o.status)}</Badge>
+                        }
+                      />
+                    ))
+                  ) : (
+                    <EstadoVazio mensagem="Nenhuma ocorrência registrada." />
+                  )}
+                </Lista>
+              </Secao>
             </>
           )}
 
@@ -377,6 +415,38 @@ export default function Dashboard({
                   )}
                 </Lista>
               </Secao>
+
+              <Secao titulo="Ocorrências em andamento">
+                <Lista className="border-t border-[var(--cor-neutra)]">
+                  {dados.ocorrenciasRecentes?.length ? (
+                    dados.ocorrenciasRecentes.slice(0, 4).map((o) => (
+                      <LinhaLista
+                        key={o.id}
+                        principal={o.titulo}
+                        secundaria={`${
+                          o.abertaPor?.unidade
+                            ? `Un. ${o.abertaPor.unidade.bloco}-${o.abertaPor.unidade.numero} · `
+                            : ""
+                        }${ROTULO_CATEGORIA_OCORRENCIA[o.categoria] ?? o.categoria}`}
+                        detalhe={`Aberta ${dataHoraCurta(o.criadoEm)}`}
+                        direita={
+                          <div className="flex items-center gap-2">
+                            <Badge tom={tomStatusOcorrencia(o.status)}>{rotuloStatusOcorrencia(o.status)}</Badge>
+                            <button
+                              className="text-sm font-medium text-[var(--cor-tema)] underline-offset-4 hover:underline"
+                              onClick={() => aoTrocar("ocorrencias")}
+                            >
+                              Atender
+                            </button>
+                          </div>
+                        }
+                      />
+                    ))
+                  ) : (
+                    <EstadoVazio mensagem="Nenhuma ocorrência aberta. Tudo em dia!" />
+                  )}
+                </Lista>
+              </Secao>
             </>
           )}
 
@@ -421,6 +491,25 @@ export default function Dashboard({
                     ))
                   ) : (
                     <EstadoVazio mensagem="Nenhuma autorização válida hoje." />
+                  )}
+                </Lista>
+              </Secao>
+
+              <Secao titulo="Ocorrências abertas">
+                <Lista className="border-t border-[var(--cor-neutra)]">
+                  {dados.ocorrenciasRecentes?.length ? (
+                    dados.ocorrenciasRecentes.slice(0, 3).map((o) => (
+                      <LinhaLista
+                        key={o.id}
+                        principal={o.titulo}
+                        secundaria={`${
+                          o.abertaPor?.unidade ? `Un. ${o.abertaPor.unidade.bloco}-${o.abertaPor.unidade.numero} · ` : ""
+                        }${ROTULO_CATEGORIA_OCORRENCIA[o.categoria] ?? o.categoria}`}
+                        direita={<Badge tom={tomStatusOcorrencia(o.status)}>{rotuloStatusOcorrencia(o.status)}</Badge>}
+                      />
+                    ))
+                  ) : (
+                    <EstadoVazio mensagem="Nenhuma ocorrência aberta." />
                   )}
                 </Lista>
               </Secao>

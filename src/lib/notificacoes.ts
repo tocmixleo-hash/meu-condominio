@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { emailConfigurado, enviarEmail } from "@/lib/email";
 
 /**
  * Notificações in-app (sino do portal). Quando RESEND_API_KEY estiver
@@ -49,28 +50,22 @@ export async function notificarCondominio(
 }
 
 async function enviarPorEmail(entradas: EntradaNotificacao[]) {
-  const chave = process.env.RESEND_API_KEY;
-  const remetente = process.env.EMAIL_REMETENTE;
-  if (!chave || !remetente) return;
+  if (!emailConfigurado()) return;
   const usuarios = await db.usuario.findMany({
     where: { id: { in: entradas.map((e) => e.usuarioId) }, ativo: true },
-    select: { email: true, nome: true },
+    select: { id: true, email: true, nome: true },
   });
+  const porId = new Map(entradas.map((e) => [e.usuarioId, e]));
   await Promise.allSettled(
-    usuarios.map((u) =>
-      fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${chave}`, "Content-Type": "application/json" },
-        body: JSON.stringify({
-          from: remetente,
-          to: u.email,
-          subject: "Meu Condomínio — você tem um novo aviso",
-          text: `Olá, ${u.nome.split(" ")[0]}.\n\n${entradas
-            .filter((e) => true)
-            .map((e) => `${e.titulo}: ${e.mensagem}`)
-            .join("\n\n")}\n\nAbra o portal para mais detalhes.`,
-        }),
-      }),
-    ),
+    usuarios.map((u) => {
+      const e = porId.get(u.id);
+      if (!e) return Promise.resolve(null);
+      return enviarEmail({
+        para: u.email,
+        nome: u.nome,
+        assunto: "Meu Condomínio — você tem um novo aviso",
+        texto: `${e.titulo}: ${e.mensagem}\n\nAbra o portal para mais detalhes.`,
+      });
+    }),
   );
 }

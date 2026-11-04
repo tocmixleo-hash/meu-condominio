@@ -9,6 +9,8 @@ import Comunicados from "@/components/portal/comunicados";
 import Reservas from "@/components/portal/reservas";
 import Encomendas from "@/components/portal/encomendas";
 import Autorizacoes from "@/components/portal/autorizacoes";
+import Ocorrencias from "@/components/portal/ocorrencias";
+import Manutencao from "@/components/portal/manutencao";
 import Documentos from "@/components/portal/documentos";
 import Assembleias from "@/components/portal/assembleias";
 import Moradores from "@/components/portal/moradores";
@@ -179,6 +181,8 @@ export default function Inicio() {
       {modulo === "reservas" && <Reservas perfil={perfilModulos} />}
       {modulo === "encomendas" && <Encomendas perfil={perfilModulos} />}
       {modulo === "autorizacoes" && <Autorizacoes perfil={perfilModulos} />}
+      {modulo === "ocorrencias" && <Ocorrencias perfil={perfilModulos} />}
+      {modulo === "manutencao" && <Manutencao />}
       {modulo === "documentos" && <Documentos perfil={perfilModulos} />}
       {modulo === "assembleias" && <Assembleias perfil={perfilModulos} />}
       {modulo === "moradores" && <Moradores />}

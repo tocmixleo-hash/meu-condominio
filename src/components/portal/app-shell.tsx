@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import {
+  AlertTriangle,
   Building2,
   CalendarDays,
   ChevronDown,
@@ -24,6 +25,7 @@ import {
   User,
   UserCog,
   Users,
+  Wrench,
   X,
 } from "lucide-react";
 import { cssVarsDoTema, resolverTema } from "@/lib/tema";
@@ -35,6 +37,8 @@ export type ModuloId =
   | "reservas"
   | "encomendas"
   | "autorizacoes"
+  | "ocorrencias"
+  | "manutencao"
   | "documentos"
   | "assembleias"
   | "moradores"
@@ -54,6 +58,8 @@ const MENUS: Record<Perfil, ItemMenu[]> = {
     { id: "reservas", rotulo: "Reservas", icone: CalendarDays },
     { id: "encomendas", rotulo: "Encomendas", icone: Package },
     { id: "autorizacoes", rotulo: "Autorizações", icone: DoorOpen },
+    { id: "ocorrencias", rotulo: "Ocorrências", icone: AlertTriangle },
+    { id: "manutencao", rotulo: "Manutenção", icone: Wrench },
     { id: "documentos", rotulo: "Documentos", icone: FileText },
     { id: "assembleias", rotulo: "Assembleias", icone: Users },
     { id: "moradores", rotulo: "Moradores", icone: Users },
@@ -66,6 +72,8 @@ const MENUS: Record<Perfil, ItemMenu[]> = {
     { id: "reservas", rotulo: "Reservas", icone: CalendarDays },
     { id: "encomendas", rotulo: "Encomendas", icone: Package },
     { id: "autorizacoes", rotulo: "Autorizações", icone: DoorOpen },
+    { id: "ocorrencias", rotulo: "Ocorrências", icone: AlertTriangle },
+    { id: "manutencao", rotulo: "Manutenção", icone: Wrench },
     { id: "documentos", rotulo: "Documentos", icone: FileText },
     { id: "assembleias", rotulo: "Assembleias", icone: Users },
     { id: "moradores", rotulo: "Moradores", icone: Users },
@@ -76,6 +84,7 @@ const MENUS: Record<Perfil, ItemMenu[]> = {
     { id: "inicio", rotulo: "Início", icone: Home },
     { id: "encomendas", rotulo: "Encomendas", icone: Package },
     { id: "autorizacoes", rotulo: "Autorizações", icone: DoorOpen },
+    { id: "ocorrencias", rotulo: "Ocorrências", icone: AlertTriangle },
   ],
   MORADOR: [
     { id: "inicio", rotulo: "Início", icone: Home },
@@ -83,6 +92,7 @@ const MENUS: Record<Perfil, ItemMenu[]> = {
     { id: "reservas", rotulo: "Reservas", icone: CalendarDays },
     { id: "encomendas", rotulo: "Encomendas", icone: Package },
     { id: "autorizacoes", rotulo: "Autorizações", icone: DoorOpen },
+    { id: "ocorrencias", rotulo: "Ocorrências", icone: AlertTriangle },
   ],
   PLATAFORMA: [
     { id: "inicio", rotulo: "Início", icone: Home },
@@ -120,6 +130,8 @@ const ITEM_POR_MODULO: Record<string, ItemMenu> = {
   reservas: { id: "reservas", rotulo: "Reservas", icone: CalendarDays },
   encomendas: { id: "encomendas", rotulo: "Encomendas", icone: Package },
   autorizacoes: { id: "autorizacoes", rotulo: "Autorizações", icone: DoorOpen },
+  ocorrencias: { id: "ocorrencias", rotulo: "Ocorrências", icone: AlertTriangle },
+  manutencao: { id: "manutencao", rotulo: "Manutenção", icone: Wrench },
   documentos: { id: "documentos", rotulo: "Documentos", icone: FileText },
   assembleias: { id: "assembleias", rotulo: "Assembleias", icone: Users },
   moradores: { id: "moradores", rotulo: "Moradores", icone: Users },

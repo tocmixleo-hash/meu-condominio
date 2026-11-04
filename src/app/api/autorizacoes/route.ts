@@ -33,6 +33,15 @@ export async function POST(req: Request) {
   if (dataFim < dataInicio) {
     return Response.json({ erro: "A data final deve ser depois da inicial." }, { status: 400 });
   }
+
+  // Código único do QR de entrada (portaria valida pelo código escaneado/digitado)
+  let codigo: string;
+  do {
+    codigo = String(Math.floor(100000 + Math.random() * 900000));
+  } while (
+    await db.autorizacao.findFirst({ where: { condominioId: eu.condominio.id, codigo } })
+  );
+
   const autorizacao = await db.autorizacao.create({
     data: {
       condominioId: eu.condominio.id,
@@ -40,6 +49,7 @@ export async function POST(req: Request) {
       tipo: tipo === "PRESTADOR" ? "PRESTADOR" : "VISITANTE",
       documento: documento?.trim() || null,
       veiculo: veiculo?.trim() || null,
+      codigo,
       dataInicio,
       dataFim,
       moradorId: eu.id,

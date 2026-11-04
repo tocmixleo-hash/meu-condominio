@@ -32,6 +32,31 @@ export const ROTULO_CATEGORIA_DOCUMENTO: Record<string, string> = {
   OUTRO: "Outro",
 };
 
+export const ROTULO_CATEGORIA_OCORRENCIA: Record<string, string> = {
+  INFRAESTRUTURA: "Infraestrutura",
+  ELETRICA: "Elétrica",
+  HIDRAULICA: "Hidráulica",
+  ELEVADOR: "Elevador",
+  SEGURANCA: "Segurança",
+  LIMPEZA: "Limpeza",
+  OUTROS: "Outros",
+};
+
+export const ROTULO_PRIORIDADE_OCORRENCIA: Record<string, string> = {
+  BAIXA: "Baixa",
+  NORMAL: "Normal",
+  ALTA: "Alta",
+  URGENTE: "Urgente",
+};
+
+export const ROTULO_PERIODICIDADE: Record<string, string> = {
+  MENSAL: "Mensal",
+  BIMESTRAL: "Bimestral",
+  TRIMESTRAL: "Trimestral",
+  SEMESTRAL: "Semestral",
+  ANUAL: "Anual",
+};
+
 export const ROTULO_AUTORIZACAO: Record<string, string> = {
   VISITANTE: "Visitante",
   PRESTADOR: "Prestador",
@@ -44,10 +69,18 @@ export const ROTULO_ACAO: Record<string, string> = {
   RESERVA_CONFIRMADA: "Confirmou reserva",
   RESERVA_REJEITADA: "Rejeitou reserva",
   RESERVA_CANCELADA: "Cancelou reserva",
+  RESERVA_REGRAS: "Ajustou as regras de reserva",
   ENCOMENDA_REGISTRADA: "Registrou encomenda",
   ENCOMENDA_RETIRADA: "Deu baixa em encomenda",
   AUTORIZACAO_CRIADA: "Autorizou visitante",
   AUTORIZACAO_CANCELADA: "Cancelou autorização",
+  AUTORIZACAO_ENTRADA: "Registrou entrada de visitante",
+  OCORRENCIA_CRIADA: "Abriu ocorrência",
+  OCORRENCIA_ATUALIZADA: "Atualizou ocorrência",
+  OCORRENCIA_RESOLVIDA: "Resolveu ocorrência",
+  MANUTENCAO_CRIADA: "Agendou manutenção",
+  MANUTENCAO_REALIZADA: "Registrou realização de manutenção",
+  MANUTENCAO_ALTERADA: "Alterou manutenção",
   MORADOR_CADASTRADO: "Cadastrou morador",
   MORADOR_ALTERADO: "Alterou morador",
   EQUIPE_CADASTRADA: "Cadastrou membro da equipe",
@@ -64,6 +97,7 @@ export const ROTULO_ACAO: Record<string, string> = {
   IDENTIDADE_ARQUIVO: "Atualizou arquivo da identidade",
   CONDOMINIO_CRIADO: "Cadastrou condomínio",
   SENHA_ALTERADA: "Alterou a própria senha",
+  SENHA_REDEFINIDA: "Redefiniu a senha pelo token de recuperação",
 };
 
 export function formatarData(iso: string) {
