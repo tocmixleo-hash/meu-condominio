@@ -168,7 +168,11 @@ function SinoNotificacoes({ sobreClaro = false }: { sobreClaro?: boolean }) {
       </button>
 
       {aberto && (
-        <div className="absolute right-0 top-full z-50 mt-2 w-80 rounded-xl border border-[var(--cor-neutra)] bg-white shadow-xl">
+        <div
+          className={`absolute top-full z-50 mt-2 w-80 rounded-xl border border-[var(--cor-neutra)] bg-white shadow-xl ${
+            sobreClaro ? "right-0" : "left-0"
+          }`}
+        >
           <div className="flex items-center justify-between border-b border-[var(--cor-neutra)] px-4 py-3">
             <p className="text-sm font-semibold text-stone-900">Notificações</p>
             {naoLidas > 0 && (
