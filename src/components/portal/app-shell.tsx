@@ -87,6 +87,7 @@ const MENUS: Record<Perfil, ItemMenu[]> = {
     { id: "inicio", rotulo: "Início", icone: Home },
     { id: "condominios", rotulo: "Condomínios", icone: Building2 },
     { id: "funcoes", rotulo: "Funções", icone: UserCog },
+    { id: "moradores", rotulo: "Moradores", icone: Users },
     { id: "identidade", rotulo: "Identidade visual", icone: Palette },
     { id: "auditoria", rotulo: "Auditoria", icone: History },
   ],
