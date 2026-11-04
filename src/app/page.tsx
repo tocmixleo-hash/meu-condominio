@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import AppShell, { type ModuloId, type Perfil } from "@/components/portal/app-shell";
+import type { SimulacaoUI } from "@/components/portal/app-shell";
 import LoginScreen, { type CondominioUI } from "@/components/portal/login-screen";
 import Dashboard from "@/components/portal/dashboard";
 import Comunicados from "@/components/portal/comunicados";
@@ -28,6 +29,7 @@ type Usuario = {
   condominio?: CondominioUI;
   condominios?: CondominioUI[];
   ehPlataforma?: boolean;
+  simulando?: SimulacaoUI | null;
 };
 
 const CONDOMINIO_PADRAO: CondominioUI = {
@@ -81,6 +83,38 @@ export default function Inicio() {
     }
   }
 
+  // Simulação de perfis: o administrador da plataforma "veste" um perfil
+  // (ou função personalizada) para testar o que ele vê e pode fazer.
+  async function simular(perfil: string, funcaoId?: string) {
+    setAviso("");
+    try {
+      const r = await fetch("/api/auth/simular", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ perfil, ...(funcaoId ? { funcaoId } : {}) }),
+      });
+      const d = await r.json().catch(() => null);
+      if (!r.ok) throw new Error(d?.erro || "Não foi possível iniciar a simulação.");
+      setUsuario(d.usuario as Usuario);
+      setModulo("inicio");
+    } catch (e) {
+      setAviso(mensagemDeErro(e, "Falha ao simular perfil."));
+    }
+  }
+
+  async function encerrarSimulacao() {
+    setAviso("");
+    try {
+      const r = await fetch("/api/auth/simular", { method: "DELETE" });
+      const d = await r.json().catch(() => null);
+      if (!r.ok) throw new Error(d?.erro || "Não foi possível encerrar a simulação.");
+      setUsuario(d.usuario as Usuario);
+      setModulo("inicio");
+    } catch (e) {
+      setAviso(mensagemDeErro(e, "Falha ao encerrar a simulação."));
+    }
+  }
+
   if (carregando) {
     return (
       <div className="flex h-dvh items-center justify-center bg-[var(--cor-fundo,#f7f6f3)]">
@@ -120,8 +154,11 @@ export default function Inicio() {
       modulo={modulo}
       permissoes={usuario.permissoes}
       funcaoNome={usuario.funcaoNome}
+      simulando={usuario.simulando}
       aoTrocar={setModulo}
       aoTrocarCondominio={trocarCondominio}
+      aoSimular={simular}
+      aoEncerrarSimulacao={encerrarSimulacao}
       aoSair={sair}
     >
       {aviso && (

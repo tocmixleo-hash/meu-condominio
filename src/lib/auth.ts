@@ -7,6 +7,7 @@ import { db } from "@/lib/db";
 // existe para o ambiente de demonstração — é determinístico entre instâncias.
 const SEGREDO = process.env.SEGREDO_SESSAO ?? "meu-condominio::chave-padrao-demo";
 export const COOKIE_SESSAO = "mc_sessao";
+export const COOKIE_SIMULACAO = "mc_simulacao"; // simulação de perfis (só plataforma)
 const DURACAO_SESSAO_MS = 7 * 24 * 60 * 60 * 1000; // 7 dias
 
 export function hashSenha(senha: string): string {
@@ -45,6 +46,39 @@ export function lerToken(token: string): { userId: string; condominioAtivoId: st
   if (!userId || !Number.isFinite(iat)) return null;
   if (Date.now() - iat > DURACAO_SESSAO_MS) return null; // sessão expirada
   return { userId, condominioAtivoId: condominioAtivoId || null };
+}
+
+// ── Simulação de perfis (exclusiva do administrador da plataforma) ─
+// O administrador pode "vestir" qualquer perfil do condomínio ativo para
+// testar exatamente o que cada um vê e pode fazer. O cookie é assinado e
+// só é honrado quando a sessão de base é PLATAFORMA — a simulação nunca
+// amplia poderes de outros usuários.
+export type Simulacao = {
+  perfil: string;
+  funcaoId: string | null;
+  funcaoNome: string | null;
+};
+
+const PERFIS_SIMULAVEIS = ["SINDICO", "ADMINISTRATIVO", "PORTARIA", "MORADOR"];
+
+export function criarTokenSimulacao(perfil: string, funcaoId?: string | null): string {
+  const payload = Buffer.from(`${perfil}|${funcaoId ?? ""}`).toString("base64url");
+  return `${payload}.${assinar(payload)}`;
+}
+
+export function lerTokenSimulacao(
+  token: string | undefined | null,
+): { perfil: string; funcaoId: string | null } | null {
+  if (!token) return null;
+  const [payload, assinatura] = token.split(".");
+  if (!payload || !assinatura) return null;
+  const esperada = assinar(payload);
+  const a = Buffer.from(assinatura);
+  const b = Buffer.from(esperada);
+  if (a.length !== b.length || !timingSafeEqual(a, b)) return null;
+  const [perfil, funcaoId] = Buffer.from(payload, "base64url").toString("utf8").split("|");
+  if (!perfil) return null;
+  return { perfil, funcaoId: funcaoId || null };
 }
 
 // ── Sessão ───────────────────────────────────────────────────────
@@ -87,6 +121,7 @@ export type UsuarioSessao = {
   condominios: CondominioSessao[]; // condomínios acessíveis (vínculos ou todos)
   permissoes: string[]; // módulos concedidos no condomínio ativo
   ehPlataforma: boolean;
+  simulando: Simulacao | null; // perfil "vestido" pelo administrador (teste)
 };
 
 // ── Permissões por módulo ────────────────────────────────────────
@@ -249,6 +284,7 @@ async function montarSessao(
       condominios: todos.map(paraSessao),
       permissoes: [...MODULOS_TODOS],
       ehPlataforma: true,
+      simulando: null,
     };
   }
 
@@ -276,6 +312,63 @@ async function montarSessao(
     condominios: vinculos.map((v) => paraSessao(v.condominio)),
     permissoes,
     ehPlataforma: false,
+    simulando: null,
+  };
+}
+
+/**
+ * Aplica a simulação de perfil sobre a sessão do administrador da
+ * plataforma. Sessões de outros usuários passam ilesas — a simulação nunca
+ * amplia poderes. `valorCookie` permite aplicar o cookie recém-criado no
+ * mesmo request (o store pode não refletir a escrita imediatamente).
+ */
+async function aplicarSimulacao(
+  sessao: UsuarioSessao,
+  valorCookie?: string | null,
+): Promise<UsuarioSessao> {
+  if (!sessao.ehPlataforma) return sessao;
+  let valor = valorCookie;
+  if (valor === undefined) {
+    const loja = await cookies();
+    valor = loja.get(COOKIE_SIMULACAO)?.value;
+  }
+  const lida = lerTokenSimulacao(valor);
+  if (!lida) return sessao;
+
+  let permissoes: string[];
+  let funcaoNome: string | null = null;
+
+  if (lida.perfil === "FUNCAO") {
+    if (!lida.funcaoId) return sessao;
+    const f = await db.funcao.findUnique({
+      where: { id: lida.funcaoId },
+      select: { nome: true, permissoes: true, ativo: true, condominioId: true },
+    });
+    if (!f || !f.ativo || f.condominioId !== sessao.condominio.id) return sessao;
+    let lista: string[] = [];
+    try {
+      const bruto = JSON.parse(f.permissoes);
+      if (Array.isArray(bruto)) {
+        lista = bruto.filter((m) => (MODULOS_CONCEDIVEIS as readonly string[]).includes(m));
+      }
+    } catch {
+      lista = [];
+    }
+    permissoes = ["inicio", ...lista];
+    funcaoNome = f.nome;
+  } else if (PERFIS_SIMULAVEIS.includes(lida.perfil)) {
+    permissoes = [...(PERMISSOES_FIXAS[lida.perfil] ?? ["inicio"])];
+  } else {
+    return sessao;
+  }
+
+  return {
+    ...sessao,
+    perfil: lida.perfil,
+    funcaoNome,
+    permissoes,
+    ehPlataforma: false,
+    simulando: { perfil: lida.perfil, funcaoId: lida.funcaoId, funcaoNome },
   };
 }
 
@@ -302,7 +395,9 @@ export async function usuarioAtual(): Promise<UsuarioSessao | null> {
     include: INCLUIR_SESSAO,
   });
   if (!u || !u.ativo) return null;
-  return montarSessao(u, lido.condominioAtivoId);
+  const base = await montarSessao(u, lido.condominioAtivoId);
+  if (!base) return null;
+  return aplicarSimulacao(base);
 }
 
 /** Sessão explícita após login ou troca de condomínio (usa a mesma regra de segurança). */
@@ -316,6 +411,21 @@ export async function sessaoComCondominio(
   });
   if (!u || !u.ativo) return null;
   return montarSessao(u, condominioAtivoId);
+}
+
+/**
+ * Sessão explícita COM a simulação aplicada — usada pela troca de condomínio
+ * e pela própria simulação, para que o retorno já venha "vestido" com o
+ * perfil simulado. `valorSimulacao` é o cookie recém-criado no mesmo request.
+ */
+export async function sessaoAtiva(
+  userId: string,
+  condominioAtivoId: string | null,
+  valorSimulacao?: string | null,
+): Promise<UsuarioSessao | null> {
+  const base = await sessaoComCondominio(userId, condominioAtivoId);
+  if (!base) return null;
+  return aplicarSimulacao(base, valorSimulacao);
 }
 
 export function json401() {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import {
   Building2,
@@ -9,6 +9,7 @@ import {
   ClipboardList,
   Crown,
   DoorOpen,
+  Eye,
   FileText,
   History,
   Home,
@@ -312,6 +313,126 @@ function DialogoSenha({ aoFechar }: { aoFechar: () => void }) {
   );
 }
 
+export type SimulacaoUI = {
+  perfil: string;
+  funcaoId?: string | null;
+  funcaoNome?: string | null;
+};
+
+// ── Simulador de perfis (exclusivo do administrador da plataforma) ──
+type PerfilSimulavel = { perfil: string; rotulo: string; descricao: string; modulos: string[] };
+type FuncaoSimulavel = { id: string; nome: string; modulos: string[]; rotuloModulos: string };
+
+function DialogoSimulacao({
+  aoFechar,
+  aoSimular,
+}: {
+  aoFechar: () => void;
+  aoSimular: (perfil: string, funcaoId?: string) => void;
+}) {
+  const [perfis, setPerfis] = useState<PerfilSimulavel[]>([]);
+  const [funcoes, setFuncoes] = useState<FuncaoSimulavel[]>([]);
+  const [carregando, setCarregando] = useState(true);
+  const [erro, setErro] = useState("");
+
+  useEffect(() => {
+    fetch("/api/auth/simular")
+      .then(async (r) => {
+        const d = await r.json().catch(() => null);
+        if (!r.ok) throw new Error(d?.erro || "Não foi possível carregar os perfis.");
+        setPerfis(d.perfis ?? []);
+        setFuncoes(d.funcoes ?? []);
+      })
+      .catch((e) => setErro(e instanceof Error ? e.message : "Falha ao carregar perfis."))
+      .finally(() => setCarregando(false));
+  }, []);
+
+  const ICONE: Record<string, typeof Home> = {
+    SINDICO: Crown,
+    ADMINISTRATIVO: ClipboardList,
+    PORTARIA: ShieldCheck,
+    MORADOR: User,
+  };
+
+  return (
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+      <button aria-label="Fechar" className="absolute inset-0 bg-black/40" onClick={aoFechar} />
+      <div className="relative flex max-h-[85dvh] w-full max-w-lg flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
+        <div className="border-b border-stone-100 px-6 py-4">
+          <h2 className="flex items-center gap-2 text-lg font-semibold text-stone-900">
+            <Eye className="h-5 w-5 text-stone-500" /> Simular perfis
+          </h2>
+          <p className="mt-1 text-sm text-stone-500">
+            Entre no lugar de cada perfil para testar exatamente o que ele vê e pode fazer neste
+            condomínio. Seus poderes de administrador ficam suspensos até encerrar a simulação.
+          </p>
+        </div>
+        <div className="flex-1 overflow-y-auto px-6 py-4">
+          {carregando && (
+            <p className="flex items-center gap-2 py-6 text-sm text-stone-500">
+              <LoaderCircle className="h-4 w-4 animate-spin" /> Carregando perfis…
+            </p>
+          )}
+          {erro && <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{erro}</p>}
+          {!carregando && !erro && (
+            <>
+              <p className="text-xs font-semibold uppercase tracking-wide text-stone-400">Perfis clássicos</p>
+              <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                {perfis.map((p) => {
+                  const Icone = ICONE[p.perfil] ?? User;
+                  return (
+                    <button
+                      key={p.perfil}
+                      onClick={() => aoSimular(p.perfil)}
+                      className="rounded-xl border border-stone-200 px-4 py-3 text-left transition hover:border-[var(--cor-tema)] hover:bg-[var(--cor-tema-suave,#faf9f7)]"
+                    >
+                      <span className="flex items-center gap-2 text-sm font-semibold text-stone-900">
+                        <Icone className="h-4 w-4 text-stone-500" /> {p.rotulo}
+                      </span>
+                      <span className="mt-1 block text-xs leading-relaxed text-stone-500">{p.descricao}</span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              <p className="mt-5 text-xs font-semibold uppercase tracking-wide text-stone-400">
+                Funções personalizadas deste condomínio
+              </p>
+              {funcoes.length === 0 ? (
+                <p className="mt-2 text-sm text-stone-500">
+                  Nenhuma função personalizada criada ainda — cadastre no menu Funções.
+                </p>
+              ) : (
+                <div className="mt-2 grid gap-2">
+                  {funcoes.map((f) => (
+                    <button
+                      key={f.id}
+                      onClick={() => aoSimular("FUNCAO", f.id)}
+                      className="rounded-xl border border-stone-200 px-4 py-3 text-left transition hover:border-[var(--cor-tema)] hover:bg-[var(--cor-tema-suave,#faf9f7)]"
+                    >
+                      <span className="flex items-center gap-2 text-sm font-semibold text-stone-900">
+                        <UserCog className="h-4 w-4 text-stone-500" /> {f.nome}
+                      </span>
+                      <span className="mt-1 block truncate text-xs text-stone-500">
+                        {f.rotuloModulos || "Somente o Início"}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+        </div>
+        <div className="flex justify-end border-t border-stone-100 px-6 py-3">
+          <button onClick={aoFechar} className="rounded-lg border border-stone-200 px-4 py-2 text-sm font-medium text-stone-700 transition hover:bg-stone-50">
+            Fechar
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function AppShell({
   perfil,
   nome,
@@ -321,8 +442,11 @@ export default function AppShell({
   modulo,
   permissoes,
   funcaoNome,
+  simulando,
   aoTrocar,
   aoTrocarCondominio,
+  aoSimular,
+  aoEncerrarSimulacao,
   aoSair,
   children,
 }: {
@@ -334,13 +458,17 @@ export default function AppShell({
   modulo: ModuloId;
   permissoes?: string[];
   funcaoNome?: string | null;
+  simulando?: SimulacaoUI | null;
   aoTrocar: (m: ModuloId) => void;
   aoTrocarCondominio: (id: string) => void;
+  aoSimular?: (perfil: string, funcaoId?: string) => void;
+  aoEncerrarSimulacao?: () => void;
   aoSair: () => void;
   children: React.ReactNode;
 }) {
   const [menuAberto, setMenuAberto] = useState(false);
   const [dialogoSenha, setDialogoSenha] = useState(false);
+  const [dialogoSimulacao, setDialogoSimulacao] = useState(false);
   // Menu da função personalizada: módulos concedidos, sempre na ordem do catálogo
   const itens: ItemMenu[] =
     perfil === "FUNCAO"
@@ -414,7 +542,9 @@ export default function AppShell({
       <div className="flex items-center gap-3">
         <span
           aria-hidden
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-[var(--cor-tema-hover)] text-[var(--cor-fundo)]"
+          className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-[var(--cor-fundo)] ${
+            simulando ? "bg-amber-400" : "bg-[var(--cor-tema-hover)]"
+          }`}
         >
           <IconePerfil className="h-[18px] w-[18px]" />
         </span>
@@ -422,17 +552,26 @@ export default function AppShell({
           <p className="truncate text-sm font-medium text-[var(--cor-fundo)]">{nome}</p>
           <p className="truncate text-xs text-[var(--cor-clara-a70)]">
             {perfil === "FUNCAO" && funcaoNome ? funcaoNome : ROTULO_PERFIL[perfil] ?? perfil}
+            {simulando ? " · simulado" : ""}
             {unidade ? ` · Unidade ${unidade.bloco}-${unidade.numero}` : ""}
           </p>
         </div>
       </div>
-      <div className="mt-3 flex items-center gap-1">
+      <div className="mt-3 flex flex-wrap items-center gap-1">
         <button
           onClick={() => setDialogoSenha(true)}
           className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-[var(--cor-clara-a85)] transition-colors hover:bg-[var(--cor-tema-hover-a60)] hover:text-[var(--cor-fundo)]"
         >
           <KeyRound className="h-4 w-4" /> Alterar senha
         </button>
+        {perfil === "PLATAFORMA" && !simulando && aoSimular && (
+          <button
+            onClick={() => setDialogoSimulacao(true)}
+            className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-[var(--cor-clara-a85)] transition-colors hover:bg-[var(--cor-tema-hover-a60)] hover:text-[var(--cor-fundo)]"
+          >
+            <Eye className="h-4 w-4" /> Simular perfis
+          </button>
+        )}
       </div>
       <button
         onClick={aoSair}
@@ -481,6 +620,15 @@ export default function AppShell({
     <div style={temaVars} className="flex h-dvh overflow-hidden bg-[var(--cor-fundo)]">
       {corpo}
       {dialogoSenha && <DialogoSenha aoFechar={() => setDialogoSenha(false)} />}
+      {dialogoSimulacao && (
+        <DialogoSimulacao
+          aoFechar={() => setDialogoSimulacao(false)}
+          aoSimular={(p, f) => {
+            setDialogoSimulacao(false);
+            aoSimular?.(p, f);
+          }}
+        />
+      )}
 
       {/* Conteúdo */}
       <div className="flex min-w-0 flex-1 flex-col">
@@ -504,6 +652,24 @@ export default function AppShell({
             <span className="truncate text-xs text-stone-500">{condominio.nome}</span>
           </div>
         </header>
+        {/* Banner da simulação — sempre visível enquanto durar */}
+        {simulando && (
+          <div className="flex items-center gap-2.5 border-b border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-900">
+            <Eye className="h-4 w-4 shrink-0" />
+            <p className="min-w-0 flex-1 truncate">
+              Simulando <strong>{simulando.funcaoNome ?? ROTULO_PERFIL[simulando.perfil as Perfil] ?? simulando.perfil}</strong>
+              {" "}— o que você vê é o que este perfil vê.
+            </p>
+            {aoEncerrarSimulacao && (
+              <button
+                onClick={aoEncerrarSimulacao}
+                className="shrink-0 rounded-md border border-amber-300 bg-white px-2.5 py-1 text-xs font-semibold text-amber-900 transition hover:bg-amber-100"
+              >
+                Encerrar simulação
+              </button>
+            )}
+          </div>
+        )}
         <main className="flex-1 overflow-y-auto">
           <div className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 lg:px-8">{children}</div>
         </main>

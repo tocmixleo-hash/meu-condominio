@@ -350,29 +350,28 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
             </form>
           </div>
 
-          {/* Acesso rápido para demonstração — nunca exibido em produção.
-              Sem botão do administrador: o acesso de gestão é exclusivo do
-              login pessoal do administrador da plataforma. */}
-          {MODO_DEMO && (
-            <div className="mt-6">
-              <p className="text-[13px] font-medium uppercase tracking-[0.06em] text-stone-400">
-                Acesso rápido para demonstração
-              </p>
-              <div className="mt-3 grid grid-cols-1 gap-2.5 lg:grid-cols-2">
-                {rapidos.map((r) => (
-                  <button
-                    key={r.email}
-                    type="button"
-                    disabled={enviando}
-                    onClick={() => submeter({ email: r.email, senha: r.senha })}
-                    className="whitespace-nowrap rounded-full bg-white px-4 py-3 text-left text-sm text-stone-800 transition hover:bg-stone-50 disabled:opacity-50"
-                  >
-                    {r.etiqueta}
-                  </button>
-                ))}
-              </div>
+          {/* Acesso rápido para demonstração — visível também em produção,
+              para que novas pessoas possam experimentar o portal livremente.
+              O administrador da plataforma NUNCA aparece aqui: o acesso de
+              gestão é exclusivo do login pessoal dele. */}
+          <div className="mt-6">
+            <p className="text-[13px] font-medium uppercase tracking-[0.06em] text-stone-400">
+              Acesso rápido para demonstração
+            </p>
+            <div className="mt-3 grid grid-cols-1 gap-2.5 lg:grid-cols-2">
+              {rapidos.map((r) => (
+                <button
+                  key={r.email}
+                  type="button"
+                  disabled={enviando}
+                  onClick={() => submeter({ email: r.email, senha: r.senha })}
+                  className="whitespace-nowrap rounded-full bg-white px-4 py-3 text-left text-sm text-stone-800 transition hover:bg-stone-50 disabled:opacity-50"
+                >
+                  {r.etiqueta}
+                </button>
+              ))}
             </div>
-          )}
+          </div>
         </div>
       </div>
     </div>

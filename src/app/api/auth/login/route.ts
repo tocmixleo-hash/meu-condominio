@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import {
   COOKIE_SESSAO,
+  COOKIE_SIMULACAO,
   conferirSenha,
   criarToken,
   sessaoComCondominio,
@@ -70,6 +71,8 @@ export async function POST(req: Request) {
   limparTentativas(chave);
 
   const loja = await cookies();
+  // Login novo começa limpo: encerra qualquer simulação anterior.
+  loja.delete(COOKIE_SIMULACAO);
   loja.set(COOKIE_SESSAO, criarToken(alvo.id, condominioAtivoId), {
     httpOnly: true,
     sameSite: "lax",

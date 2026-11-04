@@ -1,5 +1,12 @@
 import { db } from "@/lib/db";
-import { COOKIE_SESSAO, criarToken, json401, usuarioAtual } from "@/lib/auth";
+import {
+  COOKIE_SESSAO,
+  COOKIE_SIMULACAO,
+  criarToken,
+  json401,
+  sessaoAtiva,
+  usuarioAtual,
+} from "@/lib/auth";
 import { cookies } from "next/headers";
 import { registrarAcao } from "@/lib/auditoria";
 
@@ -52,8 +59,9 @@ export async function POST(req: Request) {
     detalhe: `${eu.nome} passou a operar em ${existe.nome}`,
   });
 
-  const { sessaoComCondominio } = await import("@/lib/auth");
-  const usuario = await sessaoComCondominio(eu.id, destino);
+  // A simulação de perfil persiste ao trocar de condomínio (perfis clássicos);
+  // funções personalizadas são revalidadas contra o condomínio de destino.
+  const usuario = await sessaoAtiva(eu.id, destino, loja.get(COOKIE_SIMULACAO)?.value);
   if (!usuario) return json401();
   return Response.json({ usuario });
 }
