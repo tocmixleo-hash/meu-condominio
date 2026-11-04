@@ -2,7 +2,7 @@
 // • API sempre na rede (dados ao vivo, nunca cacheados)
 // • Estáticos (/_next/static, ícones): cache-first
 // • Navegação: rede primeiro, cai para o cache quando offline
-const CACHE = "mc-portal-v2";
+const CACHE = "mc-portal-v3";
 const ESTATICOS = [
   "/manifest.webmanifest",
   "/icons/icon-192.png",
