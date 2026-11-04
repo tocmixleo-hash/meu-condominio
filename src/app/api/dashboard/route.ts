@@ -4,6 +4,7 @@ import { json401, usuarioAtual } from "@/lib/auth";
 export async function GET() {
   const eu = await usuarioAtual();
   if (!eu) return json401();
+  const cid = eu.condominio.id;
 
   const hoje = new Date();
   const isoHoje = hoje.toISOString().slice(0, 10);
@@ -12,23 +13,23 @@ export async function GET() {
   if (eu.perfil === "MORADOR") {
     const [encomendasAguardando, encomendasRecentes, reservasProximas, autorizacoesAtivas, comunicadosRecentes] =
       await Promise.all([
-        db.encomenda.count({ where: { destinatarioId: eu.id, status: "AGUARDANDO" } }),
+        db.encomenda.count({ where: { condominioId: cid, destinatarioId: eu.id, status: "AGUARDANDO" } }),
         db.encomenda.findMany({
-          where: { destinatarioId: eu.id, status: "AGUARDANDO" },
+          where: { condominioId: cid, destinatarioId: eu.id, status: "AGUARDANDO" },
           orderBy: { recebidaEm: "desc" },
           take: 3,
         }),
         db.reserva.findMany({
-          where: { solicitanteId: eu.id, data: { gte: isoHoje }, status: { in: ["PENDENTE", "CONFIRMADA"] } },
+          where: { condominioId: cid, solicitanteId: eu.id, data: { gte: isoHoje }, status: { in: ["PENDENTE", "CONFIRMADA"] } },
           orderBy: { data: "asc" },
           take: 3,
         }),
         db.autorizacao.findMany({
-          where: { moradorId: eu.id, status: "ATIVA", dataFim: { gte: isoHoje } },
+          where: { condominioId: cid, moradorId: eu.id, status: "ATIVA", dataFim: { gte: isoHoje } },
           orderBy: { criadoEm: "desc" },
           take: 3,
         }),
-        db.comunicado.findMany({ orderBy: { criadoEm: "desc" }, take: 3 }),
+        db.comunicado.findMany({ where: { condominioId: cid }, orderBy: { criadoEm: "desc" }, take: 3 }),
       ]);
 
     return Response.json({
@@ -48,17 +49,17 @@ export async function GET() {
   if (eu.perfil === "PORTARIA") {
     const [encomendasAguardando, autorizacoesAtivas, visitantesHoje, encomendasRecentes, autorizacoesRecentes] =
       await Promise.all([
-        db.encomenda.count({ where: { status: "AGUARDANDO" } }),
-        db.autorizacao.count({ where: { status: "ATIVA", dataFim: { gte: isoHoje } } }),
-        db.autorizacao.count({ where: { status: "ATIVA", dataInicio: { lte: isoHoje }, dataFim: { gte: isoHoje } } }),
+        db.encomenda.count({ where: { condominioId: cid, status: "AGUARDANDO" } }),
+        db.autorizacao.count({ where: { condominioId: cid, status: "ATIVA", dataFim: { gte: isoHoje } } }),
+        db.autorizacao.count({ where: { condominioId: cid, status: "ATIVA", dataInicio: { lte: isoHoje }, dataFim: { gte: isoHoje } } }),
         db.encomenda.findMany({
-          where: { status: "AGUARDANDO" },
+          where: { condominioId: cid, status: "AGUARDANDO" },
           include: { destinatario: { include: { unidade: true } } },
           orderBy: { recebidaEm: "desc" },
           take: 5,
         }),
         db.autorizacao.findMany({
-          where: { status: "ATIVA", dataFim: { gte: isoHoje } },
+          where: { condominioId: cid, status: "ATIVA", dataFim: { gte: isoHoje } },
           include: { morador: { include: { unidade: true } } },
           orderBy: { dataInicio: "asc" },
           take: 5,
@@ -80,22 +81,22 @@ export async function GET() {
   // Síndico e Administrativo (Gestão)
   const [moradoresAtivos, reservasPendentes, encomendasAguardando, autorizacoesAtivas, reservasLista, assembleiasProximas, comunicadosRecentes] =
     await Promise.all([
-      db.usuario.count({ where: { perfil: "MORADOR", ativo: true } }),
-      db.reserva.count({ where: { status: "PENDENTE" } }),
-      db.encomenda.count({ where: { status: "AGUARDANDO" } }),
-      db.autorizacao.count({ where: { status: "ATIVA", dataFim: { gte: isoHoje } } }),
+      db.usuario.count({ where: { condominioId: cid, perfil: "MORADOR", ativo: true } }),
+      db.reserva.count({ where: { condominioId: cid, status: "PENDENTE" } }),
+      db.encomenda.count({ where: { condominioId: cid, status: "AGUARDANDO" } }),
+      db.autorizacao.count({ where: { condominioId: cid, status: "ATIVA", dataFim: { gte: isoHoje } } }),
       db.reserva.findMany({
-        where: { status: "PENDENTE", data: { lte: em30dias } },
+        where: { condominioId: cid, status: "PENDENTE", data: { lte: em30dias } },
         include: { solicitante: { include: { unidade: true } } },
         orderBy: { data: "asc" },
         take: 5,
       }),
       db.assembleia.findMany({
-        where: { status: "AGENDADA", data: { gte: isoHoje } },
+        where: { condominioId: cid, status: "AGENDADA", data: { gte: isoHoje } },
         orderBy: { data: "asc" },
         take: 3,
       }),
-      db.comunicado.findMany({ orderBy: { criadoEm: "desc" }, take: 3 }),
+      db.comunicado.findMany({ where: { condominioId: cid }, orderBy: { criadoEm: "desc" }, take: 3 }),
     ]);
 
   return Response.json({

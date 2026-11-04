@@ -27,6 +27,27 @@ export async function notificarUsuarios(
   enviarPorEmail(validas).catch(() => null);
 }
 
+/** Notifica todos os usuários ativos do condomínio (opcionalmente exceto um). */
+export async function notificarCondominio(
+  condominioId: string,
+  tipo: string,
+  aviso: { titulo: string; mensagem: string; excetoUsuarioId?: string },
+) {
+  const usuarios = await db.usuario.findMany({
+    where: {
+      condominioId,
+      ativo: true,
+      ...(aviso.excetoUsuarioId ? { id: { not: aviso.excetoUsuarioId } } : {}),
+    },
+    select: { id: true },
+  });
+  await notificarUsuarios(
+    condominioId,
+    tipo,
+    usuarios.map((u) => ({ usuarioId: u.id, titulo: aviso.titulo, mensagem: aviso.mensagem })),
+  );
+}
+
 async function enviarPorEmail(entradas: EntradaNotificacao[]) {
   const chave = process.env.RESEND_API_KEY;
   const remetente = process.env.EMAIL_REMETENTE;

@@ -1,5 +1,7 @@
 import { db } from "@/lib/db";
 import { json401, json403, usuarioAtual } from "@/lib/auth";
+import { notificarUsuarios } from "@/lib/notificacoes";
+import { registrarAcao } from "@/lib/auditoria";
 
 const ISO = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -7,7 +9,10 @@ export async function GET() {
   const eu = await usuarioAtual();
   if (!eu) return json401();
   const lista = await db.autorizacao.findMany({
-    where: eu.perfil === "MORADOR" ? { moradorId: eu.id } : {},
+    where: {
+      condominioId: eu.condominio.id,
+      ...(eu.perfil === "MORADOR" ? { moradorId: eu.id } : {}),
+    },
     include: { morador: { include: { unidade: true } } },
     orderBy: { criadoEm: "desc" },
   });
@@ -29,6 +34,7 @@ export async function POST(req: Request) {
   }
   const autorizacao = await db.autorizacao.create({
     data: {
+      condominioId: eu.condominio.id,
       visitanteNome: String(visitanteNome).trim(),
       tipo: tipo === "PRESTADOR" ? "PRESTADOR" : "VISITANTE",
       documento: documento?.trim() || null,
@@ -39,6 +45,26 @@ export async function POST(req: Request) {
     },
     include: { morador: { include: { unidade: true } } },
   });
+
+  await registrarAcao({
+    condominioId: eu.condominio.id,
+    usuarioId: eu.id,
+    acao: "AUTORIZACAO_CRIADA",
+    detalhe: `${autorizacao.visitanteNome} · ${dataInicio} a ${dataFim}`,
+  });
+  // Portaria fica sabendo da nova autorização na hora
+  const portarias = await db.usuario.findMany({
+    where: { condominioId: eu.condominio.id, perfil: "PORTARIA", ativo: true },
+    select: { id: true },
+  });
+  await notificarUsuarios(eu.condominio.id, "AUTORIZACAO",
+    portarias.map((p) => ({
+      usuarioId: p.id,
+      titulo: "Nova autorização de acesso",
+      mensagem: `${autorizacao.visitanteNome} (${autorizacao.tipo.toLowerCase()}), autorizado por ${eu.nome} de ${dataInicio} a ${dataFim}.`,
+    })),
+  );
+
   return Response.json({ autorizacao });
 }
 
@@ -47,7 +73,9 @@ export async function PATCH(req: Request) {
   if (!eu) return json401();
   const { id, status } = await req.json().catch(() => ({}) as never);
   const atual = await db.autorizacao.findUnique({ where: { id } });
-  if (!atual) return Response.json({ erro: "Autorização não encontrada." }, { status: 404 });
+  if (!atual || atual.condominioId !== eu.condominio.id) {
+    return Response.json({ erro: "Autorização não encontrada." }, { status: 404 });
+  }
 
   const permitido =
     status === "CANCELADA" && atual.moradorId === eu.id && atual.status === "ATIVA";
@@ -58,5 +86,13 @@ export async function PATCH(req: Request) {
     data: { status },
     include: { morador: { include: { unidade: true } } },
   });
+
+  await registrarAcao({
+    condominioId: eu.condominio.id,
+    usuarioId: eu.id,
+    acao: "AUTORIZACAO_CANCELADA",
+    detalhe: autorizacao.visitanteNome,
+  });
+
   return Response.json({ autorizacao });
 }

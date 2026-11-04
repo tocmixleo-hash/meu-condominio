@@ -1,10 +1,13 @@
 import { db } from "@/lib/db";
 import { json401, json403, usuarioAtual } from "@/lib/auth";
+import { notificarCondominio } from "@/lib/notificacoes";
+import { registrarAcao } from "@/lib/auditoria";
 
 export async function GET() {
   const eu = await usuarioAtual();
   if (!eu) return json401();
   const lista = await db.comunicado.findMany({
+    where: { condominioId: eu.condominio.id },
     include: { autor: { select: { nome: true, perfil: true } } },
     orderBy: { criadoEm: "desc" },
   });
@@ -22,6 +25,7 @@ export async function POST(req: Request) {
   }
   const comunicado = await db.comunicado.create({
     data: {
+      condominioId: eu.condominio.id,
       titulo: String(titulo).trim(),
       conteudo: String(conteudo).trim(),
       categoria: categoria || "GERAL",
@@ -30,5 +34,18 @@ export async function POST(req: Request) {
     },
     include: { autor: { select: { nome: true, perfil: true } } },
   });
+
+  await registrarAcao({
+    condominioId: eu.condominio.id,
+    usuarioId: eu.id,
+    acao: "COMUNICADO_CRIADO",
+    detalhe: comunicado.titulo,
+  });
+  await notificarCondominio(eu.condominio.id, "COMUNICADO", {
+    titulo: "Novo comunicado",
+    mensagem: comunicado.titulo,
+    excetoUsuarioId: eu.id,
+  });
+
   return Response.json({ comunicado });
 }

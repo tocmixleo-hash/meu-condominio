@@ -5,63 +5,31 @@
 // • Seções SEM caixa: título em caixa alta + filete
 // • Indicadores em linha com divisórias verticais
 // • Listas com separadores horizontais
-// • Paleta: stone + marrom #4D403A; verde/vermelho apenas p/ status
+// • Cores via variáveis de tema (--cor-*) definidas por condomínio
+// • Verde/vermelho apenas p/ status
 // • Sem sombras, sem caixas coloridas, sem cards de dimensões exageradas
 // ─────────────────────────────────────────────────────────────
 
 import type { ReactNode } from "react";
+import {
+  ROTULO_AUTORIZACAO,
+  ROTULO_CATEGORIA_COMUNICADO,
+  ROTULO_CATEGORIA_DOCUMENTO,
+  ROTULO_CATEGORIA_ENCOMENDA,
+  ROTULO_ESPACO,
+  dataHoraCurta,
+  formatarData,
+} from "@/lib/rotulos";
 
-export const MARROM = "#4D403A";
-
-export const ROTULO_ESPACO: Record<string, string> = {
-  SALAO_FESTAS: "Salão de festas",
-  CHURRASQUEIRA: "Churrasqueira",
-  QUADRA: "Quadra",
-  PISCINA: "Piscina",
-  VIRTUAL: "Virtual",
+export {
+  ROTULO_AUTORIZACAO,
+  ROTULO_CATEGORIA_COMUNICADO,
+  ROTULO_CATEGORIA_DOCUMENTO,
+  ROTULO_CATEGORIA_ENCOMENDA,
+  ROTULO_ESPACO,
+  formatarData,
+  dataHoraCurta,
 };
-
-export const ROTULO_CATEGORIA_COMUNICADO: Record<string, string> = {
-  GERAL: "Geral",
-  MANUTENCAO: "Manutenção",
-  EVENTO: "Evento",
-  SEGURANCA: "Segurança",
-  OBRA: "Obra",
-};
-
-export const ROTULO_CATEGORIA_ENCOMENDA: Record<string, string> = {
-  CORREIO: "Correio",
-  TRANSPORTADORA: "Transportadora",
-  FARMACIA: "Farmácia",
-  MERCADO: "Mercado",
-  OUTRO: "Outro",
-};
-
-export const ROTULO_CATEGORIA_DOCUMENTO: Record<string, string> = {
-  ATA: "Ata",
-  CONVENCAO: "Convenção",
-  REGIMENTO: "Regimento",
-  PRESTACAO_CONTAS: "Prestação de contas",
-  OUTRO: "Outro",
-};
-
-export const ROTULO_AUTORIZACAO: Record<string, string> = {
-  VISITANTE: "Visitante",
-  PRESTADOR: "Prestador",
-};
-
-export function formatarData(iso: string) {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(iso)) return iso;
-  const [a, m, d] = iso.split("-");
-  return `${d}/${m}/${a}`;
-}
-
-export function dataHoraCurta(dataISO: string) {
-  const dt = new Date(dataISO);
-  const dia = dt.toLocaleDateString("pt-BR", { day: "2-digit", month: "short" });
-  const hora = dt.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
-  return `${dia} · ${hora}`;
-}
 
 // ── Seção sem caixa ──────────────────────────────────────────
 
@@ -99,7 +67,7 @@ export function LinhaIndicadores({
   className?: string;
 }) {
   return (
-    <div className={`flex flex-col sm:flex-row sm:divide-x sm:divide-[#dfdacf] ${className}`}>
+    <div className={`flex flex-col sm:flex-row sm:divide-x sm:divide-[var(--cor-neutra-2)] ${className}`}>
       {itens.map((item, i) => (
         <div
           key={item.rotulo}
@@ -120,7 +88,7 @@ export function LinhaIndicadores({
 // ── Linha de lista com separador horizontal ──────────────────
 
 export function Lista({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return <div className={`divide-y divide-[#EFE9E1] ${className}`}>{children}</div>;
+  return <div className={`divide-y divide-[var(--cor-neutra)] ${className}`}>{children}</div>;
 }
 
 export function LinhaLista({
@@ -157,7 +125,7 @@ export function EstadoVazio({ mensagem }: { mensagem: string }) {
 export function Carregando() {
   return (
     <div className="flex items-center gap-2 py-6 text-sm text-stone-400">
-      <span className="h-3 w-3 animate-spin rounded-full border border-stone-300 border-t-[#4D403A]" />
+      <span className="h-3 w-3 animate-spin rounded-full border border-[var(--cor-neutra-2)] border-t-[var(--cor-tema)]" />
       Carregando…
     </div>
   );
@@ -175,7 +143,7 @@ export function Badge({
   tom?: TomBadge;
 }) {
   const estilos: Record<TomBadge, string> = {
-    neutro: "bg-[#EFE9E1] text-stone-600",
+    neutro: "bg-[var(--cor-neutra)] text-[var(--cor-fg-suave)]",
     verde: "bg-green-50 text-green-700",
     vermelho: "bg-red-50 text-red-700",
   };
@@ -252,7 +220,7 @@ export function BotaoPrimario({
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={`inline-flex h-9 items-center justify-center gap-2 rounded-md bg-[#4D403A] px-4 text-sm font-medium text-[#f7f6f3] transition-colors hover:bg-[#61514A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a3968d] disabled:pointer-events-none disabled:opacity-50 ${className}`}
+      className={`inline-flex h-9 items-center justify-center gap-2 rounded-md bg-[var(--cor-tema)] px-4 text-sm font-medium text-[var(--cor-fundo)] transition-colors hover:bg-[var(--cor-tema-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cor-tema-suave)] disabled:pointer-events-none disabled:opacity-50 ${className}`}
     >
       {children}
     </button>
@@ -277,7 +245,7 @@ export function BotaoSecundario({
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={`inline-flex h-9 items-center justify-center gap-2 rounded-md border border-[#dfdacf] bg-white px-4 text-sm font-medium text-stone-700 transition-colors hover:bg-[#EFE9E1] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a3968d] disabled:pointer-events-none disabled:opacity-50 ${className}`}
+      className={`inline-flex h-9 items-center justify-center gap-2 rounded-md border border-[var(--cor-neutra-2)] bg-white px-4 text-sm font-medium text-stone-700 transition-colors hover:bg-[var(--cor-neutra)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cor-tema-suave)] disabled:pointer-events-none disabled:opacity-50 ${className}`}
     >
       {children}
     </button>
@@ -287,16 +255,16 @@ export function BotaoSecundario({
 export function BotaoTexto({
   children,
   onClick,
-  tom = "marrom",
+  tom = "tema",
   disabled,
 }: {
   children: ReactNode;
   onClick?: () => void;
-  tom?: "marrom" | "vermelho" | "verde";
+  tom?: "tema" | "vermelho" | "verde";
   disabled?: boolean;
 }) {
   const cores = {
-    marrom: "text-[#4D403A] hover:text-[#61514A]",
+    tema: "text-[var(--cor-tema)] hover:text-[var(--cor-tema-hover)]",
     vermelho: "text-red-600 hover:text-red-700",
     verde: "text-green-700 hover:text-green-800",
   }[tom];

@@ -1,8 +1,10 @@
+import { db } from "@/lib/db";
 import { json401, usuarioAtual } from "@/lib/auth";
 import { readFile } from "fs/promises";
 import path from "path";
 
-// Serve arquivos enviados (local: public/uploads; Vercel: /tmp/uploads).
+// Serve arquivos enviados (local: public/uploads; Vercel: /tmp/uploads;
+// com Blob configurado, redireciona para a URL persistente).
 const PASTA = process.env.PASTA_UPLOADS
   ? path.resolve(process.env.PASTA_UPLOADS)
   : process.env.VERCEL
@@ -28,6 +30,15 @@ export async function GET(_req: Request, { params }: { params: Promise<{ nome: s
 
   const { nome } = await params;
   const limpo = path.basename(nome); // impede traversia de diretório
+
+  // Arquivo armazenado no Vercel Blob — redireciona (URL assinada do storage)
+  const doc = await db.documento.findFirst({
+    where: { nomeArquivo: limpo, condominioId: eu.condominio.id },
+  });
+  if (doc?.url) {
+    return Response.redirect(doc.url, 302);
+  }
+
   try {
     const conteudo = await readFile(path.join(PASTA, limpo));
     const extensao = path.extname(limpo).toLowerCase();
