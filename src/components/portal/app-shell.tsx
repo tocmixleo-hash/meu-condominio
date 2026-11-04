@@ -4,6 +4,8 @@ import { useState } from "react";
 import Image from "next/image";
 import {
   CalendarDays,
+  ClipboardList,
+  Crown,
   DoorOpen,
   FileText,
   Home,
@@ -11,6 +13,8 @@ import {
   Megaphone,
   Menu,
   Package,
+  ShieldCheck,
+  User,
   Users,
   X,
 } from "lucide-react";
@@ -71,6 +75,14 @@ const ROTULO_PERFIL: Record<Perfil, string> = {
   MORADOR: "Morador",
 };
 
+// Ícone por perfil no rodapé — evita repetir a logo do condomínio
+const ICONE_PERFIL: Record<Perfil, typeof Home> = {
+  SINDICO: Crown,
+  ADMINISTRATIVO: ClipboardList,
+  PORTARIA: ShieldCheck,
+  MORADOR: User,
+};
+
 export default function AppShell({
   perfil,
   nome,
@@ -90,6 +102,7 @@ export default function AppShell({
 }) {
   const [menuAberto, setMenuAberto] = useState(false);
   const itens = MENUS[perfil];
+  const IconePerfil = ICONE_PERFIL[perfil];
 
   function trocar(m: ModuloId) {
     aoTrocar(m);
@@ -139,13 +152,12 @@ export default function AppShell({
   const rodape = (
     <div className="border-t border-[#61514A] px-5 py-4">
       <div className="flex items-center gap-3">
-        <Image
-          src="/fotos/logo-parque-california.png"
-          alt="Logo do Parque Califórnia"
-          width={36}
-          height={36}
-          className="h-9 w-9 shrink-0 rounded-md bg-white object-contain p-0.5"
-        />
+        <span
+          aria-hidden
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-[#61514A] text-[#f7f6f3]"
+        >
+          <IconePerfil className="h-[18px] w-[18px]" />
+        </span>
         <div className="min-w-0">
           <p className="truncate text-sm font-medium text-[#f7f6f3]">{nome}</p>
           <p className="truncate text-xs text-[#EFE9E1]/70">
