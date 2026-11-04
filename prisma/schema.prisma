@@ -3,120 +3,212 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "sqlite" // Para Postgres (Neon/Vercel), troque para "postgresql" — ver DEPLOY.md
   url      = env("DATABASE_URL")
+}
+
+// ── Condomínio (multi-tenant) ───────────────────────────────────
+
+model Condominio {
+  id       String @id @default(cuid())
+  nome     String
+  slug     String @unique
+  corTema  String @default("#4D403A")
+  logo     String
+  foto     String
+  criadoEm DateTime @default(now())
+
+  unidades     Unidade[]
+  usuarios     Usuario[]
+  comunicados  Comunicado[]
+  reservas     Reserva[]
+  encomendas   Encomenda[]
+  autorizacoes Autorizacao[]
+  documentos   Documento[]
+  assembleias  Assembleia[]
+  notificacoes Notificacao[]
+  auditorias   Auditoria[]
 }
 
 // ── Usuários e unidades ──────────────────────────────────────────
 
 model Usuario {
-  id        String   @id @default(cuid())
-  nome      String
-  email     String   @unique
-  senha     String
-  perfil    String // SINDICO | ADMINISTRATIVO | PORTARIA | MORADOR
-  telefone  String?
-  ativo     Boolean  @default(true)
-  unidadeId String?
-  unidade   Unidade? @relation(fields: [unidadeId], references: [id])
-  criadoEm  DateTime @default(now())
+  id           String     @id @default(cuid())
+  condominioId String
+  condominio   Condominio @relation(fields: [condominioId], references: [id])
+  nome         String
+  email        String
+  senha        String
+  perfil       String // SINDICO | ADMINISTRATIVO | PORTARIA | MORADOR
+  telefone     String?
+  ativo        Boolean    @default(true)
+  unidadeId    String?
+  unidade      Unidade?   @relation(fields: [unidadeId], references: [id])
+  criadoEm     DateTime   @default(now())
 
   comunicados  Comunicado[]
   reservas     Reserva[]
   encomendas   Encomenda[]
   autorizacoes Autorizacao[]
   documentos   Documento[]
+  notificacoes Notificacao[]
+  auditorias   Auditoria[]
+
+  @@unique([condominioId, email])
+  @@index([condominioId])
 }
 
 model Unidade {
-  id        String    @id @default(cuid())
-  bloco     String
-  numero    String
-  moradores Usuario[]
+  id           String     @id @default(cuid())
+  condominioId String
+  condominio   Condominio @relation(fields: [condominioId], references: [id])
+  bloco        String
+  numero       String
+  moradores    Usuario[]
+
+  @@unique([condominioId, bloco, numero])
 }
 
 // ── Comunicados ──────────────────────────────────────────────────
 
 model Comunicado {
-  id         String   @id @default(cuid())
-  titulo     String
-  conteudo   String
-  categoria  String // GERAL | MANUTENCAO | EVENTO | SEGURANCA | OBRA
-  prioridade String   @default("NORMAL") // BAIXA | NORMAL | ALTA
-  autorId    String
-  autor      Usuario  @relation(fields: [autorId], references: [id])
-  criadoEm   DateTime @default(now())
+  id           String     @id @default(cuid())
+  condominioId String
+  condominio   Condominio @relation(fields: [condominioId], references: [id])
+  titulo       String
+  conteudo     String
+  categoria    String // GERAL | MANUTENCAO | EVENTO | SEGURANCA | OBRA
+  prioridade   String     @default("NORMAL") // BAIXA | NORMAL | ALTA
+  autorId      String
+  autor        Usuario    @relation(fields: [autorId], references: [id])
+  criadoEm     DateTime   @default(now())
+
+  @@index([condominioId, criadoEm])
 }
 
 // ── Reservas de espaços comuns ───────────────────────────────────
 
 model Reserva {
-  id            String   @id @default(cuid())
+  id            String     @id @default(cuid())
+  condominioId  String
+  condominio    Condominio @relation(fields: [condominioId], references: [id])
   espaco        String // SALAO_FESTAS | CHURRASQUEIRA | QUADRA | PISCINA
   data          String // yyyy-MM-dd
   horario       String // ex.: "14:00 – 18:00"
   observacoes   String?
-  status        String   @default("PENDENTE") // PENDENTE | CONFIRMADA | REJEITADA | CANCELADA
+  status        String     @default("PENDENTE") // PENDENTE | CONFIRMADA | REJEITADA | CANCELADA
   solicitanteId String
-  solicitante   Usuario  @relation(fields: [solicitanteId], references: [id])
-  criadoEm      DateTime @default(now())
+  solicitante   Usuario    @relation(fields: [solicitanteId], references: [id])
+  criadoEm      DateTime   @default(now())
+
+  @@index([condominioId, data])
 }
 
 // ── Encomendas (código de retirada na portaria) ─────────────────
 
 model Encomenda {
-  id             String    @id @default(cuid())
+  id             String     @id @default(cuid())
+  condominioId   String
+  condominio     Condominio @relation(fields: [condominioId], references: [id])
   descricao      String
   remetente      String?
-  categoria      String    @default("CORREIO") // CORREIO | TRANSPORTADORA | FARMACIA | MERCADO | OUTRO
-  codigo         String    @unique
-  status         String    @default("AGUARDANDO") // AGUARDANDO | RETIRADA
+  categoria      String     @default("CORREIO") // CORREIO | TRANSPORTADORA | FARMACIA | MERCADO | OUTRO
+  codigo         String
+  status         String     @default("AGUARDANDO") // AGUARDANDO | RETIRADA
   destinatarioId String
-  destinatario   Usuario   @relation(fields: [destinatarioId], references: [id])
-  recebidaEm     DateTime  @default(now())
+  destinatario   Usuario    @relation(fields: [destinatarioId], references: [id])
+  recebidaEm     DateTime   @default(now())
   retiradaEm     DateTime?
+
+  @@unique([condominioId, codigo])
+  @@index([condominioId, status])
 }
 
 // ── Autorizações de acesso (morador → portaria) ─────────────────
 
 model Autorizacao {
-  id            String   @id @default(cuid())
+  id            String     @id @default(cuid())
+  condominioId  String
+  condominio    Condominio @relation(fields: [condominioId], references: [id])
   visitanteNome String
   tipo          String // VISITANTE | PRESTADOR
   documento     String?
   veiculo       String?
   dataInicio    String // yyyy-MM-dd
   dataFim       String // yyyy-MM-dd
-  status        String   @default("ATIVA") // ATIVA | UTILIZADA | CANCELADA
+  status        String     @default("ATIVA") // ATIVA | UTILIZADA | CANCELADA
   moradorId     String
-  morador       Usuario  @relation(fields: [moradorId], references: [id])
-  criadoEm      DateTime @default(now())
+  morador       Usuario    @relation(fields: [moradorId], references: [id])
+  criadoEm      DateTime   @default(now())
+
+  @@index([condominioId, status])
 }
 
 // ── Documentos ───────────────────────────────────────────────────
 
 model Documento {
-  id            String   @id @default(cuid())
-  titulo        String
-  categoria     String // ATA | CONVENCAO | REGIMENTO | PRESTACAO_CONTAS | OUTRO
-  nomeArquivo   String
-  tamanhoBytes  Int      @default(0)
-  enviadoPorId  String
-  enviadoPor    Usuario  @relation(fields: [enviadoPorId], references: [id])
-  criadoEm      DateTime @default(now())
+  id           String     @id @default(cuid())
+  condominioId String
+  condominio   Condominio @relation(fields: [condominioId], references: [id])
+  titulo       String
+  categoria    String // ATA | CONVENCAO | REGIMENTO | PRESTACAO_CONTAS | OUTRO
+  nomeArquivo  String
+  url          String? // URL do Vercel Blob (armazenamento persistente)
+  tamanhoBytes Int        @default(0)
+  enviadoPorId String
+  enviadoPor   Usuario    @relation(fields: [enviadoPorId], references: [id])
+  criadoEm     DateTime   @default(now())
+
+  @@index([condominioId, criadoEm])
 }
 
 // ── Assembleias ──────────────────────────────────────────────────
 
 model Assembleia {
-  id        String   @id @default(cuid())
-  titulo    String
-  descricao String?
-  tipo      String // ORDINARIA | EXTRAORDINARIA
-  data      String // yyyy-MM-dd
-  horario   String // HH:mm
-  local     String // SALAO_FESTAS | VIRTUAL
-  status    String   @default("AGENDADA") // AGENDADA | REALIZADA | CANCELADA
-  pauta     String?
-  criadoEm  DateTime @default(now())
+  id           String     @id @default(cuid())
+  condominioId String
+  condominio   Condominio @relation(fields: [condominioId], references: [id])
+  titulo       String
+  descricao    String?
+  tipo         String // ORDINARIA | EXTRAORDINARIA
+  data         String // yyyy-MM-dd
+  horario      String // HH:mm
+  local        String // SALAO_FESTAS | VIRTUAL
+  status       String     @default("AGENDADA") // AGENDADA | REALIZADA | CANCELADA
+  pauta        String?
+  criadoEm     DateTime   @default(now())
+
+  @@index([condominioId, data])
+}
+
+// ── Notificações in-app (sino) ───────────────────────────────────
+
+model Notificacao {
+  id           String     @id @default(cuid())
+  condominioId String
+  condominio   Condominio @relation(fields: [condominioId], references: [id])
+  usuarioId    String
+  usuario      Usuario    @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  tipo         String // COMUNICADO | ENCOMENDA | RESERVA | AUTORIZACAO | ASSEMBLEIA | DOCUMENTO
+  titulo       String
+  mensagem     String
+  lida         Boolean    @default(false)
+  criadoEm     DateTime   @default(now())
+
+  @@index([usuarioId, lida, criadoEm])
+}
+
+// ── Auditoria (histórico de ações) ───────────────────────────────
+
+model Auditoria {
+  id           String     @id @default(cuid())
+  condominioId String
+  condominio   Condominio @relation(fields: [condominioId], references: [id])
+  usuarioId    String?
+  usuario      Usuario?   @relation(fields: [usuarioId], references: [id], onDelete: SetNull)
+  acao         String
+  detalhe      String?
+  criadoEm     DateTime   @default(now())
+
+  @@index([condominioId, criadoEm])
 }
