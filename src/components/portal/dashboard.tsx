@@ -97,6 +97,17 @@ function dataLonga() {
   });
 }
 
+const DESCRICAO_PERFIL: Record<Perfil, string> = {
+  MORADOR:
+    "Acompanhe os comunicados, reserve espaços comuns e gerencie encomendas e autorizações da sua unidade.",
+  SINDICO:
+    "Visão geral do condomínio: reservas para aprovar, próximas assembleias e comunicados publicados.",
+  ADMINISTRATIVO:
+    "Rotina da administração: reservas pendentes, encomendas na portaria e cadastro de moradores.",
+  PORTARIA:
+    "Movimentação do dia: encomendas recebidas e autorizações de acesso válidas na guarita.",
+};
+
 const ACOES: Record<Perfil, { rotulo: string; destino: ModuloId }[]> = {
   MORADOR: [
     { rotulo: "Nova reserva", destino: "reservas" },
@@ -141,37 +152,54 @@ export default function Dashboard({
 
   return (
     <div className="space-y-7">
-      {/* Faixa fotográfica */}
-      <div className="relative h-44 overflow-hidden rounded-md border border-[#EFE9E1] sm:h-52">
+      {/* Faixa panorâmica — largura total, cantos retos, degradê para o fundo */}
+      <div className="relative -mx-4 h-[104px] overflow-hidden sm:-mx-6 sm:h-[116px] lg:-mx-8 lg:h-[128px]">
         <Image
-          src="/fotos/faixa.jpg"
-          alt="Área verde e piscina do Parque Califórnia"
+          src="/fotos/parque-california.jpg"
+          alt="Área de lazer do Parque Califórnia com pergolado, quadra e residências"
           fill
           priority
-          className="object-cover"
-          sizes="(max-width: 1024px) 100vw, 1024px"
+          className="object-cover object-[50%_42%]"
+          sizes="100vw"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#4D403A]/70 via-transparent to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-5">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-white/80">
-            Parque Califórnia
-          </p>
-          <h1 className="mt-0.5 text-xl font-semibold text-white sm:text-2xl">
-            {saudacao()}, {nome.split(" ")[0]}
-          </h1>
-          <p className="mt-0.5 text-xs text-white/85 sm:text-sm">
-            {dataLonga()}
-            {perfil === "MORADOR" && unidade ? ` · Unidade ${unidade.bloco}-${unidade.numero}` : ""}
-          </p>
-        </div>
+        <div className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-b from-transparent to-[#f7f6f3]" />
       </div>
+
+      {/* Cabeçalho — texto direto no fundo, sem card */}
+      <header className="-mt-4 space-y-1.5">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-500">
+          Parque Califórnia · {dataLonga()}
+        </p>
+        <div className="flex items-center gap-3">
+          <Image
+            src="/fotos/logo-parque-california.png"
+            alt="Logo do Parque Califórnia"
+            width={44}
+            height={44}
+            className="h-11 w-11 shrink-0 rounded-md border border-[#EFE9E1] bg-white object-contain p-0.5"
+          />
+          <div>
+            <h1 className="text-2xl font-semibold leading-tight text-stone-900">
+              {saudacao()}, {nome.split(" ")[0]}
+            </h1>
+            {perfil === "MORADOR" && unidade && (
+              <p className="text-sm text-stone-500">
+                Unidade {unidade.bloco}-{unidade.numero}
+              </p>
+            )}
+          </div>
+        </div>
+        <p className="max-w-2xl text-sm leading-relaxed text-stone-500">
+          {DESCRICAO_PERFIL[perfil]}
+        </p>
+      </header>
 
       {/* Indicadores */}
       {!dados ? (
         <Carregando />
       ) : (
         <>
-          <LinhaIndicadores itens={dados.indicadores} />
+          <LinhaIndicadores itens={dados.indicadores} className="-mt-1" />
 
           {/* Ações rápidas */}
           <Secao titulo="Ações rápidas">

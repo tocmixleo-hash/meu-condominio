@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import {
-  Building2,
   CalendarDays,
   DoorOpen,
   FileText,
@@ -122,9 +122,13 @@ export default function AppShell({
 
   const marca = (
     <div className="flex items-center gap-3 border-b border-[#61514A] px-5 py-4">
-      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-[#61514A]">
-        <Building2 className="h-4.5 w-4.5 text-[#f7f6f3]" />
-      </span>
+      <Image
+        src="/fotos/logo-parque-california.png"
+        alt="Logo do Parque Califórnia"
+        width={36}
+        height={36}
+        className="h-9 w-9 shrink-0 rounded-md bg-white object-contain p-0.5"
+      />
       <div className="min-w-0">
         <p className="truncate text-sm font-semibold leading-tight text-[#f7f6f3]">Meu Condomínio</p>
         <p className="truncate text-xs text-[#EFE9E1]/70">Parque Califórnia</p>
@@ -134,11 +138,22 @@ export default function AppShell({
 
   const rodape = (
     <div className="border-t border-[#61514A] px-5 py-4">
-      <p className="truncate text-sm font-medium text-[#f7f6f3]">{nome}</p>
-      <p className="mt-0.5 truncate text-xs text-[#EFE9E1]/70">
-        {ROTULO_PERFIL[perfil]}
-        {unidade ? ` · Unidade ${unidade.bloco}-${unidade.numero}` : ""}
-      </p>
+      <div className="flex items-center gap-3">
+        <Image
+          src="/fotos/logo-parque-california.png"
+          alt="Logo do Parque Califórnia"
+          width={36}
+          height={36}
+          className="h-9 w-9 shrink-0 rounded-md bg-white object-contain p-0.5"
+        />
+        <div className="min-w-0">
+          <p className="truncate text-sm font-medium text-[#f7f6f3]">{nome}</p>
+          <p className="truncate text-xs text-[#EFE9E1]/70">
+            {ROTULO_PERFIL[perfil]}
+            {unidade ? ` · Unidade ${unidade.bloco}-${unidade.numero}` : ""}
+          </p>
+        </div>
+      </div>
       <button
         onClick={aoSair}
         className="mt-3 flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-[#EFE9E1]/85 transition-colors hover:bg-[#61514A]/60 hover:text-[#f7f6f3]"

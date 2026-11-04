@@ -89,7 +89,7 @@ export function Secao({
   );
 }
 
-// ── Indicadores com divisórias verticais ─────────────────────
+// ── Indicadores com divisórias verticais (sem caixa) ─────────
 
 export function LinhaIndicadores({
   itens,
@@ -99,14 +99,12 @@ export function LinhaIndicadores({
   className?: string;
 }) {
   return (
-    <div
-      className={`flex flex-wrap overflow-hidden rounded-md border border-[#EFE9E1] bg-white ${className}`}
-    >
+    <div className={`flex flex-col sm:flex-row sm:divide-x sm:divide-[#dfdacf] ${className}`}>
       {itens.map((item, i) => (
         <div
           key={item.rotulo}
-          className={`min-w-[9rem] flex-1 px-5 py-4 ${
-            i > 0 ? "border-l border-[#EFE9E1]" : ""
+          className={`py-2.5 sm:flex-1 sm:py-1 ${i === 0 ? "sm:pl-0" : "sm:px-5"} ${
+            i === itens.length - 1 ? "sm:pr-0" : ""
           }`}
         >
           <p className="text-2xl font-semibold tabular-nums text-stone-900">{item.valor}</p>

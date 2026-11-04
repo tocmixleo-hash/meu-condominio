@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     "Plataforma de gestão comunitária do Parque Califórnia: comunicados, reservas, encomendas, autorizações de acesso, documentos e assembleias.",
   keywords: ["condomínio", "Parque Califórnia", "moradores", "síndico", "portaria"],
   icons: {
-    icon: "/fotos/faixa.jpg",
+    icon: "/fotos/logo-parque-california.png",
   },
 };
 
