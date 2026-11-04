@@ -138,7 +138,10 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
     try {
       const usuario = await entrarNoApp({
         ...(dados ?? { email, senha }),
-        ...(MODO_DEMO ? { condominioId: condo.id } : {}),
+        // Contexto do condomínio selecionado: orienta o login quando o mesmo
+        // e-mail existir em mais de um parque; nunca bloqueia (o backend
+        // recorre à conta correta quando o vínculo não coincide).
+        condominioId: condo.id,
       });
       aoEntrar(usuario);
     } catch (e) {
@@ -229,44 +232,44 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
             className="mx-auto h-20 w-auto mix-blend-multiply"
           />
 
-          {/* Seletor de condomínio — apenas na demonstração; em produção os
-              vínculos do usuário são resolvidos no backend após o login */}
-          {MODO_DEMO && (
-            <div className="mt-4 grid grid-cols-2 gap-3">
-              {condominios.map((c) => {
-                const ativo = c.id === condo.id;
-                return (
-                  <button
-                    key={c.id}
-                    type="button"
-                    onClick={() => setCondo(c)}
-                    className={`flex items-center gap-3 rounded-xl border bg-white px-4 py-3 text-left transition ${
-                      ativo
-                        ? "border-[var(--cor-tema)] ring-2 ring-[var(--cor-tema)]/25"
-                        : "border-stone-200 hover:border-stone-300"
-                    }`}
-                  >
-                    <img
-                      src={c.logo}
-                      alt=""
-                      className="h-10 w-10 shrink-0 rounded-lg bg-white object-contain p-0.5"
-                    />
-                    <span className="min-w-0">
-                      <span className="block truncate text-sm font-semibold text-stone-900">{c.nome}</span>
-                      <span className="flex items-center gap-1.5 text-xs text-stone-500">
-                        <span
-                          aria-hidden
-                          className="inline-block h-2 w-2 rounded-full"
-                          style={{ backgroundColor: c.corTema }}
-                        />
-                        {ativo ? "Selecionado" : "Selecionar"}
-                      </span>
+          {/* Seletor de condomínio — sempre visível: escolhe a identidade
+              visual (logo, foto, tema) e os acessos rápidos de cada parque.
+              Em produção o vínculo real do usuário continua sendo resolvido
+              no backend após o login — a escolha nunca bloqueia ninguém. */}
+          <div className="mt-4 grid grid-cols-2 gap-3">
+            {condominios.map((c) => {
+              const ativo = c.id === condo.id;
+              return (
+                <button
+                  key={c.id}
+                  type="button"
+                  onClick={() => setCondo(c)}
+                  className={`flex items-center gap-3 rounded-xl border bg-white px-4 py-3 text-left transition ${
+                    ativo
+                      ? "border-[var(--cor-tema)] ring-2 ring-[var(--cor-tema)]/25"
+                      : "border-stone-200 hover:border-stone-300"
+                  }`}
+                >
+                  <img
+                    src={c.logo}
+                    alt=""
+                    className="h-10 w-10 shrink-0 rounded-lg bg-white object-contain p-0.5"
+                  />
+                  <span className="min-w-0">
+                    <span className="block truncate text-sm font-semibold text-stone-900">{c.nome}</span>
+                    <span className="flex items-center gap-1.5 text-xs text-stone-500">
+                      <span
+                        aria-hidden
+                        className="inline-block h-2 w-2 rounded-full"
+                        style={{ backgroundColor: c.corTema }}
+                      />
+                      {ativo ? "Selecionado" : "Selecionar"}
                     </span>
-                  </button>
-                );
-              })}
-            </div>
-          )}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
 
           {/* Cartão de acesso */}
           <div className="mt-4 rounded-2xl bg-white p-6 shadow-[var(--sombra-cartao)] sm:p-7">

@@ -30,14 +30,15 @@ export async function POST(req: Request) {
 
   const emailNorm = String(email).trim().toLowerCase();
   // E-mail pode existir em mais de um condomínio (cadastros legados por
-  // condomínio): aceita o condomínio explícito (demonstração) ou resolve
-  // a primeira conta cuja senha confere.
+  // condomínio): aceita o condomínio explícito (seletor da tela de login);
+  // se o vínculo principal não coincidir, recorre à conta correta — a
+  // escolha visual nunca bloqueia o acesso de quem tem senha válida.
   const candidatos = await db.usuario.findMany({
     where: { email: emailNorm, ativo: true },
     include: { vinculos: { where: { ativo: true }, orderBy: { criadoEm: "asc" } } },
   });
   const alvo = condominioId
-    ? candidatos.find((u) => u.condominioId === String(condominioId)) ?? null
+    ? candidatos.find((u) => u.condominioId === String(condominioId)) ?? candidatos[0] ?? null
     : candidatos[0] ?? null;
   if (!alvo || !conferirSenha(String(senha), alvo.senha)) {
     registrarFalha(chave);
@@ -71,8 +72,9 @@ export async function POST(req: Request) {
   limparTentativas(chave);
 
   const loja = await cookies();
-  // Login novo começa limpo: encerra qualquer simulação anterior.
-  loja.delete(COOKIE_SIMULACAO);
+  // Login novo começa limpo: encerra qualquer simulação anterior (o delete
+  // só emite header quando o cookie existe — evita poluir o Set-Cookie).
+  if (loja.get(COOKIE_SIMULACAO)?.value) loja.delete(COOKIE_SIMULACAO);
   loja.set(COOKIE_SESSAO, criarToken(alvo.id, condominioAtivoId), {
     httpOnly: true,
     sameSite: "lax",

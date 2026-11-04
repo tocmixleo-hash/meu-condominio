@@ -46,8 +46,8 @@ const ELENCO = [
   { email: "portaria@parqueflorida.com.br", condo: "florida", nome: "Sérgio Lima", perfil: "PORTARIA", unidade: null },
   { email: "helena@email.com", condo: "florida", nome: "Helena Barbosa", perfil: "MORADOR", unidade: ["A", "101"] },
   { email: "tiago@email.com", condo: "florida", nome: "Tiago Moreira", perfil: "MORADOR", unidade: ["A", "102"] },
-  { email: "juliana@email.com", condo: "florida", nome: "Juliana Rocha", perfil: "MORADOR", unidade: ["B", "201"], demoEmailUnico: "juliana.florida@email.com" },
-  { email: "rafael@email.com", condo: "florida", nome: "Rafael Souza", perfil: "MORADOR", unidade: ["B", "202"], demoEmailUnico: "rafael.florida@email.com" },
+  { email: "camila@email.com", condo: "florida", nome: "Camila Freitas", perfil: "MORADOR", unidade: ["B", "201"] },
+  { email: "andre@email.com", condo: "florida", nome: "André Cardoso", perfil: "MORADOR", unidade: ["B", "202"] },
 ];
 
 const UNIDADES_PADRAO = [
@@ -56,12 +56,6 @@ const UNIDADES_PADRAO = [
   ["B", "201"],
   ["B", "202"],
 ];
-
-// E-mails no banco demo — Florida usa os mesmos nomes fictícios com e-mail próprio
-const EMAIL_DEMO = {
-  "juliana.florida@email.com": "juliana.florida@email.com",
-  "rafael.florida@email.com": "rafael.florida@email.com",
-};
 
 async function main() {
   // 1. Condomínios de produção por slug (NUNCA cria)

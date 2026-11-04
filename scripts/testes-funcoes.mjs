@@ -19,8 +19,11 @@ function verificar(nome, condicao, detalhe = "") {
 }
 
 function cookieDaResposta(res) {
-  const bruto = res.headers.get("set-cookie") ?? "";
-  return bruto.split(";")[0] || "";
+  // Escolhe sempre o cookie de SESSÃO entre os Set-Cookie da resposta
+  // (a resposta pode carregar também o cookie de simulação).
+  const lista = res.headers.getSetCookie?.() ?? [res.headers.get("set-cookie") ?? ""];
+  const sessao = lista.find((c) => c.startsWith("mc_sessao="));
+  return (sessao ?? lista[0] ?? "").split(";")[0] || "";
 }
 
 async function chamar(cookie, caminho, opcoes = {}) {
