@@ -146,14 +146,14 @@ export default function AppShell({
 
   const marca = (
     <div className="border-b border-[var(--cor-tema-hover)] px-4 py-4">
-      {/* Marca da plataforma — logo criada pelo usuário */}
+      {/* Marca da plataforma — logo criada pelo usuário (versão horizontal legível) */}
       <div className="flex h-14 items-center justify-center rounded-xl bg-white px-3 shadow-sm">
         <Image
-          src="/fotos/logo-meu-condominio.png"
+          src="/fotos/logo-meu-condominio-horizontal.png"
           alt="Meu Condomínio"
-          width={120}
-          height={44}
-          className="h-11 w-auto object-contain"
+          width={605}
+          height={158}
+          className="h-10 w-auto object-contain"
           priority
         />
       </div>
@@ -245,11 +245,11 @@ export default function AppShell({
           </button>
           <div className="flex min-w-0 flex-1 items-center gap-2.5">
             <Image
-              src="/fotos/logo-meu-condominio.png"
+              src="/fotos/logo-meu-condominio-horizontal.png"
               alt="Meu Condomínio"
-              width={52}
-              height={36}
-              className="h-9 w-auto object-contain"
+              width={605}
+              height={158}
+              className="h-8 w-auto object-contain"
             />
             <span className="truncate text-xs text-stone-500">{condominio.nome}</span>
           </div>

@@ -139,12 +139,12 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
         <div className="absolute inset-0 bg-gradient-to-t from-[var(--cor-tema-escura-a70)] via-[var(--cor-tema-a20)] to-[var(--cor-tema-escura2-a50)]" />
 
         <div className="relative z-10 flex h-full flex-col p-10 text-white lg:px-14 lg:py-12">
-          {/* Marca — logo criada pelo usuário */}
+          {/* Marca — logo criada pelo usuário (versão horizontal legível) */}
           <span className="inline-flex items-center self-start rounded-2xl bg-white px-4 py-3 shadow-sm">
             <img
-              src="/fotos/logo-meu-condominio.png"
+              src="/fotos/logo-meu-condominio-horizontal.png"
               alt="Meu Condomínio"
-              className="h-16 w-auto object-contain"
+              className="h-12 w-auto object-contain"
             />
           </span>
 
