@@ -99,7 +99,7 @@ async function main() {
   for (const item of ELENCO) {
     const emailProducao = item.email;
     const emailDemo = item.demoEmailUnico ?? item.email;
-    const demoUsuario = await demo.usuario.findUnique({
+    const demoUsuario = await demo.usuario.findFirst({
       where: { email: emailDemo },
       select: { senha: true, nome: true },
     });
