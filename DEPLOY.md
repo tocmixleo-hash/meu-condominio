@@ -50,14 +50,30 @@ destrutiva é necessária.
    ```
 4. **Na Vercel**, cadastre `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN`, `SEGREDO_SESSAO` e
    `BLOB_READ_WRITE_TOKEN` e faça **Redeploy**. Com o Turso configurado, o portal entra
-   automaticamente em modo de produção (sem seletor de login nem acessos de demonstração).
+   automaticamente em modo de produção persistente (os acessos rápidos continuam na tela
+   de login, alimentados pelo seed da etapa 6).
 5. Acesse o portal com o e-mail do administrador da plataforma
    (leonardo_lira@outlook.com) e **altere a senha no primeiro acesso**.
    Depois, cadastre os vínculos da equipe de cada condomínio (Síndico,
    Administrativo, Portaria e Moradores) pelo próprio portal.
+6. **Material de demonstração para testes de perfis** (opcional, a qualquer momento):
+   para que a simulação de perfis do administrador e os acessos rápidos tenham
+   conteúdo de verdade, semeie o elenco e o material demo nos dois condomínios.
+   Ambos os scripts são idempotentes (rodar de novo não duplica) e **nunca tocam
+   no administrador da plataforma nem em quaisquer dados reais**:
+   ```bash
+   TURSO_DATABASE_URL="libsql://..." TURSO_AUTH_TOKEN="..." bun scripts/semear-usuarios-demo-producao.mjs
+   TURSO_DATABASE_URL="libsql://..." TURSO_AUTH_TOKEN="..." bun scripts/semear-dados-demo-producao.mjs
+   ```
+   O material semeado: comunicados, reservas, encomendas, autorizações de visita e
+   assembleia em cada condomínio, com datas relativas ao dia da execução (visitas
+   valendo hoje, assembleia na próxima semana) para nunca "envelhecer".
 
 O modo demonstração (SQLite + elenco fictício + acessos rápidos) continua disponível para
-desenvolvimento local e previews, sem interferir na produção.
+desenvolvimento local e previews, sem interferir na produção. Na produção real, a tela de
+login mantém o seletor de condomínios e os acessos rápidos de demonstração — quem recebe
+o link testa livremente; o administrador da plataforma nunca aparece nos atalhos e entra
+apenas pelo e-mail e senha próprios.
 
 ## 5. Limitações do modo demonstração (SQLite em `/tmp`)
 
