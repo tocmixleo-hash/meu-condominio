@@ -3,6 +3,7 @@ import { ehEquipe, json401, json403, pode, usuarioAtual } from "@/lib/auth";
 import { notificarUsuarios } from "@/lib/notificacoes";
 import { registrarAcao } from "@/lib/auditoria";
 import { ROTULO_ESPACO } from "@/lib/rotulos";
+import { hojeISO } from "@/lib/datas";
 
 const ESPACOS = ["SALAO_FESTAS", "CHURRASQUEIRA", "QUADRA", "PISCINA"];
 
@@ -37,7 +38,7 @@ export async function POST(req: Request) {
   });
   const antecedenciaMaxDias = regra?.antecedenciaMaxDias ?? 60;
   const limiteMensalUnidade = regra?.limiteMensalUnidade ?? 2;
-  const hoje = new Date().toISOString().slice(0, 10);
+  const hoje = hojeISO();
   const limiteData = new Date(Date.now() + antecedenciaMaxDias * 86_400_000)
     .toISOString()
     .slice(0, 10);

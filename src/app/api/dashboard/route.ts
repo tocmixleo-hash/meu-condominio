@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { json401, usuarioAtual } from "@/lib/auth";
+import { hojeISO } from "@/lib/datas";
 
 export async function GET() {
   const eu = await usuarioAtual();
@@ -7,7 +8,7 @@ export async function GET() {
   const cid = eu.condominio.id;
 
   const hoje = new Date();
-  const isoHoje = hoje.toISOString().slice(0, 10);
+  const isoHoje = hojeISO();
   const em30dias = new Date(hoje.getTime() + 30 * 86400000).toISOString().slice(0, 10);
   const em7dias = new Date(hoje.getTime() + 7 * 86400000).toISOString().slice(0, 10);
 

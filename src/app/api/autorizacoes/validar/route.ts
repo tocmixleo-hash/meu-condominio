@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { ehEquipe, json401, json403, pode, usuarioAtual } from "@/lib/auth";
 import { notificarUsuarios } from "@/lib/notificacoes";
 import { registrarAcao } from "@/lib/auditoria";
+import { hojeISO } from "@/lib/datas";
 
 /**
  * Validação do QR Code de entrada na portaria: a equipe informa o código
@@ -36,7 +37,7 @@ export async function POST(req: Request) {
     return Response.json({ erro: "Entrada já registrada para este código." }, { status: 409 });
   }
 
-  const hoje = new Date().toISOString().slice(0, 10);
+  const hoje = hojeISO();
   if (hoje < autorizacao.dataInicio || hoje > autorizacao.dataFim) {
     return Response.json(
       {

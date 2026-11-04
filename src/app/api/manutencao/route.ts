@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { ehGestao, json401, json403, pode, usuarioAtual } from "@/lib/auth";
 import { registrarAcao } from "@/lib/auditoria";
 import { ROTULO_PERIODICIDADE } from "@/lib/rotulos";
+import { hojeISO } from "@/lib/datas";
 
 const PERIODICIDADES = ["MENSAL", "BIMESTRAL", "TRIMESTRAL", "SEMESTRAL", "ANUAL"];
 const MESES: Record<string, number> = {
@@ -27,7 +28,7 @@ export async function GET() {
   if (!eu) return json401();
   if (!pode(eu, "manutencao")) return json403();
 
-  const hoje = new Date().toISOString().slice(0, 10);
+  const hoje = hojeISO();
   const em7dias = new Date(Date.now() + 7 * 86_400_000).toISOString().slice(0, 10);
   const lista = await db.manutencao.findMany({
     where: { condominioId: eu.condominio.id, ativo: true },
@@ -90,7 +91,7 @@ export async function PATCH(req: Request) {
 
   // Registrar a realização hoje: recalcula a próxima data pela periodicidade
   if (acao === "REALIZAR") {
-    const hoje = new Date().toISOString().slice(0, 10);
+    const hoje = hojeISO();
     const meses = MESES[atual.periodicidade] ?? 6;
     const manutencao = await db.manutencao.update({
       where: { id },
