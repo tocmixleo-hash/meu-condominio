@@ -78,14 +78,52 @@ export type UsuarioSessao = {
   id: string;
   nome: string;
   email: string;
-  perfil: string; // perfil do vínculo ATIVO (PLATAFORMA para o administrador geral)
+  perfil: string; // perfil do vínculo ATIVO (PLATAFORMA para o administrador geral; FUNCAO para função personalizada)
+  funcaoNome: string | null; // nome da função personalizada (quando o vínculo é FUNCAO)
   telefone: string | null;
   ativo: boolean;
   unidade: { id: string; bloco: string; numero: string } | null;
   condominio: CondominioSessao; // condomínio ativo
   condominios: CondominioSessao[]; // condomínios acessíveis (vínculos ou todos)
+  permissoes: string[]; // módulos concedidos no condomínio ativo
   ehPlataforma: boolean;
 };
+
+// ── Permissões por módulo ────────────────────────────────────────
+// Cada módulo do portal é uma permissão. Perfis clássicos têm conjuntos
+// fixos; funções personalizadas (Funcao) recebem um subconjunto escolhido
+// pelo administrador da plataforma. Os módulos "condominios" e "funcoes"
+// são exclusivos do PLATAFORMA — nunca concedíveis a funções.
+export const MODULOS_TODOS = [
+  "inicio", "comunicados", "reservas", "encomendas", "autorizacoes",
+  "documentos", "assembleias", "moradores", "auditoria", "identidade",
+  "condominios", "funcoes",
+] as const;
+
+export const MODULOS_CONCEDIVEIS = [
+  "comunicados", "reservas", "encomendas", "autorizacoes",
+  "documentos", "assembleias", "moradores", "auditoria", "identidade",
+] as const;
+
+const PERMISSOES_FIXAS: Record<string, string[]> = {
+  SINDICO: [...MODULOS_TODOS.filter((m) => m !== "condominios" && m !== "funcoes")],
+  ADMINISTRATIVO: [...MODULOS_TODOS.filter((m) => m !== "condominios" && m !== "funcoes")],
+  PORTARIA: ["inicio", "encomendas", "autorizacoes", "moradores"],
+  MORADOR: ["inicio", "comunicados", "reservas", "encomendas", "autorizacoes", "documentos", "assembleias"],
+};
+
+/** O usuário pode usar o módulo no condomínio ativo? (enforcement do backend) */
+export function pode(eu: { perfil: string; permissoes: string[]; ehPlataforma: boolean }, modulo: string): boolean {
+  if (eu.ehPlataforma || eu.perfil === "PLATAFORMA") return true;
+  if (eu.permissoes?.includes(modulo)) return true;
+  if (eu.perfil !== "FUNCAO") return (PERMISSOES_FIXAS[eu.perfil] ?? []).includes(modulo);
+  return false;
+}
+
+/** Equipe do condomínio (não morador): enxerga listas completas dos módulos concedidos. */
+export function ehEquipe(perfil: string): boolean {
+  return ["SINDICO", "ADMINISTRATIVO", "PORTARIA", "FUNCAO"].includes(perfil);
+}
 
 type CondominioCompleto = {
   id: string;
@@ -149,8 +187,25 @@ type VinculoAtivo = {
   condominioId: string;
   perfil: string;
   ativo: boolean;
+  funcaoId: string | null;
+  funcao: { id: string; nome: string; permissoes: string; ativo: boolean } | null;
   condominio: CondominioCompleto;
 };
+
+/** Permissões efetivas de um vínculo (perfil clássico ou função personalizada). */
+function permissoesDoVinculo(v: VinculoAtivo): { permissoes: string[]; funcaoNome: string | null } {
+  if (v.funcaoId && v.funcao && v.funcao.ativo) {
+    let lista: string[] = [];
+    try {
+      const bruto = JSON.parse(v.funcao.permissoes);
+      if (Array.isArray(bruto)) lista = bruto.filter((m) => (MODULOS_CONCEDIVEIS as readonly string[]).includes(m));
+    } catch {
+      lista = [];
+    }
+    return { permissoes: ["inicio", ...lista], funcaoNome: v.funcao.nome };
+  }
+  return { permissoes: PERMISSOES_FIXAS[v.perfil] ?? ["inicio"], funcaoNome: null };
+}
 
 /**
  * Monta a sessão do usuário escolhendo o condomínio ativo com segurança:
@@ -186,11 +241,13 @@ async function montarSessao(
       nome: u.nome,
       email: u.email,
       perfil: "PLATAFORMA",
+      funcaoNome: null,
       telefone: u.telefone,
       ativo: u.ativo,
       unidade: null,
       condominio: paraSessao(ativo),
       condominios: todos.map(paraSessao),
+      permissoes: [...MODULOS_TODOS],
       ehPlataforma: true,
     };
   }
@@ -203,11 +260,13 @@ async function montarSessao(
     vinculos[0];
   const unidade =
     vinculoAtivo.condominioId === u.condominioId ? u.unidade : null;
+  const { permissoes, funcaoNome } = permissoesDoVinculo(vinculoAtivo);
   return {
     id: u.id,
     nome: u.nome,
     email: u.email,
-    perfil: vinculoAtivo.perfil,
+    perfil: vinculoAtivo.funcaoId && vinculoAtivo.funcao?.ativo ? "FUNCAO" : vinculoAtivo.perfil,
+    funcaoNome,
     telefone: u.telefone,
     ativo: u.ativo,
     unidade: unidade
@@ -215,13 +274,20 @@ async function montarSessao(
       : null,
     condominio: paraSessao(vinculoAtivo.condominio),
     condominios: vinculos.map((v) => paraSessao(v.condominio)),
+    permissoes,
     ehPlataforma: false,
   };
 }
 
 const INCLUIR_SESSAO = {
   unidade: true,
-  vinculos: { where: { ativo: true }, include: { condominio: { select: CAMPOS_CONDOMINIO } } },
+  vinculos: {
+    where: { ativo: true },
+    include: {
+      condominio: { select: CAMPOS_CONDOMINIO },
+      funcao: true,
+    },
+  },
 } as const;
 
 /** Sessão a partir do cookie (condomínio ativo assinado no token). */

@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { ehGestao, json401, json403, usuarioAtual } from "@/lib/auth";
+import { json401, json403, pode, usuarioAtual } from "@/lib/auth";
 import { notificarUsuarios } from "@/lib/notificacoes";
 import { registrarAcao } from "@/lib/auditoria";
 
@@ -24,7 +24,7 @@ export async function GET() {
 export async function POST(req: Request) {
   const eu = await usuarioAtual();
   if (!eu) return json401();
-  if (!(ehGestao(eu.perfil) || eu.perfil === "PORTARIA")) return json403();
+  if (!pode(eu, "encomendas")) return json403();
 
   const { descricao, remetente, categoria, destinatarioId } = await req.json().catch(() => ({}) as never);
   if (!descricao?.trim() || !destinatarioId) {
@@ -85,7 +85,7 @@ export async function PATCH(req: Request) {
   }
 
   if (acao === "LIBERAR_RETIRADA") {
-    if (!(ehGestao(eu.perfil) || eu.perfil === "PORTARIA")) return json403();
+    if (!pode(eu, "encomendas")) return json403();
     if (atual.status === "RETIRADA") {
       return Response.json({ erro: "Esta encomenda já foi retirada." }, { status: 409 });
     }

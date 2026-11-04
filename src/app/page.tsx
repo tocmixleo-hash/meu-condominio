@@ -14,6 +14,7 @@ import Moradores from "@/components/portal/moradores";
 import Auditoria from "@/components/portal/auditoria";
 import Identidade from "@/components/portal/identidade";
 import Condominios from "@/components/portal/condominios";
+import Funcoes from "@/components/portal/funcoes";
 import { mensagemDeErro } from "@/lib/api-cliente";
 
 type Usuario = {
@@ -21,6 +22,8 @@ type Usuario = {
   nome: string;
   email: string;
   perfil: Perfil;
+  funcaoNome?: string | null;
+  permissoes?: string[];
   unidade?: { bloco: string; numero: string } | null;
   condominio?: CondominioUI;
   condominios?: CondominioUI[];
@@ -99,10 +102,13 @@ export default function Inicio() {
 
   const condominio = usuario.condominio ?? CONDOMINIO_PADRAO;
   const condominios = usuario.condominios?.length ? usuario.condominios : [condominio];
+  // Membro de equipe com função personalizada: nos módulos concedidos a
+  // interface de gestão aparece (o servidor continua aplicando as permissões).
+  const perfilModulos: Perfil = usuario.perfil === "FUNCAO" ? "ADMINISTRATIVO" : usuario.perfil;
   const podeEditarIdentidade =
-    usuario.perfil === "PLATAFORMA" ||
-    usuario.perfil === "SINDICO" ||
-    usuario.perfil === "ADMINISTRATIVO";
+    perfilModulos === "PLATAFORMA" ||
+    perfilModulos === "SINDICO" ||
+    perfilModulos === "ADMINISTRATIVO";
 
   return (
     <AppShell
@@ -112,6 +118,8 @@ export default function Inicio() {
       condominio={condominio}
       condominios={condominios}
       modulo={modulo}
+      permissoes={usuario.permissoes}
+      funcaoNome={usuario.funcaoNome}
       aoTrocar={setModulo}
       aoTrocarCondominio={trocarCondominio}
       aoSair={sair}
@@ -124,20 +132,21 @@ export default function Inicio() {
       {modulo === "inicio" && (
         <Dashboard
           nome={usuario.nome}
-          perfil={usuario.perfil}
+          perfil={perfilModulos}
           unidade={usuario.unidade}
           condominio={condominio}
           aoTrocar={setModulo}
         />
       )}
-      {modulo === "comunicados" && <Comunicados perfil={usuario.perfil} />}
-      {modulo === "reservas" && <Reservas perfil={usuario.perfil} />}
-      {modulo === "encomendas" && <Encomendas perfil={usuario.perfil} />}
-      {modulo === "autorizacoes" && <Autorizacoes perfil={usuario.perfil} />}
-      {modulo === "documentos" && <Documentos perfil={usuario.perfil} />}
-      {modulo === "assembleias" && <Assembleias perfil={usuario.perfil} />}
+      {modulo === "comunicados" && <Comunicados perfil={perfilModulos} />}
+      {modulo === "reservas" && <Reservas perfil={perfilModulos} />}
+      {modulo === "encomendas" && <Encomendas perfil={perfilModulos} />}
+      {modulo === "autorizacoes" && <Autorizacoes perfil={perfilModulos} />}
+      {modulo === "documentos" && <Documentos perfil={perfilModulos} />}
+      {modulo === "assembleias" && <Assembleias perfil={perfilModulos} />}
       {modulo === "moradores" && <Moradores />}
       {modulo === "auditoria" && <Auditoria />}
+      {modulo === "funcoes" && <Funcoes />}
       {modulo === "identidade" && (
         <Identidade
           condominio={condominio}

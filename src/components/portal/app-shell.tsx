@@ -21,6 +21,7 @@ import {
   Palette,
   ShieldCheck,
   User,
+  UserCog,
   Users,
   X,
 } from "lucide-react";
@@ -38,9 +39,10 @@ export type ModuloId =
   | "moradores"
   | "auditoria"
   | "identidade"
-  | "condominios";
+  | "condominios"
+  | "funcoes";
 
-export type Perfil = "SINDICO" | "ADMINISTRATIVO" | "PORTARIA" | "MORADOR" | "PLATAFORMA";
+export type Perfil = "SINDICO" | "ADMINISTRATIVO" | "PORTARIA" | "MORADOR" | "PLATAFORMA" | "FUNCAO";
 
 type ItemMenu = { id: ModuloId; rotulo: string; icone: typeof Home };
 
@@ -84,9 +86,11 @@ const MENUS: Record<Perfil, ItemMenu[]> = {
   PLATAFORMA: [
     { id: "inicio", rotulo: "Início", icone: Home },
     { id: "condominios", rotulo: "Condomínios", icone: Building2 },
+    { id: "funcoes", rotulo: "Funções", icone: UserCog },
     { id: "identidade", rotulo: "Identidade visual", icone: Palette },
     { id: "auditoria", rotulo: "Auditoria", icone: History },
   ],
+  FUNCAO: [], // menu montado dinamicamente a partir das permissões da função
 };
 
 const ROTULO_PERFIL: Record<Perfil, string> = {
@@ -95,6 +99,7 @@ const ROTULO_PERFIL: Record<Perfil, string> = {
   PORTARIA: "Portaria",
   MORADOR: "Morador",
   PLATAFORMA: "Administrador da Plataforma",
+  FUNCAO: "Função personalizada",
 };
 
 // Ícone por perfil no rodapé — evita repetir a logo do condomínio
@@ -104,6 +109,20 @@ const ICONE_PERFIL: Record<Perfil, typeof Home> = {
   PORTARIA: ShieldCheck,
   MORADOR: User,
   PLATAFORMA: Building2,
+  FUNCAO: UserCog,
+};
+
+// Catálogo para montar o menu de funções personalizadas (mesma ordem/ícones)
+const ITEM_POR_MODULO: Record<string, ItemMenu> = {
+  comunicados: { id: "comunicados", rotulo: "Comunicados", icone: Megaphone },
+  reservas: { id: "reservas", rotulo: "Reservas", icone: CalendarDays },
+  encomendas: { id: "encomendas", rotulo: "Encomendas", icone: Package },
+  autorizacoes: { id: "autorizacoes", rotulo: "Autorizações", icone: DoorOpen },
+  documentos: { id: "documentos", rotulo: "Documentos", icone: FileText },
+  assembleias: { id: "assembleias", rotulo: "Assembleias", icone: Users },
+  moradores: { id: "moradores", rotulo: "Moradores", icone: Users },
+  identidade: { id: "identidade", rotulo: "Identidade visual", icone: Palette },
+  auditoria: { id: "auditoria", rotulo: "Auditoria", icone: History },
 };
 
 // ── Seletor de condomínio (vínculos múltiplos / plataforma) ──────
@@ -299,6 +318,8 @@ export default function AppShell({
   condominio,
   condominios,
   modulo,
+  permissoes,
+  funcaoNome,
   aoTrocar,
   aoTrocarCondominio,
   aoSair,
@@ -310,6 +331,8 @@ export default function AppShell({
   condominio: CondominioUI;
   condominios: CondominioUI[];
   modulo: ModuloId;
+  permissoes?: string[];
+  funcaoNome?: string | null;
   aoTrocar: (m: ModuloId) => void;
   aoTrocarCondominio: (id: string) => void;
   aoSair: () => void;
@@ -317,7 +340,16 @@ export default function AppShell({
 }) {
   const [menuAberto, setMenuAberto] = useState(false);
   const [dialogoSenha, setDialogoSenha] = useState(false);
-  const itens = MENUS[perfil] ?? MENUS.MORADOR;
+  // Menu da função personalizada: módulos concedidos, sempre na ordem do catálogo
+  const itens: ItemMenu[] =
+    perfil === "FUNCAO"
+      ? [
+          { id: "inicio", rotulo: "Início", icone: Home },
+          ...(permissoes ?? [])
+            .filter((m) => ITEM_POR_MODULO[m])
+            .map((m) => ITEM_POR_MODULO[m]),
+        ]
+      : MENUS[perfil] ?? MENUS.MORADOR;
   const IconePerfil = ICONE_PERFIL[perfil] ?? User;
   const temaVars = cssVarsDoTema(
     resolverTema(condominio.slug, condominio.corTema, condominio),
@@ -388,7 +420,7 @@ export default function AppShell({
         <div className="min-w-0">
           <p className="truncate text-sm font-medium text-[var(--cor-fundo)]">{nome}</p>
           <p className="truncate text-xs text-[var(--cor-clara-a70)]">
-            {ROTULO_PERFIL[perfil] ?? perfil}
+            {perfil === "FUNCAO" && funcaoNome ? funcaoNome : ROTULO_PERFIL[perfil] ?? perfil}
             {unidade ? ` · Unidade ${unidade.bloco}-${unidade.numero}` : ""}
           </p>
         </div>

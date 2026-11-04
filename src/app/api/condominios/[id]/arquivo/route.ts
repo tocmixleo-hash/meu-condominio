@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { ehGestao, ehPlataforma, json401, json403, usuarioAtual } from "@/lib/auth";
+import { ehGestao, ehPlataforma, json401, json403, pode, usuarioAtual } from "@/lib/auth";
 import { registrarAcao } from "@/lib/auditoria";
 import path from "path";
 import { mkdir, writeFile, unlink } from "fs/promises";
@@ -15,7 +15,10 @@ type Ctx = { params: Promise<{ id: string }> };
 async function garantirGestao(id: string) {
   const eu = await usuarioAtual();
   if (!eu) return { erro: json401() };
-  const autorizado = ehPlataforma(eu.perfil) || (ehGestao(eu.perfil) && eu.condominio.id === id);
+  const autorizado =
+    ehPlataforma(eu.perfil) ||
+    (ehGestao(eu.perfil) && eu.condominio.id === id) ||
+    (pode(eu, "identidade") && eu.condominio.id === id);
   if (!autorizado) return { erro: json403() };
   return { eu };
 }

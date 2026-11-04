@@ -41,6 +41,7 @@ model Condominio {
   unidades     Unidade[]
   usuarios     Usuario[]
   vinculos     UsuarioCondominio[]
+  funcoes      Funcao[]
   fotos        CondominioFoto[]
   comunicados  Comunicado[]
   reservas     Reserva[]
@@ -66,6 +67,24 @@ model CondominioFoto {
   @@index([condominioId, tipo, ordem])
 }
 
+// Função (cargo) personalizada criada pelo Administrador da Plataforma —
+// define quais módulos do portal o portador pode usar naquele condomínio.
+model Funcao {
+  id           String     @id @default(cuid())
+  condominioId String
+  condominio   Condominio @relation(fields: [condominioId], references: [id], onDelete: Cascade)
+  nome         String
+  descricao    String?
+  permissoes   String     @default("[]") // JSON: array de módulos concedidos
+  ativo        Boolean    @default(true)
+  criadoEm     DateTime   @default(now())
+
+  vinculos UsuarioCondominio[]
+
+  @@unique([condominioId, nome])
+  @@index([condominioId])
+}
+
 // Vínculo usuário ↔ condomínio (muitos-para-muitos, permissão por vínculo)
 model UsuarioCondominio {
   id           String     @id @default(cuid())
@@ -73,12 +92,15 @@ model UsuarioCondominio {
   usuario      Usuario    @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
   condominioId String
   condominio   Condominio @relation(fields: [condominioId], references: [id])
-  perfil       String // perfil NO vínculo: SINDICO | ADMINISTRATIVO | PORTARIA | MORADOR
+  perfil       String // perfil NO vínculo: SINDICO | ADMINISTRATIVO | PORTARIA | MORADOR | FUNCAO
+  funcaoId     String? // quando definido, o vínculo usa a Funcao personalizada
+  funcao       Funcao?    @relation(fields: [funcaoId], references: [id], onDelete: SetNull)
   ativo        Boolean    @default(true)
   criadoEm     DateTime   @default(now())
 
   @@unique([usuarioId, condominioId])
   @@index([condominioId])
+  @@index([funcaoId])
 }
 
 // ── Usuários e unidades ──────────────────────────────────────────

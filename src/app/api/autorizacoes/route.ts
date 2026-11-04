@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { json401, json403, usuarioAtual } from "@/lib/auth";
+import { json401, json403, pode, usuarioAtual } from "@/lib/auth";
 import { notificarUsuarios } from "@/lib/notificacoes";
 import { registrarAcao } from "@/lib/auditoria";
 
@@ -8,6 +8,7 @@ const ISO = /^\d{4}-\d{2}-\d{2}$/;
 export async function GET() {
   const eu = await usuarioAtual();
   if (!eu) return json401();
+  if (!pode(eu, "autorizacoes")) return json403();
   const lista = await db.autorizacao.findMany({
     where: {
       condominioId: eu.condominio.id,

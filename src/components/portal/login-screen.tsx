@@ -350,26 +350,15 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
             </form>
           </div>
 
-          {/* Acesso rápido para demonstração — nunca exibido em produção */}
+          {/* Acesso rápido para demonstração — nunca exibido em produção.
+              Sem botão do administrador: o acesso de gestão é exclusivo do
+              login pessoal do administrador da plataforma. */}
           {MODO_DEMO && (
             <div className="mt-6">
               <p className="text-[13px] font-medium uppercase tracking-[0.06em] text-stone-400">
                 Acesso rápido para demonstração
               </p>
-              <div className="mt-3 space-y-2.5">
-                <button
-                  type="button"
-                  disabled={enviando}
-                  onClick={() => submeter({ email: "admin@meucondominio.com", senha: "admin123" })}
-                  className="flex w-full items-center gap-2 rounded-full border border-stone-300 bg-white px-4 py-3 text-left text-sm font-medium text-stone-800 transition hover:bg-stone-50 disabled:opacity-50"
-                >
-                  <span aria-hidden className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--cor-tema)] text-[10px] font-bold text-white">
-                    MC
-                  </span>
-                  Administrador da Plataforma — seletor de condomínios
-                </button>
-              </div>
-              <div className="mt-2.5 grid grid-cols-1 gap-2.5 lg:grid-cols-2">
+              <div className="mt-3 grid grid-cols-1 gap-2.5 lg:grid-cols-2">
                 {rapidos.map((r) => (
                   <button
                     key={r.email}

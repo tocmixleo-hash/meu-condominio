@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { ehGestao, json401, json403, usuarioAtual } from "@/lib/auth";
+import { json401, json403, pode, usuarioAtual } from "@/lib/auth";
 import { mkdir, writeFile, unlink } from "fs/promises";
 import path from "path";
 import { registrarAcao } from "@/lib/auditoria";
@@ -41,6 +41,7 @@ async function salvarArquivo(slug: string, nomeSeguro: string, conteudo: Buffer)
 export async function GET() {
   const eu = await usuarioAtual();
   if (!eu) return json401();
+  if (!pode(eu, "documentos")) return json403();
   const lista = await db.documento.findMany({
     where: { condominioId: eu.condominio.id },
     include: { enviadoPor: { select: { nome: true } } },
@@ -52,7 +53,7 @@ export async function GET() {
 export async function POST(req: Request) {
   const eu = await usuarioAtual();
   if (!eu) return json401();
-  if (!ehGestao(eu.perfil)) return json403();
+  if (!pode(eu, "documentos")) return json403();
 
   const form = await req.formData().catch(() => null);
   if (!form) return Response.json({ erro: "Envio inválido." }, { status: 400 });
@@ -104,7 +105,7 @@ export async function POST(req: Request) {
 export async function DELETE(req: Request) {
   const eu = await usuarioAtual();
   if (!eu) return json401();
-  if (!ehGestao(eu.perfil)) return json403();
+  if (!pode(eu, "documentos")) return json403();
   const { id } = await req.json().catch(() => ({} as never));
   const doc = await db.documento.findFirst({
     where: { id: String(id ?? ""), condominioId: eu.condominio.id },

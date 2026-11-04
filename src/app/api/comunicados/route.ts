@@ -1,11 +1,12 @@
 import { db } from "@/lib/db";
-import { ehGestao, json401, json403, usuarioAtual } from "@/lib/auth";
+import { json401, json403, pode, usuarioAtual } from "@/lib/auth";
 import { notificarCondominio } from "@/lib/notificacoes";
 import { registrarAcao } from "@/lib/auditoria";
 
 export async function GET() {
   const eu = await usuarioAtual();
   if (!eu) return json401();
+  if (!pode(eu, "comunicados")) return json403();
   const lista = await db.comunicado.findMany({
     where: { condominioId: eu.condominio.id },
     include: { autor: { select: { nome: true, perfil: true } } },
@@ -17,7 +18,7 @@ export async function GET() {
 export async function POST(req: Request) {
   const eu = await usuarioAtual();
   if (!eu) return json401();
-  if (!ehGestao(eu.perfil)) return json403();
+  if (!pode(eu, "comunicados")) return json403();
 
   const { titulo, conteudo, categoria, prioridade } = await req.json().catch(() => ({}) as never);
   if (!titulo?.trim() || !conteudo?.trim()) {

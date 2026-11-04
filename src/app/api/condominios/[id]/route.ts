@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { ehGestao, ehPlataforma, json401, json403, usuarioAtual } from "@/lib/auth";
+import { ehGestao, ehPlataforma, json401, json403, pode, usuarioAtual } from "@/lib/auth";
 import { registrarAcao } from "@/lib/auditoria";
 import { corHex } from "@/lib/tema";
 
@@ -8,12 +8,16 @@ type Ctx = { params: Promise<{ id: string }> };
 /**
  * Acesso de gestão à identidade do condomínio: administrador da plataforma
  * em qualquer ambiente; Síndico/Administrativo apenas no condomínio ativo
- * da própria sessão.
+ * da própria sessão; função personalizada com o módulo "identidade" também
+ * no próprio condomínio.
  */
 async function garantirGestao(id: string) {
   const eu = await usuarioAtual();
   if (!eu) return { erro: json401() };
-  const autorizado = ehPlataforma(eu.perfil) || (ehGestao(eu.perfil) && eu.condominio.id === id);
+  const autorizado =
+    ehPlataforma(eu.perfil) ||
+    (ehGestao(eu.perfil) && eu.condominio.id === id) ||
+    (pode(eu, "identidade") && eu.condominio.id === id);
   if (!autorizado) return { erro: json403() };
   return { eu };
 }

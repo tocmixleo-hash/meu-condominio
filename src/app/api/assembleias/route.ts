@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { ehGestao, json401, json403, usuarioAtual } from "@/lib/auth";
+import { json401, json403, pode, usuarioAtual } from "@/lib/auth";
 import { notificarCondominio } from "@/lib/notificacoes";
 import { registrarAcao } from "@/lib/auditoria";
 
@@ -8,6 +8,7 @@ const ISO = /^\d{4}-\d{2}-\d{2}$/;
 export async function GET() {
   const eu = await usuarioAtual();
   if (!eu) return json401();
+  if (!pode(eu, "assembleias")) return json403();
   const lista = await db.assembleia.findMany({
     where: { condominioId: eu.condominio.id },
     orderBy: [{ data: "asc" }, { criadoEm: "desc" }],
@@ -18,7 +19,7 @@ export async function GET() {
 export async function POST(req: Request) {
   const eu = await usuarioAtual();
   if (!eu) return json401();
-  if (!ehGestao(eu.perfil)) return json403();
+  if (!pode(eu, "assembleias")) return json403();
 
   const { titulo, descricao, tipo, data, horario, local, pauta } =
     await req.json().catch(() => ({}) as never);
@@ -56,7 +57,7 @@ export async function POST(req: Request) {
 export async function PATCH(req: Request) {
   const eu = await usuarioAtual();
   if (!eu) return json401();
-  if (!ehGestao(eu.perfil)) return json403();
+  if (!pode(eu, "assembleias")) return json403();
 
   const { id, status, pauta } = await req.json().catch(() => ({}) as never);
   const atual = await db.assembleia.findUnique({ where: { id } });

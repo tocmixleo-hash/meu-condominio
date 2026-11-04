@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { ehGestao, json401, json403, usuarioAtual } from "@/lib/auth";
+import { ehEquipe, json401, json403, pode, usuarioAtual } from "@/lib/auth";
 import { notificarUsuarios } from "@/lib/notificacoes";
 import { registrarAcao } from "@/lib/auditoria";
 import { ROTULO_ESPACO } from "@/lib/rotulos";
@@ -9,10 +9,11 @@ const ESPACOS = ["SALAO_FESTAS", "CHURRASQUEIRA", "QUADRA", "PISCINA"];
 export async function GET() {
   const eu = await usuarioAtual();
   if (!eu) return json401();
+  if (!pode(eu, "reservas")) return json403();
   const lista = await db.reserva.findMany({
     where: {
       condominioId: eu.condominio.id,
-      ...(ehGestao(eu.perfil) ? {} : { solicitanteId: eu.id }),
+      ...(pode(eu, "reservas") && ehEquipe(eu.perfil) ? {} : { solicitanteId: eu.id }),
     },
     include: { solicitante: { include: { unidade: true } } },
     orderBy: [{ data: "asc" }, { criadoEm: "desc" }],
@@ -77,7 +78,7 @@ export async function PATCH(req: Request) {
   }
 
   const permitidos =
-    ehGestao(eu.perfil) && ["CONFIRMADA", "REJEITADA"].includes(status)
+    pode(eu, "reservas") && ehEquipe(eu.perfil) && ["CONFIRMADA", "REJEITADA"].includes(status)
       ? true
       : status === "CANCELADA" && atual.solicitanteId === eu.id && atual.status === "PENDENTE";
   if (!permitidos) return json403();
