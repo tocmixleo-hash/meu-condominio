@@ -43,7 +43,7 @@ export async function PATCH(req: Request) {
   const atual = await db.assembleia.findUnique({ where: { id } });
   if (!atual) return Response.json({ erro: "Assembleia não encontrada." }, { status: 404 });
 
-  const dados: Record<string, string> = {};
+  const dados: { status?: string; pauta?: string | null } = {};
   if (status && ["AGENDADA", "REALIZADA", "CANCELADA"].includes(status)) dados.status = status;
   if (typeof pauta === "string") dados.pauta = pauta.trim() || null;
   if (Object.keys(dados).length === 0) return Response.json({ erro: "Nada para atualizar." }, { status: 400 });

@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Building2, LoaderCircle } from "lucide-react";
-import { BotaoPrimario } from "@/components/portal/ui";
+import { Eye, EyeOff, LoaderCircle, Lock, Mail, Smartphone } from "lucide-react";
 
 type Usuario = {
   id: string;
@@ -25,13 +24,22 @@ export function entrarNoApp(dados: { email: string; senha: string }): Promise<Us
 }
 
 const RAPIDOS: { email: string; senha: string; etiqueta: string }[] = [
-  { email: "maria@email.com", senha: "123456", etiqueta: "Morador — Maria (A-101)" },
-  { email: "sindico@parquecalifornia.com.br", senha: "admin123", etiqueta: "Síndico — Carlos (Gestão)" },
+  { email: "maria@email.com", senha: "123456", etiqueta: "Maria — Morador (A-101)" },
+  { email: "sindico@parquecalifornia.com.br", senha: "admin123", etiqueta: "Carlos — Síndico (Gestão)" },
+  { email: "administrativo@parquecalifornia.com.br", senha: "admin123", etiqueta: "Fernanda — Administrativo" },
+  { email: "portaria@parquecalifornia.com.br", senha: "portaria123", etiqueta: "Jorge — Portaria" },
+];
+
+const DESTAQUES = [
+  "Reserve o salão de festas em poucos toques",
+  "Receba comunicados e avisos da administração",
+  "Participe das assembleias e vote informado",
 ];
 
 export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => void }) {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
+  const [mostrarSenha, setMostrarSenha] = useState(false);
   const [erro, setErro] = useState("");
   const [enviando, setEnviando] = useState(false);
 
@@ -49,115 +57,180 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
   }
 
   return (
-    <div className="flex h-dvh min-h-[540px] items-center justify-center overflow-hidden bg-[#f7f6f3] p-4">
-      <div className="grid w-full max-w-3xl overflow-hidden rounded-lg border border-[#EFE9E1] bg-white md:grid-cols-[1.05fr_1fr]">
-        {/* Marca */}
-        <div className="hidden flex-col justify-between bg-[#4D403A] p-8 md:flex">
-          <div className="flex items-center gap-3">
-            <span className="flex h-10 w-10 items-center justify-center rounded-md bg-[#61514A]">
-              <Building2 className="h-5 w-5 text-[#f7f6f3]" />
+    <div className="flex min-h-dvh bg-[#f7f6f3]">
+      {/* ── Painel esquerdo: foto do condomínio ─────────────────────── */}
+      <div className="relative hidden w-1/2 overflow-hidden md:block">
+        <img
+          src="/fotos/parque-california.jpg"
+          alt="Parque Califórnia"
+          className="absolute inset-0 h-full w-full origin-bottom-right scale-[1.3] object-cover"
+        />
+        <div className="absolute inset-0 bg-[#4D403A]/75" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#2e2620]/70 via-[#4D403A]/20 to-[#3a2f28]/50" />
+
+        <div className="relative z-10 flex h-full flex-col p-10 text-white lg:px-14 lg:py-12">
+          {/* Marca */}
+          <div className="flex items-center gap-3.5">
+            <span className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-xl bg-white shadow-sm">
+                <img src="/fotos/logo-flor.png" alt="" className="h-8 w-8 object-contain" />
             </span>
             <div>
-              <p className="text-base font-semibold leading-tight text-[#f7f6f3]">Meu Condomínio</p>
-              <p className="text-xs text-[#EFE9E1]/80">Parque Califórnia</p>
+              <p className="text-lg font-bold leading-tight">Meu Condomínio</p>
+              <p className="text-sm text-white/65">Gestão e comunicação condominial</p>
             </div>
           </div>
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#EFE9E1]/70">
-              Acesso exclusivo
+
+          {/* Mensagem */}
+          <div className="mt-12 lg:mt-14">
+            <h1 className="text-[34px] font-bold leading-[1.18] tracking-tight xl:text-[40px]">
+              Tudo do seu condomínio,
+              <br />
+              na palma da mão.
+            </h1>
+            <p className="mt-5 max-w-[27rem] text-[15px] leading-relaxed text-white/80">
+              Reservas de espaços comuns, encomendas, documentos, assembleias e comunicados — em um
+              só lugar, com a segurança que a sua família merece.
             </p>
-            <p className="mt-1 text-sm leading-relaxed text-[#EFE9E1]/90">
-              Comunicados, reservas, encomendas, autorizações de acesso, documentos e assembleias —
-              tudo entre moradores e administração em um só lugar.
-            </p>
-          </div>
-          <p className="text-[11px] text-[#EFE9E1]/60">Guarita 24 h · ramal 2000</p>
-        </div>
-
-        {/* Formulário */}
-        <div className="flex flex-col justify-center gap-5 p-6 sm:p-8">
-          <div className="md:hidden">
-            <div className="flex items-center gap-3">
-              <span className="flex h-10 w-10 items-center justify-center rounded-md bg-[#4D403A]">
-                <Building2 className="h-5 w-5 text-[#f7f6f3]" />
-              </span>
-              <div>
-                <p className="text-base font-semibold leading-tight text-stone-900">Meu Condomínio</p>
-                <p className="text-xs text-stone-500">Parque Califórnia</p>
-              </div>
-            </div>
+            <ul className="mt-7 space-y-3.5">
+              {DESTAQUES.map((item) => (
+                <li key={item} className="flex items-center gap-3">
+                  <span className="h-2 w-2 shrink-0 rounded-full bg-emerald-400" />
+                  <span className="text-[15px] text-white/90">{item}</span>
+                </li>
+              ))}
+            </ul>
           </div>
 
-          <div>
-            <h1 className="text-lg font-semibold text-stone-900">Entrar na plataforma</h1>
-            <p className="mt-0.5 text-sm text-stone-500">Use o e-mail e a senha do seu cadastro.</p>
-          </div>
-
-          <form
-            className="space-y-3"
-            onSubmit={(e) => {
-              e.preventDefault();
-              submeter();
-            }}
-          >
+          {/* QR do portal no celular */}
+          <div className="mt-10 flex max-w-[400px] items-start gap-4 rounded-2xl border border-white/15 bg-white/10 p-4 backdrop-blur-md">
+            <img
+              src="/fotos/qr-portal.png"
+              alt="QR Code do portal"
+              className="h-[88px] w-[88px] shrink-0 rounded-lg bg-white p-1.5"
+            />
             <div>
-              <label htmlFor="email" className="mb-1 block text-[11px] font-semibold uppercase tracking-[0.12em] text-stone-500">
-                E-mail
-              </label>
-              <input
-                id="email"
-                type="email"
-                autoComplete="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="voce@email.com"
-                className="h-10 w-full rounded-md border border-[#dfdacf] bg-white px-3 text-sm text-stone-900 outline-none placeholder:text-stone-400 focus:border-[#a3968d] focus:ring-2 focus:ring-[#a3968d]/30"
-              />
-            </div>
-            <div>
-              <label htmlFor="senha" className="mb-1 block text-[11px] font-semibold uppercase tracking-[0.12em] text-stone-500">
-                Senha
-              </label>
-              <input
-                id="senha"
-                type="password"
-                autoComplete="current-password"
-                value={senha}
-                onChange={(e) => setSenha(e.target.value)}
-                placeholder="••••••"
-                className="h-10 w-full rounded-md border border-[#dfdacf] bg-white px-3 text-sm text-stone-900 outline-none placeholder:text-stone-400 focus:border-[#a3968d] focus:ring-2 focus:ring-[#a3968d]/30"
-              />
-            </div>
-
-            {erro && (
-              <p role="alert" className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
-                {erro}
+              <p className="flex items-center gap-2 text-[15px] font-semibold">
+                <Smartphone className="h-4 w-4" />
+                Use o portal no celular
               </p>
-            )}
+              <p className="mt-1.5 text-[13px] leading-relaxed text-white/70">
+                Aponte a câmera para o QR e abra o portal no telefone — útil também para mostrar o
+                QR de retirada na portaria.
+              </p>
+            </div>
+          </div>
 
-            <BotaoPrimario type="submit" disabled={enviando} className="w-full">
-              {enviando ? (
-                <>
-                  <LoaderCircle className="h-4 w-4 animate-spin" /> Entrando…
-                </>
-              ) : (
-                "Entrar"
+          <p className="mt-auto pt-8 text-xs text-white/55">
+            Ambiente de demonstração com dados fictícios — Parque Califórnia.
+          </p>
+        </div>
+      </div>
+
+      {/* ── Painel direito: acesso ───────────────────────────────────── */}
+      <div className="flex min-h-dvh w-full flex-col items-center justify-center overflow-y-auto px-5 py-10 md:w-1/2 md:px-8">
+        <div className="w-full max-w-[490px]">
+          {/* Logo Parque Califórnia */}
+          <img
+            src="/fotos/logo-parque-california.png"
+            alt="Parque Califórnia"
+            className="mx-auto h-20 w-auto mix-blend-multiply"
+          />
+
+          {/* Cartão de acesso */}
+          <div className="mt-5 rounded-2xl bg-white p-6 shadow-[0_24px_60px_-24px_rgba(61,48,39,0.30)] sm:p-7">
+            <h2 className="text-[22px] font-bold tracking-tight text-stone-900">
+              Entrar na plataforma
+            </h2>
+            <p className="mt-1.5 text-[15px] text-stone-500">
+              Acesse com o seu e-mail cadastrado pela administração.
+            </p>
+
+            <form
+              className="mt-6 space-y-4"
+              onSubmit={(e) => {
+                e.preventDefault();
+                submeter();
+              }}
+            >
+              <div>
+                <label htmlFor="email" className="mb-1.5 block text-[15px] font-semibold text-stone-800">
+                  E-mail
+                </label>
+                <div className="relative">
+                  <Mail className="pointer-events-none absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-stone-400" />
+                  <input
+                    id="email"
+                    type="email"
+                    autoComplete="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="seu@email.com"
+                    className="h-12 w-full rounded-xl border border-stone-200 bg-white pl-11 pr-4 text-[15px] text-stone-900 outline-none transition placeholder:text-stone-400 focus:border-stone-400 focus:ring-4 focus:ring-stone-400/10"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="senha" className="mb-1.5 block text-[15px] font-semibold text-stone-800">
+                  Senha
+                </label>
+                <div className="relative">
+                  <Lock className="pointer-events-none absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-stone-400" />
+                  <input
+                    id="senha"
+                    type={mostrarSenha ? "text" : "password"}
+                    autoComplete="current-password"
+                    value={senha}
+                    onChange={(e) => setSenha(e.target.value)}
+                    placeholder="Sua senha"
+                    className="h-12 w-full rounded-xl border border-stone-200 bg-white pl-11 pr-11 text-[15px] text-stone-900 outline-none transition placeholder:text-stone-400 focus:border-stone-400 focus:ring-4 focus:ring-stone-400/10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setMostrarSenha((v) => !v)}
+                    aria-label={mostrarSenha ? "Ocultar senha" : "Mostrar senha"}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-stone-400 transition hover:text-stone-600"
+                  >
+                    {mostrarSenha ? <EyeOff className="h-[18px] w-[18px]" /> : <Eye className="h-[18px] w-[18px]" />}
+                  </button>
+                </div>
+              </div>
+
+              {erro && (
+                <p role="alert" className="rounded-xl bg-red-50 px-3.5 py-2.5 text-sm text-red-700">
+                  {erro}
+                </p>
               )}
-            </BotaoPrimario>
-          </form>
 
-          <div>
-            <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-stone-400">
+              <button
+                type="submit"
+                disabled={enviando}
+                className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#4D403A] text-[15px] font-semibold text-white transition hover:bg-[#3f352e] disabled:opacity-60"
+              >
+                {enviando ? (
+                  <>
+                    <LoaderCircle className="h-4 w-4 animate-spin" /> Entrando…
+                  </>
+                ) : (
+                  "Entrar"
+                )}
+              </button>
+            </form>
+          </div>
+
+          {/* Acesso rápido para demonstração */}
+          <div className="mt-6">
+            <p className="text-[13px] font-medium uppercase tracking-[0.06em] text-stone-400">
               Acesso rápido para demonstração
             </p>
-            <div className="grid gap-2 sm:grid-cols-2">
+            <div className="mt-3 grid grid-cols-1 gap-2.5 lg:grid-cols-2">
               {RAPIDOS.map((r) => (
                 <button
                   key={r.email}
                   type="button"
                   disabled={enviando}
                   onClick={() => submeter({ email: r.email, senha: r.senha })}
-                  className="rounded-md border border-[#dfdacf] bg-[#f7f6f3] px-3 py-2 text-left text-sm text-stone-700 transition-colors hover:bg-[#EFE9E1] disabled:opacity-50"
+                  className="whitespace-nowrap rounded-full bg-white px-4 py-3 text-left text-sm text-stone-800 transition hover:bg-[#fbfaf8] disabled:opacity-50"
                 >
                   {r.etiqueta}
                 </button>

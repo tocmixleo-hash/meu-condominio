@@ -32,7 +32,7 @@ async function main() {
   });
   await db.usuario.create({
     data: {
-      nome: "Ana Beatriz Costa",
+      nome: "Fernanda Costa",
       email: "administrativo@parquecalifornia.com.br",
       senha: hash("admin123"),
       perfil: "ADMINISTRATIVO",
@@ -41,7 +41,7 @@ async function main() {
   });
   const joao = await db.usuario.create({
     data: {
-      nome: "João Ferreira",
+      nome: "Jorge Ferreira",
       email: "portaria@parquecalifornia.com.br",
       senha: hash("portaria123"),
       perfil: "PORTARIA",

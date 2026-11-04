@@ -55,7 +55,11 @@ export default function Inicio() {
   }
 
   if (!usuario) {
-    return <LoginScreen aoEntrar={setUsuario} />;
+    return (
+      <LoginScreen
+        aoEntrar={(u) => setUsuario({ ...u, perfil: u.perfil as Perfil })}
+      />
+    );
   }
 
   return (
