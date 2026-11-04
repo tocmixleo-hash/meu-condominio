@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Eye, EyeOff, LoaderCircle, Lock, Mail, Smartphone } from "lucide-react";
 import { cssVarsDoTema, resolverTema } from "@/lib/tema";
+import { corpoJson, mensagemDeErro, mensagemRede } from "@/lib/api-cliente";
 
 type Usuario = {
   id: string;
@@ -22,20 +23,31 @@ export type CondominioUI = {
   foto: string;
 };
 
-export function entrarNoApp(dados: {
+export async function entrarNoApp(dados: {
   email: string;
   senha: string;
   condominioId: string;
 }): Promise<Usuario> {
-  return fetch("/api/auth/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(dados),
-  }).then(async (r) => {
-    const corpo = await r.json();
-    if (!r.ok) throw new Error(corpo.erro || "Não foi possível entrar.");
-    return corpo.usuario as Usuario;
-  });
+  let r: Response;
+  try {
+    r = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(dados),
+    });
+  } catch {
+    throw new Error(
+      "Não foi possível conectar ao portal. Verifique a conexão e tente novamente.",
+    );
+  }
+  const corpo = await corpoJson<{ usuario?: Usuario; erro?: string }>(r);
+  if (!r.ok) throw new Error(corpo?.erro || mensagemRede(r.status));
+  if (!corpo?.usuario) {
+    throw new Error(
+      "Resposta inesperada do servidor. Recarregue a página e tente novamente.",
+    );
+  }
+  return corpo.usuario;
 }
 
 const DESTAQUES = [
@@ -105,7 +117,7 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
       });
       aoEntrar(usuario);
     } catch (e) {
-      setErro(e instanceof Error ? e.message : "Falha ao entrar.");
+      setErro(mensagemDeErro(e, "Falha ao entrar."));
     } finally {
       setEnviando(false);
     }

@@ -16,6 +16,7 @@ import {
   Secao,
 } from "@/components/portal/ui";
 import type { Perfil } from "@/components/portal/app-shell";
+import { corpoJson, mensagemDeErro, mensagemRede } from "@/lib/api-cliente";
 
 type Documento = {
   id: string;
@@ -66,7 +67,8 @@ export default function Documentos({ perfil }: { perfil: Perfil }) {
       form.append("categoria", categoria);
       form.append("arquivo", arquivo);
       const r = await fetch("/api/documentos", { method: "POST", body: form });
-      const corpo = await r.json();
+      const corpo = await corpoJson(r);
+      if (!corpo) throw new Error(mensagemRede(r.status));
       if (!r.ok) throw new Error(corpo.erro || "Falha ao enviar.");
       setAberto(false);
       setTitulo("");
@@ -75,7 +77,7 @@ export default function Documentos({ perfil }: { perfil: Perfil }) {
       if (inputArquivo.current) inputArquivo.current.value = "";
       carregar();
     } catch (e) {
-      setErro(e instanceof Error ? e.message : "Falha ao enviar.");
+      setErro(mensagemDeErro(e, "Falha ao enviar."));
     } finally {
       setEnviando(false);
     }

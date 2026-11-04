@@ -18,6 +18,7 @@ import {
   tomStatusEncomenda,
 } from "@/components/portal/ui";
 import type { Perfil } from "@/components/portal/app-shell";
+import { corpoJson, mensagemDeErro, mensagemRede } from "@/lib/api-cliente";
 
 type Encomenda = {
   id: string;
@@ -76,13 +77,14 @@ export default function Encomendas({ perfil }: { perfil: Perfil }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
-      const corpo = await r.json();
+      const corpo = await corpoJson(r);
+      if (!corpo) throw new Error(mensagemRede(r.status));
       if (!r.ok) throw new Error(corpo.erro || "Falha ao registrar.");
       setRegistrar(false);
       setForm(VAZIO);
       carregar();
     } catch (e) {
-      setErroForm(e instanceof Error ? e.message : "Falha ao registrar.");
+      setErroForm(mensagemDeErro(e, "Falha ao registrar."));
     } finally {
       setEnviando(false);
     }
@@ -98,13 +100,14 @@ export default function Encomendas({ perfil }: { perfil: Perfil }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: liberar.id, acao: "LIBERAR_RETIRADA", codigo }),
       });
-      const corpo = await r.json();
+      const corpo = await corpoJson(r);
+      if (!corpo) throw new Error(mensagemRede(r.status));
       if (!r.ok) throw new Error(corpo.erro || "Falha ao liberar.");
       setLiberar(null);
       setCodigo("");
       carregar();
     } catch (e) {
-      setErroCodigo(e instanceof Error ? e.message : "Falha ao liberar.");
+      setErroCodigo(mensagemDeErro(e, "Falha ao liberar."));
     } finally {
       setEnviando(false);
     }

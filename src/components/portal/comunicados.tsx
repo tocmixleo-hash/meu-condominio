@@ -15,6 +15,7 @@ import {
   Secao,
 } from "@/components/portal/ui";
 import type { Perfil } from "@/components/portal/app-shell";
+import { corpoJson, mensagemDeErro, mensagemRede } from "@/lib/api-cliente";
 
 type Comunicado = {
   id: string;
@@ -56,13 +57,14 @@ export default function Comunicados({ perfil }: { perfil: Perfil }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
-      const corpo = await r.json();
+      const corpo = await corpoJson(r);
+      if (!corpo) throw new Error(mensagemRede(r.status));
       if (!r.ok) throw new Error(corpo.erro || "Falha ao publicar.");
       setAberto(false);
       setForm(VAZIO);
       carregar();
     } catch (e) {
-      setErro(e instanceof Error ? e.message : "Falha ao publicar.");
+      setErro(mensagemDeErro(e, "Falha ao publicar."));
     } finally {
       setEnviando(false);
     }

@@ -13,6 +13,7 @@ import {
   LinhaLista,
   Secao,
 } from "@/components/portal/ui";
+import { corpoJson, mensagemDeErro, mensagemRede } from "@/lib/api-cliente";
 
 type Morador = {
   id: string;
@@ -59,13 +60,14 @@ export default function Moradores() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
-      const corpo = await r.json();
+      const corpo = await corpoJson(r);
+      if (!corpo) throw new Error(mensagemRede(r.status));
       if (!r.ok) throw new Error(corpo.erro || "Falha ao cadastrar.");
       setAberto(false);
       setForm(VAZIO);
       carregar();
     } catch (e) {
-      setErro(e instanceof Error ? e.message : "Falha ao cadastrar.");
+      setErro(mensagemDeErro(e, "Falha ao cadastrar."));
     } finally {
       setEnviando(false);
     }

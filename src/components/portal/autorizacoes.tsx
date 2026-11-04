@@ -18,6 +18,7 @@ import {
   tomStatusAutorizacao,
 } from "@/components/portal/ui";
 import type { Perfil } from "@/components/portal/app-shell";
+import { corpoJson, mensagemDeErro, mensagemRede } from "@/lib/api-cliente";
 
 type Autorizacao = {
   id: string;
@@ -76,13 +77,14 @@ export default function Autorizacoes({ perfil }: { perfil: Perfil }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
-      const corpo = await r.json();
+      const corpo = await corpoJson(r);
+      if (!corpo) throw new Error(mensagemRede(r.status));
       if (!r.ok) throw new Error(corpo.erro || "Falha ao autorizar.");
       setAberto(false);
       setForm(VAZIO);
       carregar();
     } catch (e) {
-      setErro(e instanceof Error ? e.message : "Falha ao autorizar.");
+      setErro(mensagemDeErro(e, "Falha ao autorizar."));
     } finally {
       setEnviando(false);
     }
