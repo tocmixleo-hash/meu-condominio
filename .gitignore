@@ -57,3 +57,6 @@ server.log
 /scripts/verif/
 # Exemplo de ambiente deve ser versionado
 !.env.example
+
+# CI habilitado manualmente (token sem escopo workflow)
+.github/workflows/
