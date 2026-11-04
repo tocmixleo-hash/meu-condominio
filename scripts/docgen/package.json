@@ -1,0 +1,7 @@
+{
+  "name": "docgen-diagnostico",
+  "private": true,
+  "dependencies": {
+    "docx": "8.5.0"
+  }
+}
