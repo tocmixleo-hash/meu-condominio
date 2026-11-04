@@ -12,6 +12,9 @@ import Documentos from "@/components/portal/documentos";
 import Assembleias from "@/components/portal/assembleias";
 import Moradores from "@/components/portal/moradores";
 import Auditoria from "@/components/portal/auditoria";
+import Identidade from "@/components/portal/identidade";
+import Condominios from "@/components/portal/condominios";
+import { mensagemDeErro } from "@/lib/api-cliente";
 
 type Usuario = {
   id: string;
@@ -20,6 +23,8 @@ type Usuario = {
   perfil: Perfil;
   unidade?: { bloco: string; numero: string } | null;
   condominio?: CondominioUI;
+  condominios?: CondominioUI[];
+  ehPlataforma?: boolean;
 };
 
 const CONDOMINIO_PADRAO: CondominioUI = {
@@ -35,6 +40,7 @@ export default function Inicio() {
   const [usuario, setUsuario] = useState<Usuario | null>(null);
   const [carregando, setCarregando] = useState(true);
   const [modulo, setModulo] = useState<ModuloId>("inicio");
+  const [aviso, setAviso] = useState("");
 
   const verificar = useCallback(() => {
     fetch("/api/auth/verificar")
@@ -52,6 +58,24 @@ export default function Inicio() {
     await fetch("/api/auth/logout", { method: "POST" }).catch(() => null);
     setUsuario(null);
     setModulo("inicio");
+    setAviso("");
+  }
+
+  async function trocarCondominio(id: string) {
+    setAviso("");
+    try {
+      const r = await fetch("/api/auth/trocar-condominio", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ condominioId: id }),
+      });
+      const d = await r.json().catch(() => null);
+      if (!r.ok) throw new Error(d?.erro || "Não foi possível trocar de condomínio.");
+      setUsuario(d.usuario as Usuario);
+      setModulo("inicio");
+    } catch (e) {
+      setAviso(mensagemDeErro(e, "Falha ao trocar de condomínio."));
+    }
   }
 
   if (carregando) {
@@ -74,6 +98,11 @@ export default function Inicio() {
   }
 
   const condominio = usuario.condominio ?? CONDOMINIO_PADRAO;
+  const condominios = usuario.condominios?.length ? usuario.condominios : [condominio];
+  const podeEditarIdentidade =
+    usuario.perfil === "PLATAFORMA" ||
+    usuario.perfil === "SINDICO" ||
+    usuario.perfil === "ADMINISTRATIVO";
 
   return (
     <AppShell
@@ -81,10 +110,17 @@ export default function Inicio() {
       nome={usuario.nome}
       unidade={usuario.unidade}
       condominio={condominio}
+      condominios={condominios}
       modulo={modulo}
       aoTrocar={setModulo}
+      aoTrocarCondominio={trocarCondominio}
       aoSair={sair}
     >
+      {aviso && (
+        <p role="alert" className="mb-4 rounded-xl bg-red-50 px-3.5 py-2.5 text-sm text-red-700">
+          {aviso}
+        </p>
+      )}
       {modulo === "inicio" && (
         <Dashboard
           nome={usuario.nome}
@@ -102,6 +138,16 @@ export default function Inicio() {
       {modulo === "assembleias" && <Assembleias perfil={usuario.perfil} />}
       {modulo === "moradores" && <Moradores />}
       {modulo === "auditoria" && <Auditoria />}
+      {modulo === "identidade" && (
+        <Identidade
+          condominio={condominio}
+          podeEditar={podeEditarIdentidade}
+          aoAtualizar={verificar}
+        />
+      )}
+      {modulo === "condominios" && (
+        <Condominios ativoId={condominio.id} aoOperar={trocarCondominio} />
+      )}
     </AppShell>
   );
 }

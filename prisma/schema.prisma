@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
@@ -18,8 +19,29 @@ model Condominio {
   foto     String
   criadoEm DateTime @default(now())
 
+  // ── Identidade visual administrável (tudo opcional: ausente = preset/derivação) ──
+  nomeExibicao   String? // nome completo exibido no portal (padrão: nome)
+  nomeCurto      String? // nome reduzido (menu, seletor)
+  descricao      String? // texto institucional
+  telefoneContato String?
+  emailContato   String?
+  endereco       String?
+  cnpj           String?
+
+  corPrimaria  String? // cor principal — menu lateral, botões, overlay
+  corSecundaria String? // itens ativos/hover
+  corDestaque  String? // foco e realces
+  corSidebar   String? // fundo da barra lateral (padrão: corPrimaria)
+  corFundo     String? // fundo geral
+  corTexto     String? // texto principal
+
+  logoMenu      String? // versão do logotipo para o menu lateral (padrão: logo)
+  logoCabecalho String? // versão do logotipo para o cabeçalho (padrão: logo)
+
   unidades     Unidade[]
   usuarios     Usuario[]
+  vinculos     UsuarioCondominio[]
+  fotos        CondominioFoto[]
   comunicados  Comunicado[]
   reservas     Reserva[]
   encomendas   Encomenda[]
@@ -30,21 +52,52 @@ model Condominio {
   auditorias   Auditoria[]
 }
 
+// Galeria de fotografias do condomínio (áreas comuns e institucionais)
+model CondominioFoto {
+  id           String     @id @default(cuid())
+  condominioId String
+  condominio   Condominio @relation(fields: [condominioId], references: [id], onDelete: Cascade)
+  tipo         String // AREA_COMUM | INSTITUCIONAL
+  url          String
+  legenda      String?
+  ordem        Int        @default(0)
+  criadoEm     DateTime   @default(now())
+
+  @@index([condominioId, tipo, ordem])
+}
+
+// Vínculo usuário ↔ condomínio (muitos-para-muitos, permissão por vínculo)
+model UsuarioCondominio {
+  id           String     @id @default(cuid())
+  usuarioId    String
+  usuario      Usuario    @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  condominioId String
+  condominio   Condominio @relation(fields: [condominioId], references: [id])
+  perfil       String // perfil NO vínculo: SINDICO | ADMINISTRATIVO | PORTARIA | MORADOR
+  ativo        Boolean    @default(true)
+  criadoEm     DateTime   @default(now())
+
+  @@unique([usuarioId, condominioId])
+  @@index([condominioId])
+}
+
 // ── Usuários e unidades ──────────────────────────────────────────
 
 model Usuario {
   id           String     @id @default(cuid())
-  condominioId String
+  condominioId String // vínculo principal (contexto herdado; contexto ativo vem da sessão)
   condominio   Condominio @relation(fields: [condominioId], references: [id])
   nome         String
   email        String
   senha        String
-  perfil       String // SINDICO | ADMINISTRATIVO | PORTARIA | MORADOR
+  perfil       String // perfil principal: SINDICO | ADMINISTRATIVO | PORTARIA | MORADOR | PLATAFORMA
   telefone     String?
   ativo        Boolean    @default(true)
   unidadeId    String?
   unidade      Unidade?   @relation(fields: [unidadeId], references: [id])
   criadoEm     DateTime   @default(now())
+
+  vinculos     UsuarioCondominio[]
 
   comunicados  Comunicado[]
   reservas     Reserva[]

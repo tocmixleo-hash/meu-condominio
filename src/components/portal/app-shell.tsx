@@ -3,17 +3,22 @@
 import { useState } from "react";
 import Image from "next/image";
 import {
+  Building2,
   CalendarDays,
+  ChevronDown,
   ClipboardList,
   Crown,
   DoorOpen,
   FileText,
   History,
   Home,
+  KeyRound,
+  LoaderCircle,
   LogOut,
   Megaphone,
   Menu,
   Package,
+  Palette,
   ShieldCheck,
   User,
   Users,
@@ -31,9 +36,11 @@ export type ModuloId =
   | "documentos"
   | "assembleias"
   | "moradores"
-  | "auditoria";
+  | "auditoria"
+  | "identidade"
+  | "condominios";
 
-export type Perfil = "SINDICO" | "ADMINISTRATIVO" | "PORTARIA" | "MORADOR";
+export type Perfil = "SINDICO" | "ADMINISTRATIVO" | "PORTARIA" | "MORADOR" | "PLATAFORMA";
 
 type ItemMenu = { id: ModuloId; rotulo: string; icone: typeof Home };
 
@@ -47,6 +54,7 @@ const MENUS: Record<Perfil, ItemMenu[]> = {
     { id: "documentos", rotulo: "Documentos", icone: FileText },
     { id: "assembleias", rotulo: "Assembleias", icone: Users },
     { id: "moradores", rotulo: "Moradores", icone: Users },
+    { id: "identidade", rotulo: "Identidade visual", icone: Palette },
     { id: "auditoria", rotulo: "Auditoria", icone: History },
   ],
   ADMINISTRATIVO: [
@@ -58,6 +66,7 @@ const MENUS: Record<Perfil, ItemMenu[]> = {
     { id: "documentos", rotulo: "Documentos", icone: FileText },
     { id: "assembleias", rotulo: "Assembleias", icone: Users },
     { id: "moradores", rotulo: "Moradores", icone: Users },
+    { id: "identidade", rotulo: "Identidade visual", icone: Palette },
     { id: "auditoria", rotulo: "Auditoria", icone: History },
   ],
   PORTARIA: [
@@ -72,6 +81,12 @@ const MENUS: Record<Perfil, ItemMenu[]> = {
     { id: "encomendas", rotulo: "Encomendas", icone: Package },
     { id: "autorizacoes", rotulo: "Autorizações", icone: DoorOpen },
   ],
+  PLATAFORMA: [
+    { id: "inicio", rotulo: "Início", icone: Home },
+    { id: "condominios", rotulo: "Condomínios", icone: Building2 },
+    { id: "identidade", rotulo: "Identidade visual", icone: Palette },
+    { id: "auditoria", rotulo: "Auditoria", icone: History },
+  ],
 };
 
 const ROTULO_PERFIL: Record<Perfil, string> = {
@@ -79,6 +94,7 @@ const ROTULO_PERFIL: Record<Perfil, string> = {
   ADMINISTRATIVO: "Administrativo",
   PORTARIA: "Portaria",
   MORADOR: "Morador",
+  PLATAFORMA: "Administrador da Plataforma",
 };
 
 // Ícone por perfil no rodapé — evita repetir a logo do condomínio
@@ -87,15 +103,204 @@ const ICONE_PERFIL: Record<Perfil, typeof Home> = {
   ADMINISTRATIVO: ClipboardList,
   PORTARIA: ShieldCheck,
   MORADOR: User,
+  PLATAFORMA: Building2,
 };
+
+// ── Seletor de condomínio (vínculos múltiplos / plataforma) ──────
+function SeletorCondominio({
+  condominio,
+  condominios,
+  aoTrocarCondominio,
+}: {
+  condominio: CondominioUI;
+  condominios: CondominioUI[];
+  aoTrocarCondominio: (id: string) => void;
+}) {
+  const [aberto, setAberto] = useState(false);
+  if (condominios.length <= 1) {
+    // Vínculo único — identificação simples do condomínio conectado
+    return (
+      <div className="mt-3 flex items-center gap-2.5">
+        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-white p-1">
+          <Image
+            src={condominio.logo}
+            alt={`Logo do ${condominio.nome}`}
+            width={32}
+            height={32}
+            className="h-full w-auto object-contain"
+          />
+        </span>
+        <p className="min-w-0 truncate text-xs font-medium text-[var(--cor-clara-a70)]">
+          {condominio.nome}
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative mt-3">
+      <button
+        onClick={() => setAberto((v) => !v)}
+        aria-expanded={aberto}
+        aria-haspopup="listbox"
+        className="flex w-full items-center gap-2.5 rounded-lg border border-[var(--cor-tema-hover)] bg-[var(--cor-tema-hover-a60)] px-2.5 py-2 text-left transition hover:border-[var(--cor-clara-a70)]"
+      >
+        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-white p-1">
+          <Image
+            src={condominio.logo}
+            alt={`Logo do ${condominio.nome}`}
+            width={32}
+            height={32}
+            className="h-full w-auto object-contain"
+          />
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block truncate text-xs font-semibold text-[var(--cor-fundo)]">
+            {condominio.nomeCurto || condominio.nome}
+          </span>
+          <span className="block text-[11px] text-[var(--cor-clara-a70)]">
+            Condomínio ativo
+          </span>
+        </span>
+        <ChevronDown className={`h-4 w-4 shrink-0 text-[var(--cor-clara-a70)] transition ${aberto ? "rotate-180" : ""}`} />
+      </button>
+
+      {aberto && (
+        <>
+          <button
+            aria-label="Fechar seletor"
+            className="fixed inset-0 z-10 cursor-default"
+            onClick={() => setAberto(false)}
+          />
+          <ul
+            role="listbox"
+            aria-label="Condomínios disponíveis"
+            className="absolute inset-x-0 top-full z-20 mt-1 max-h-72 overflow-y-auto rounded-lg border border-[var(--cor-neutra)] bg-white py-1 shadow-xl"
+          >
+            {condominios.map((c) => {
+              const ativo = c.id === condominio.id;
+              return (
+                <li key={c.id}>
+                  <button
+                    role="option"
+                    aria-selected={ativo}
+                    onClick={() => {
+                      setAberto(false);
+                      if (!ativo) aoTrocarCondominio(c.id);
+                    }}
+                    className={`flex w-full items-center gap-2.5 px-3 py-2 text-left transition ${
+                      ativo ? "bg-[var(--cor-tema-suave)]" : "hover:bg-stone-50"
+                    }`}
+                  >
+                    <img
+                      src={c.logo}
+                      alt=""
+                      className="h-7 w-7 shrink-0 rounded bg-white object-contain p-0.5"
+                    />
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-sm font-medium text-stone-800">
+                        {c.nomeCurto || c.nome}
+                      </span>
+                      {ativo && (
+                        <span className="text-[11px] font-medium text-[var(--cor-tema)]">
+                          Ambiente atual
+                        </span>
+                      )}
+                    </span>
+                    <span
+                      aria-hidden
+                      className="h-2 w-2 shrink-0 rounded-full"
+                      style={{ backgroundColor: c.corTema }}
+                    />
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </>
+      )}
+    </div>
+  );
+}
+
+// ── Alteração da própria senha ─────────────────────────────────
+function DialogoSenha({ aoFechar }: { aoFechar: () => void }) {
+  const [atual, setAtual] = useState("");
+  const [nova, setNova] = useState("");
+  const [confirma, setConfirma] = useState("");
+  const [erro, setErro] = useState("");
+  const [ok, setOk] = useState("");
+  const [enviando, setEnviando] = useState(false);
+
+  async function salvar() {
+    setErro("");
+    setOk("");
+    if (nova.length < 8) {
+      setErro("A nova senha precisa ter pelo menos 8 caracteres.");
+      return;
+    }
+    if (nova !== confirma) {
+      setErro("A confirmação não coincide com a nova senha.");
+      return;
+    }
+    setEnviando(true);
+    try {
+      const r = await fetch("/api/auth/senha", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ senhaAtual: atual, novaSenha: nova }),
+      });
+      const d = await r.json().catch(() => null);
+      if (!r.ok) throw new Error(d?.erro || "Não foi possível alterar a senha.");
+      setOk("Senha alterada com sucesso.");
+      setAtual("");
+      setNova("");
+      setConfirma("");
+    } catch (e) {
+      setErro(e instanceof Error ? e.message : "Falha ao alterar a senha.");
+    } finally {
+      setEnviando(false);
+    }
+  }
+
+  const campo =
+    "h-10 w-full rounded-lg border border-stone-200 bg-white px-3 text-sm text-stone-900 outline-none transition focus:border-stone-400 focus:ring-4 focus:ring-stone-400/10";
+
+  return (
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+      <button aria-label="Fechar" className="absolute inset-0 bg-black/40" onClick={aoFechar} />
+      <div className="relative w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl">
+        <h2 className="text-lg font-semibold text-stone-900">Alterar senha</h2>
+        <div className="mt-4 space-y-3">
+          <input type="password" autoComplete="current-password" placeholder="Senha atual" value={atual} onChange={(e) => setAtual(e.target.value)} className={campo} />
+          <input type="password" autoComplete="new-password" placeholder="Nova senha (mín. 8 caracteres)" value={nova} onChange={(e) => setNova(e.target.value)} className={campo} />
+          <input type="password" autoComplete="new-password" placeholder="Confirmar nova senha" value={confirma} onChange={(e) => setConfirma(e.target.value)} className={campo} />
+          {erro && <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{erro}</p>}
+          {ok && <p role="status" className="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-800">{ok}</p>}
+          <div className="flex items-center justify-end gap-2 pt-1">
+            <button onClick={aoFechar} className="rounded-lg border border-stone-200 px-4 py-2 text-sm font-medium text-stone-700 transition hover:bg-stone-50">
+              Fechar
+            </button>
+            <button onClick={salvar} disabled={enviando} className="flex items-center gap-2 rounded-lg bg-[var(--cor-tema)] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[var(--cor-tema-botao-hover)] disabled:opacity-60">
+              {enviando && <LoaderCircle className="h-4 w-4 animate-spin" />}
+              Salvar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function AppShell({
   perfil,
   nome,
   unidade,
   condominio,
+  condominios,
   modulo,
   aoTrocar,
+  aoTrocarCondominio,
   aoSair,
   children,
 }: {
@@ -103,16 +308,19 @@ export default function AppShell({
   nome: string;
   unidade?: { bloco: string; numero: string } | null;
   condominio: CondominioUI;
+  condominios: CondominioUI[];
   modulo: ModuloId;
   aoTrocar: (m: ModuloId) => void;
+  aoTrocarCondominio: (id: string) => void;
   aoSair: () => void;
   children: React.ReactNode;
 }) {
   const [menuAberto, setMenuAberto] = useState(false);
-  const itens = MENUS[perfil];
-  const IconePerfil = ICONE_PERFIL[perfil];
+  const [dialogoSenha, setDialogoSenha] = useState(false);
+  const itens = MENUS[perfil] ?? MENUS.MORADOR;
+  const IconePerfil = ICONE_PERFIL[perfil] ?? User;
   const temaVars = cssVarsDoTema(
-    resolverTema(condominio.slug, condominio.corTema),
+    resolverTema(condominio.slug, condominio.corTema, condominio),
   ) as React.CSSProperties;
 
   function trocar(m: ModuloId) {
@@ -146,32 +354,25 @@ export default function AppShell({
 
   const marca = (
     <div className="border-b border-[var(--cor-tema-hover)] px-4 py-4">
-      {/* Marca da plataforma — logo criada pelo usuário (versão horizontal legível) */}
+      {/* Logotipo do condomínio (versão de menu quando existir) — identidade
+          independente refletida em todos os ambientes */}
       <div className="flex h-14 items-center justify-center rounded-xl bg-white px-3 shadow-sm">
         <Image
-          src="/fotos/logo-meu-condominio-horizontal.png"
-          alt="Meu Condomínio"
+          src={condominio.logoMenu || condominio.logo}
+          alt={condominio.nome}
           width={605}
           height={158}
           className="h-10 w-auto object-contain"
           priority
+          unoptimized={!!condominio.logoMenu}
         />
       </div>
-      {/* Condomínio conectado */}
-      <div className="mt-3 flex items-center gap-2.5">
-        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-white p-1">
-          <Image
-            src={condominio.logo}
-            alt={`Logo do ${condominio.nome}`}
-            width={32}
-            height={32}
-            className="h-full w-auto object-contain"
-          />
-        </span>
-        <p className="min-w-0 truncate text-xs font-medium text-[var(--cor-clara-a70)]">
-          {condominio.nome}
-        </p>
-      </div>
+      {/* Condomínio ativo + seletor para múltiplos vínculos */}
+      <SeletorCondominio
+        condominio={condominio}
+        condominios={condominios}
+        aoTrocarCondominio={aoTrocarCondominio}
+      />
     </div>
   );
 
@@ -187,24 +388,32 @@ export default function AppShell({
         <div className="min-w-0">
           <p className="truncate text-sm font-medium text-[var(--cor-fundo)]">{nome}</p>
           <p className="truncate text-xs text-[var(--cor-clara-a70)]">
-            {ROTULO_PERFIL[perfil]}
+            {ROTULO_PERFIL[perfil] ?? perfil}
             {unidade ? ` · Unidade ${unidade.bloco}-${unidade.numero}` : ""}
           </p>
         </div>
       </div>
+      <div className="mt-3 flex items-center gap-1">
+        <button
+          onClick={() => setDialogoSenha(true)}
+          className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-[var(--cor-clara-a85)] transition-colors hover:bg-[var(--cor-tema-hover-a60)] hover:text-[var(--cor-fundo)]"
+        >
+          <KeyRound className="h-4 w-4" /> Alterar senha
+        </button>
+      </div>
       <button
         onClick={aoSair}
-        className="mt-3 flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-[var(--cor-clara-a85)] transition-colors hover:bg-[var(--cor-tema-hover-a60)] hover:text-[var(--cor-fundo)]"
+        className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-[var(--cor-clara-a85)] transition-colors hover:bg-[var(--cor-tema-hover-a60)] hover:text-[var(--cor-fundo)]"
       >
         <LogOut className="h-4 w-4" /> Sair da conta
       </button>
     </div>
   );
 
-  return (
-    <div style={temaVars} className="flex h-dvh overflow-hidden bg-[var(--cor-fundo)]">
+  const corpo = (
+    <>
       {/* Sidebar desktop */}
-      <aside className="hidden w-60 shrink-0 flex-col bg-[var(--cor-tema)] md:flex">
+      <aside className="hidden w-60 shrink-0 flex-col bg-[var(--cor-sidebar)] md:flex">
         {marca}
         {nav}
         {rodape}
@@ -218,7 +427,7 @@ export default function AppShell({
             className="absolute inset-0 bg-black/40"
             onClick={() => setMenuAberto(false)}
           />
-          <aside className="absolute inset-y-0 left-0 flex w-64 flex-col bg-[var(--cor-tema)] shadow-xl">
+          <aside className="absolute inset-y-0 left-0 flex w-64 flex-col bg-[var(--cor-sidebar)] shadow-xl">
             <button
               aria-label="Fechar"
               className="absolute right-3 top-3 text-[var(--cor-clara-a80)] hover:text-[var(--cor-fundo)]"
@@ -232,6 +441,13 @@ export default function AppShell({
           </aside>
         </div>
       )}
+    </>
+  );
+
+  return (
+    <div style={temaVars} className="flex h-dvh overflow-hidden bg-[var(--cor-fundo)]">
+      {corpo}
+      {dialogoSenha && <DialogoSenha aoFechar={() => setDialogoSenha(false)} />}
 
       {/* Conteúdo */}
       <div className="flex min-w-0 flex-1 flex-col">
@@ -245,11 +461,12 @@ export default function AppShell({
           </button>
           <div className="flex min-w-0 flex-1 items-center gap-2.5">
             <Image
-              src="/fotos/logo-meu-condominio-horizontal.png"
-              alt="Meu Condomínio"
+              src={condominio.logoCabecalho || condominio.logoMenu || condominio.logo}
+              alt={condominio.nome}
               width={605}
               height={158}
               className="h-8 w-auto object-contain"
+              unoptimized={!!(condominio.logoCabecalho || condominio.logoMenu)}
             />
             <span className="truncate text-xs text-stone-500">{condominio.nome}</span>
           </div>

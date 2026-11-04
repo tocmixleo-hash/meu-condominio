@@ -75,6 +75,12 @@ async function semearCondominio(opts: {
   logo: string;
   foto: string;
   festaJunina: string;
+  // Identidade visual aprovada do condomínio (presets migrados para o banco)
+  corSecundaria: string;
+  corDestaque: string;
+  corSidebar: string;
+  corFundo: string;
+  corTexto: string;
 }) {
   const elenco = ELENCO[opts.slug];
   if (!elenco) throw new Error(`Elenco não definido para ${opts.slug}`);
@@ -86,6 +92,12 @@ async function semearCondominio(opts: {
       corTema: opts.corTema,
       logo: opts.logo,
       foto: opts.foto,
+      corPrimaria: opts.corTema,
+      corSecundaria: opts.corSecundaria,
+      corDestaque: opts.corDestaque,
+      corSidebar: opts.corSidebar,
+      corFundo: opts.corFundo,
+      corTexto: opts.corTexto,
     },
   });
   const cid = condominio.id;
@@ -128,7 +140,16 @@ async function semearCondominio(opts: {
     },
   });
 
-  const [m1, m2, m3, m4] = await Promise.all(
+  // Vínculos usuário ↔ condomínio (perfil por vínculo)
+  await db.usuarioCondominio.createMany({
+    data: [
+      { usuarioId: sindico.id, condominioId: cid, perfil: "SINDICO" },
+      { usuarioId: administrativo.id, condominioId: cid, perfil: "ADMINISTRATIVO" },
+      { usuarioId: portaria.id, condominioId: cid, perfil: "PORTARIA" },
+    ],
+  });
+
+  const moradores = await Promise.all(
     elenco.moradores.map((m, i) =>
       db.usuario.create({
         data: {
@@ -142,6 +163,10 @@ async function semearCondominio(opts: {
         },
       })),
   );
+
+  await db.usuarioCondominio.createMany({
+    data: moradores.map((m) => ({ usuarioId: m.id, condominioId: cid, perfil: "MORADOR" })),
+  });
 
   await db.comunicado.createMany({
     data: [
@@ -246,6 +271,8 @@ async function main() {
   await db.autorizacao.deleteMany();
   await db.documento.deleteMany();
   await db.assembleia.deleteMany();
+  await db.usuarioCondominio.deleteMany();
+  await db.condominioFoto.deleteMany();
   await db.usuario.deleteMany();
   await db.unidade.deleteMany();
   await db.condominio.deleteMany();
@@ -258,6 +285,11 @@ async function main() {
     logo: "/fotos/logo-parque-california.png",
     foto: "/fotos/parque-california.jpg",
     festaJunina: "Festa Junina do Parque California",
+    corSecundaria: "#61514A",
+    corDestaque: "#a3968d",
+    corSidebar: "#4D403A",
+    corFundo: "#f7f6f3",
+    corTexto: "#292524",
   });
 
   await semearCondominio({
@@ -268,9 +300,30 @@ async function main() {
     logo: "/fotos/logo-parque-florida.png",
     foto: "/fotos/parque-florida.jpg",
     festaJunina: "Festa Junina do Parque Florida",
+    corSecundaria: "#525252",
+    corDestaque: "#a3a3a3",
+    corSidebar: "#404040",
+    corFundo: "#f5f5f5",
+    corTexto: "#262626",
   });
 
-  console.log("Seed concluído: 2 condomínios, senhas com bcrypt.");
+  // Administrador da plataforma (demonstração) — na produção real a conta
+  // é criada pelo seed-producao com o e-mail do responsável, sem elenco fictício.
+  const california = await db.condominio.findUnique({ where: { slug: "california" }, select: { id: true } });
+  if (california) {
+    await db.usuario.create({
+      data: {
+        condominioId: california.id,
+        nome: "Administrador da Plataforma",
+        email: "admin@meucondominio.com",
+        senha: hash("admin123"),
+        perfil: "PLATAFORMA",
+      },
+    });
+    console.log("✓ Administrador da plataforma de demonstração (admin@meucondominio.com / admin123).");
+  }
+
+  console.log("Seed concluído: 2 condomínios com identidade e vínculos, senhas com bcrypt.");
 }
 
 main()

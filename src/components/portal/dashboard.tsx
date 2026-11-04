@@ -106,6 +106,8 @@ const DESCRICAO_PERFIL: Record<Perfil, string> = {
     "Rotina da administração: reservas pendentes, encomendas na portaria e cadastro de moradores.",
   PORTARIA:
     "Movimentação do dia: encomendas recebidas e autorizações de acesso válidas na guarita.",
+  PLATAFORMA:
+    "Console da plataforma: você está operando no condomínio ativo do seletor — gerencie ambientes, identidades visuais e auditoria.",
 };
 
 const ACOES: Record<Perfil, { rotulo: string; destino: ModuloId }[]> = {
@@ -127,6 +129,10 @@ const ACOES: Record<Perfil, { rotulo: string; destino: ModuloId }[]> = {
   PORTARIA: [
     { rotulo: "Registrar encomenda", destino: "encomendas" },
     { rotulo: "Ver autorizações", destino: "autorizacoes" },
+  ],
+  PLATAFORMA: [
+    { rotulo: "Gerenciar condomínios", destino: "condominios" },
+    { rotulo: "Identidade visual", destino: "identidade" },
   ],
 };
 

@@ -1,5 +1,10 @@
 import { db } from "@/lib/db";
-import { COOKIE_SESSAO, conferirSenha, criarToken } from "@/lib/auth";
+import {
+  COOKIE_SESSAO,
+  conferirSenha,
+  criarToken,
+  sessaoComCondominio,
+} from "@/lib/auth";
 import { cookies } from "next/headers";
 import {
   ipDaRequisicao,
@@ -18,50 +23,61 @@ export async function POST(req: Request) {
   }
 
   const { email, senha, condominioId } = await req.json().catch(() => ({}) as never);
-  if (!email || !senha || !condominioId) {
-    return Response.json({ erro: "Informe o condomínio, e-mail e senha." }, { status: 400 });
+  if (!email?.trim() || !senha) {
+    return Response.json({ erro: "Informe e-mail e senha." }, { status: 400 });
   }
 
-  const u = await db.usuario.findFirst({
-    where: {
-      email: String(email).trim().toLowerCase(),
-      condominioId: String(condominioId),
-    },
-    include: { unidade: true, condominio: true },
+  const emailNorm = String(email).trim().toLowerCase();
+  // E-mail pode existir em mais de um condomínio (cadastros legados por
+  // condomínio): aceita o condomínio explícito (demonstração) ou resolve
+  // a primeira conta cuja senha confere.
+  const candidatos = await db.usuario.findMany({
+    where: { email: emailNorm, ativo: true },
+    include: { vinculos: { where: { ativo: true }, orderBy: { criadoEm: "asc" } } },
   });
-  if (!u || !conferirSenha(String(senha), u.senha)) {
+  const alvo = condominioId
+    ? candidatos.find((u) => u.condominioId === String(condominioId)) ?? null
+    : candidatos[0] ?? null;
+  if (!alvo || !conferirSenha(String(senha), alvo.senha)) {
     registrarFalha(chave);
     return Response.json({ erro: "E-mail ou senha incorretos." }, { status: 401 });
   }
-  if (!u.ativo) {
-    return Response.json({ erro: "Cadastro desativado. Fale com a administração." }, { status: 403 });
+
+  // Administrador da plataforma: ativo = primeiro condomínio (pode trocar depois).
+  let condominioAtivoId: string | null;
+  if (alvo.perfil === "PLATAFORMA") {
+    const primeiro = await db.condominio.findFirst({ orderBy: { criadoEm: "asc" }, select: { id: true } });
+    if (!primeiro) {
+      return Response.json(
+        { erro: "Nenhum condomínio cadastrado na plataforma ainda." },
+        { status: 409 },
+      );
+    }
+    condominioAtivoId = primeiro.id;
+  } else {
+    const vinculos = alvo.vinculos.filter((v) => v.ativo);
+    if (vinculos.length === 0) {
+      return Response.json(
+        { erro: "Conta sem vínculo ativo com um condomínio. Fale com a administração." },
+        { status: 403 },
+      );
+    }
+    condominioAtivoId =
+      vinculos.find((v) => v.condominioId === alvo.condominioId)?.condominioId ??
+      vinculos[0].condominioId;
   }
 
   limparTentativas(chave);
 
   const loja = await cookies();
-  loja.set(COOKIE_SESSAO, criarToken(u.id), {
+  loja.set(COOKIE_SESSAO, criarToken(alvo.id, condominioAtivoId), {
     httpOnly: true,
     sameSite: "lax",
     secure: process.env.VERCEL === "1" || !!process.env.VERCEL_URL,
     path: "/",
     maxAge: 60 * 60 * 24 * 7,
   });
-  return Response.json({
-    usuario: {
-      id: u.id,
-      nome: u.nome,
-      email: u.email,
-      perfil: u.perfil,
-      unidade: u.unidade,
-      condominio: {
-        id: u.condominio.id,
-        nome: u.condominio.nome,
-        slug: u.condominio.slug,
-        corTema: u.condominio.corTema,
-        logo: u.condominio.logo,
-        foto: u.condominio.foto,
-      },
-    },
-  });
+
+  const usuario = await sessaoComCondominio(alvo.id, condominioAtivoId);
+  return Response.json({ usuario });
 }

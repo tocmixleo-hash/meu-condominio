@@ -21,12 +21,32 @@ export type CondominioUI = {
   corTema: string;
   logo: string;
   foto: string;
+  // Identidade visual administrável (opcional na UI)
+  nomeExibicao?: string | null;
+  nomeCurto?: string | null;
+  descricao?: string | null;
+  telefoneContato?: string | null;
+  emailContato?: string | null;
+  endereco?: string | null;
+  cnpj?: string | null;
+  corPrimaria?: string | null;
+  corSecundaria?: string | null;
+  corDestaque?: string | null;
+  corSidebar?: string | null;
+  corFundo?: string | null;
+  corTexto?: string | null;
+  logoMenu?: string | null;
+  logoCabecalho?: string | null;
 };
+
+// Modo demonstração detectado automaticamente pelo servidor (rota /api/ambiente):
+// sem banco Turso configurado, o login mostra o seletor de condomínio e os
+// acessos rápidos; em produção, entrada por e-mail e senha.
 
 export async function entrarNoApp(dados: {
   email: string;
   senha: string;
-  condominioId: string;
+  condominioId?: string; // informado apenas no modo demonstração
 }): Promise<Usuario> {
   let r: Response;
   try {
@@ -93,8 +113,13 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
   const [mostrarSenha, setMostrarSenha] = useState(false);
   const [erro, setErro] = useState("");
   const [enviando, setEnviando] = useState(false);
+  const [MODO_DEMO, setModoDemo] = useState(false);
 
   useEffect(() => {
+    fetch("/api/ambiente")
+      .then(async (r) => (r.ok ? r.json() : null))
+      .then((d) => setModoDemo(!!d?.demo))
+      .catch(() => null);
     fetch("/api/condominios")
       .then(async (r) => (r.ok ? r.json() : null))
       .then((d) => {
@@ -113,7 +138,7 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
     try {
       const usuario = await entrarNoApp({
         ...(dados ?? { email, senha }),
-        condominioId: condo.id,
+        ...(MODO_DEMO ? { condominioId: condo.id } : {}),
       });
       aoEntrar(usuario);
     } catch (e) {
@@ -189,7 +214,7 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
           </div>
 
           <p className="mt-auto pt-8 text-xs text-white/55">
-            Ambiente de demonstração com dados fictícios — {condo.nome}.
+            {MODO_DEMO ? `Ambiente de demonstração com dados fictícios — ${condo.nome}.` : condo.descricao || ""}
           </p>
         </div>
       </div>
@@ -204,41 +229,44 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
             className="mx-auto h-20 w-auto mix-blend-multiply"
           />
 
-          {/* Seletor de condomínio */}
-          <div className="mt-4 grid grid-cols-2 gap-3">
-            {condominios.map((c) => {
-              const ativo = c.id === condo.id;
-              return (
-                <button
-                  key={c.id}
-                  type="button"
-                  onClick={() => setCondo(c)}
-                  className={`flex items-center gap-3 rounded-xl border bg-white px-4 py-3 text-left transition ${
-                    ativo
-                      ? "border-[var(--cor-tema)] ring-2 ring-[var(--cor-tema)]/25"
-                      : "border-stone-200 hover:border-stone-300"
-                  }`}
-                >
-                  <img
-                    src={c.logo}
-                    alt=""
-                    className="h-10 w-10 shrink-0 rounded-lg bg-white object-contain p-0.5"
-                  />
-                  <span className="min-w-0">
-                    <span className="block truncate text-sm font-semibold text-stone-900">{c.nome}</span>
-                    <span className="flex items-center gap-1.5 text-xs text-stone-500">
-                      <span
-                        aria-hidden
-                        className="inline-block h-2 w-2 rounded-full"
-                        style={{ backgroundColor: c.corTema }}
-                      />
-                      {ativo ? "Selecionado" : "Selecionar"}
+          {/* Seletor de condomínio — apenas na demonstração; em produção os
+              vínculos do usuário são resolvidos no backend após o login */}
+          {MODO_DEMO && (
+            <div className="mt-4 grid grid-cols-2 gap-3">
+              {condominios.map((c) => {
+                const ativo = c.id === condo.id;
+                return (
+                  <button
+                    key={c.id}
+                    type="button"
+                    onClick={() => setCondo(c)}
+                    className={`flex items-center gap-3 rounded-xl border bg-white px-4 py-3 text-left transition ${
+                      ativo
+                        ? "border-[var(--cor-tema)] ring-2 ring-[var(--cor-tema)]/25"
+                        : "border-stone-200 hover:border-stone-300"
+                    }`}
+                  >
+                    <img
+                      src={c.logo}
+                      alt=""
+                      className="h-10 w-10 shrink-0 rounded-lg bg-white object-contain p-0.5"
+                    />
+                    <span className="min-w-0">
+                      <span className="block truncate text-sm font-semibold text-stone-900">{c.nome}</span>
+                      <span className="flex items-center gap-1.5 text-xs text-stone-500">
+                        <span
+                          aria-hidden
+                          className="inline-block h-2 w-2 rounded-full"
+                          style={{ backgroundColor: c.corTema }}
+                        />
+                        {ativo ? "Selecionado" : "Selecionar"}
+                      </span>
                     </span>
-                  </span>
-                </button>
-              );
-            })}
-          </div>
+                  </button>
+                );
+              })}
+            </div>
+          )}
 
           {/* Cartão de acesso */}
           <div className="mt-4 rounded-2xl bg-white p-6 shadow-[var(--sombra-cartao)] sm:p-7">
@@ -322,25 +350,40 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
             </form>
           </div>
 
-          {/* Acesso rápido para demonstração */}
-          <div className="mt-6">
-            <p className="text-[13px] font-medium uppercase tracking-[0.06em] text-stone-400">
-              Acesso rápido para demonstração
-            </p>
-            <div className="mt-3 grid grid-cols-1 gap-2.5 lg:grid-cols-2">
-              {rapidos.map((r) => (
+          {/* Acesso rápido para demonstração — nunca exibido em produção */}
+          {MODO_DEMO && (
+            <div className="mt-6">
+              <p className="text-[13px] font-medium uppercase tracking-[0.06em] text-stone-400">
+                Acesso rápido para demonstração
+              </p>
+              <div className="mt-3 space-y-2.5">
                 <button
-                  key={r.email}
                   type="button"
                   disabled={enviando}
-                  onClick={() => submeter({ email: r.email, senha: r.senha })}
-                  className="whitespace-nowrap rounded-full bg-white px-4 py-3 text-left text-sm text-stone-800 transition hover:bg-stone-50 disabled:opacity-50"
+                  onClick={() => submeter({ email: "admin@meucondominio.com", senha: "admin123" })}
+                  className="flex w-full items-center gap-2 rounded-full border border-stone-300 bg-white px-4 py-3 text-left text-sm font-medium text-stone-800 transition hover:bg-stone-50 disabled:opacity-50"
                 >
-                  {r.etiqueta}
+                  <span aria-hidden className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--cor-tema)] text-[10px] font-bold text-white">
+                    MC
+                  </span>
+                  Administrador da Plataforma — seletor de condomínios
                 </button>
-              ))}
+              </div>
+              <div className="mt-2.5 grid grid-cols-1 gap-2.5 lg:grid-cols-2">
+                {rapidos.map((r) => (
+                  <button
+                    key={r.email}
+                    type="button"
+                    disabled={enviando}
+                    onClick={() => submeter({ email: r.email, senha: r.senha })}
+                    className="whitespace-nowrap rounded-full bg-white px-4 py-3 text-left text-sm text-stone-800 transition hover:bg-stone-50 disabled:opacity-50"
+                  >
+                    {r.etiqueta}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>

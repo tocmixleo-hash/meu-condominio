@@ -2,71 +2,77 @@
 
 ## 1. Subir o código para o GitHub
 
-**Opção A — pela interface web (mais simples):**
-
-1. Acesse [github.com/new](https://github.com/new) e crie um repositório vazio (ex.: `meu-condominio`), **sem** README.
-2. Extraia o `meu-condominio.zip` no seu computador.
-3. Na página do repositório, clique em **uploading an existing file** e arraste **o conteúdo da pasta extraída** (o `.zip` inteiro não funciona).
-4. Clique em **Commit changes**.
-
-**Opção B — pela linha de comando:**
-
 ```bash
-unzip meu-condominio.zip -d meu-condominio && cd meu-condominio
-git init && git add . && git commit -m "Meu Condomínio — portal multi-condomínio"
+git init && git add . && git commit -m "Meu Condomínio — plataforma multi-condomínio"
 git branch -M main
-git remote add origin https://github.com/SEU-USUARIO/meu-condominio.git
+git remote add origin https://github.com/tocmixleo-hash/meu-condominio.git
 git push -u origin main
 ```
 
 ## 2. Criar o projeto na Vercel
 
-1. Acesse [vercel.com/new](https://vercel.com/new) e conecte sua conta do GitHub.
-2. Selecione o repositório `meu-condominio` e clique em **Import**.
-3. O framework **Next.js** é detectado automaticamente — não mude o build.
-4. Em **Environment Variables**, adicione:
-
-   | Nome | Valor |
-   | --- | --- |
-   | `DATABASE_URL` | `file:/tmp/custom.db` |
-   | `SEGREDO_SESSAO` | resultado de `openssl rand -hex 32` |
-
-5. Clique em **Deploy** e aguarde ~2 minutos.
-
-O app copia o banco de demonstração (2 condomínios — Parque California e Parque Florida) para `/tmp` no primeiro acesso — o seletor de condomínio na tela de login e todas as funções funcionam de imediato.
+1. Acesse [vercel.com/new](https://vercel.com/new), conecte o GitHub e selecione o repositório `meu-condominio` (integração Git já conectada: cada envio à `main` publica automaticamente).
+2. O framework **Next.js** é detectado automaticamente — não mude o build.
+3. Adicione as variáveis de ambiente conforme a tabela abaixo (seção 3) e clique em **Deploy**.
 
 ## 3. Variáveis de ambiente
 
 | Variável | Obrigatória? | Para que serve |
 | --- | --- | --- |
-| `DATABASE_URL` | Sim | Banco de dados (SQLite no modo demo, Postgres em produção) |
-| `SEGREDO_SESSAO` | Em produção | Segredo HMAC dos cookies de sessão (`openssl rand -hex 32`) |
-| `BLOB_READ_WRITE_TOKEN` | Opcional | Armazena documentos no Vercel Blob (persistente). Sem ele, arquivos vão para `/tmp` |
-| `RESEND_API_KEY` + `EMAIL_REMETENTE` | Opcional | Envia as notificações também por e-mail (Resend). Sem elas, ficam só no sino do portal |
+| `TURSO_DATABASE_URL` | Sim (produção) | Endereço `libsql://` do banco Turso — ativa o modo persistente |
+| `TURSO_AUTH_TOKEN` | Sim (produção) | Token de acesso do Turso (usado só no backend) |
+| `SEGREDO_SESSAO` | Sim | Segredo HMAC dos cookies de sessão (`openssl rand -hex 32`) |
+| `BLOB_READ_WRITE_TOKEN` | Recomendada | Documentos, logotipos e fotografias no Vercel Blob (por condomínio) |
+| `DATABASE_URL` | Desenvolvimento | Arquivo SQLite local (`file:...`) — ignorada quando Turso está ativo |
+| `SENHA_ADMIN` | Uso único | Senha provisória do administrador no seed de produção |
+| `RESEND_API_KEY` + `EMAIL_REMETENTE` | Opcional | Notificações também por e-mail (Resend) |
 
-## 4. Banco de dados persistente (Postgres) — passo a passo
+## 4. Banco de produção em Turso (libSQL) — passo a passo
 
-O SQLite em `/tmp` serve bem para **demonstração**, mas reseta a cada *cold start*. Para um condomínio usar de verdade:
+O runtime usa o driver adapter libSQL do Prisma: com `TURSO_DATABASE_URL` presente, a
+aplicação grava no Turso; sem ela, roda em SQLite local (desenvolvimento/demo), igual ao
+comportamento anterior. O provider do schema permanece `sqlite` — nenhuma migração
+destrutiva é necessária.
 
-1. Crie um banco gratuito no [neon.tech](https://neon.tech) (ou Supabase/Vercel Postgres) e copie a *connection string* (`postgresql://...`).
-2. Aponte o Prisma para Postgres — em `prisma/schema.prisma`, troque:
-   ```prisma
-   datasource db {
-     provider = "postgresql"
-     url      = env("DATABASE_URL")
-   }
-   ```
-3. Crie o schema e semeie o banco a partir da sua máquina:
+1. **Criar o banco** (app.turso.tech → *New database*, ou CLI):
    ```bash
-   DATABASE_URL="postgresql://..." bunx prisma db push
-   DATABASE_URL="postgresql://..." bun prisma/seed.ts
+   turso db create meu-condominio
+   turso db show meu-condominio   # copia a URL libsql://
+   turso db tokens create meu-condominio
    ```
-4. Na Vercel, troque a variável `DATABASE_URL` pelo endereço do Postgres e faça **Redeploy**.
+2. **Aplicar o schema** (da sua máquina, uma vez):
+   ```bash
+   TURSO_DATABASE_URL="libsql://..." TURSO_AUTH_TOKEN="..." bun scripts/aplicar-schema-turso.mjs
+   ```
+3. **Semear a base real** (2 condomínios + administrador, sem dados fictícios):
+   ```bash
+   TURSO_DATABASE_URL="libsql://..." TURSO_AUTH_TOKEN="..." SENHA_ADMIN="senha-forte" bun prisma/seed-producao.ts
+   ```
+4. **Na Vercel**, cadastre `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN`, `SEGREDO_SESSAO` e
+   `BLOB_READ_WRITE_TOKEN` e faça **Redeploy**. Com o Turso configurado, o portal entra
+   automaticamente em modo de produção (sem seletor de login nem acessos de demonstração).
+5. Acesse o portal com o e-mail do administrador da plataforma
+   (leonardo_lira@outlook.com) e **altere a senha no primeiro acesso**.
+   Depois, cadastre os vínculos da equipe de cada condomínio (Síndico,
+   Administrativo, Portaria e Moradores) pelo próprio portal.
 
-Pronto: cadastros, encomendas, reservas e documentos passam a persistir para sempre. Configure também o **BLOB_READ_WRITE_TOKEN** (Vercel → Storage → Blob) para os documentos sobreviverem junto.
+O modo demonstração (SQLite + elenco fictício + acessos rápidos) continua disponível para
+desenvolvimento local e previews, sem interferir na produção.
 
 ## 5. Limitações do modo demonstração (SQLite em `/tmp`)
 
 - A cada *cold start* a instância volta ao banco de demonstração — cadastros podem desaparecer após inatividade.
 - Uploads sem `BLOB_READ_WRITE_TOKEN` ficam em `/tmp`, sujeitos ao mesmo reset.
 - O rate limit de login é em memória (por instância); para bloqueio global use um store compartilhado (ex. Upstash Redis).
+
+## 6. Escopo desta versão
+
+- Multi-condomínio completo: vínculos usuário ↔ condomínio (muitos-para-muitos) com permissão
+  por vínculo, perfil **PLATAFORMA** (administrador geral) e troca de ambiente auditada.
+- Identidade visual administrável por condomínio (paleta, logotipos de menu/cabeçalho,
+  fotografias, textos institucionais e contatos) — painel "Identidade visual".
+- Armazenamento organizado por condomínio no Blob e documentos entregues por streaming
+  autenticado (a URL do armazenamento não é exposta ao navegador).
+- Suíte de isolamento entre condomínios: `bun scripts/testes-isolamento.mjs`.
+- Módulo financeiro: **fora do escopo** por decisão do cliente (empresa externa cuida do
+  financeiro; a arquitetura de vínculos por condomínio fica pronta para integração futura).

@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { json401, json403, usuarioAtual } from "@/lib/auth";
+import { ehGestao, json401, json403, usuarioAtual } from "@/lib/auth";
 import { mkdir, writeFile, unlink } from "fs/promises";
 import path from "path";
 import { registrarAcao } from "@/lib/auditoria";
@@ -7,7 +7,8 @@ import { notificarCondominio } from "@/lib/notificacoes";
 
 // No Vercel o filesystem é somente leitura (exceto /tmp); local usa public/uploads.
 // Com BLOB_READ_WRITE_TOKEN configurado, arquivos vão para o Vercel Blob
-// (armazenamento persistente) e só caem no filesystem como reserva.
+// (armazenamento persistente) sob chaves organizadas por condomínio e só caem
+// no filesystem como reserva.
 const PASTA =
   process.env.PASTA_UPLOADS
     ? path.resolve(process.env.PASTA_UPLOADS)
@@ -16,12 +17,12 @@ const PASTA =
       : path.join(process.cwd(), "public", "uploads");
 const MAX_BYTES = 8 * 1024 * 1024;
 
-async function salvarArquivo(nomeSeguro: string, conteudo: Buffer): Promise<string | null> {
+async function salvarArquivo(slug: string, nomeSeguro: string, conteudo: Buffer): Promise<string | null> {
   const token = process.env.BLOB_READ_WRITE_TOKEN;
   if (token) {
     try {
       const { put } = await import("@vercel/blob");
-      const blob = await put(`documentos/${nomeSeguro}`, conteudo, {
+      const blob = await put(`condominios/${slug}/documentos/${nomeSeguro}`, conteudo, {
         access: "public",
         token,
         addRandomSuffix: false,
@@ -31,8 +32,9 @@ async function salvarArquivo(nomeSeguro: string, conteudo: Buffer): Promise<stri
       // Blob indisponível — grava no filesystem como reserva
     }
   }
-  await mkdir(PASTA, { recursive: true });
-  await writeFile(path.join(PASTA, nomeSeguro), conteudo);
+  const pasta = path.join(PASTA, "condominios", slug);
+  await mkdir(pasta, { recursive: true });
+  await writeFile(path.join(pasta, nomeSeguro), conteudo);
   return null;
 }
 
@@ -50,7 +52,7 @@ export async function GET() {
 export async function POST(req: Request) {
   const eu = await usuarioAtual();
   if (!eu) return json401();
-  if (!["SINDICO", "ADMINISTRATIVO"].includes(eu.perfil)) return json403();
+  if (!ehGestao(eu.perfil)) return json403();
 
   const form = await req.formData().catch(() => null);
   if (!form) return Response.json({ erro: "Envio inválido." }, { status: 400 });
@@ -65,7 +67,11 @@ export async function POST(req: Request) {
   }
 
   const nomeSeguro = `${Date.now()}-${arquivo.name.replace(/[^\w.\-]+/g, "_")}`;
-  const url = await salvarArquivo(nomeSeguro, Buffer.from(await arquivo.arrayBuffer()));
+  const condominio = await db.condominio.findUnique({
+    where: { id: eu.condominio.id },
+    select: { slug: true },
+  });
+  const url = await salvarArquivo(condominio?.slug ?? "geral", nomeSeguro, Buffer.from(await arquivo.arrayBuffer()));
 
   const documento = await db.documento.create({
     data: {
@@ -98,7 +104,7 @@ export async function POST(req: Request) {
 export async function DELETE(req: Request) {
   const eu = await usuarioAtual();
   if (!eu) return json401();
-  if (!["SINDICO", "ADMINISTRATIVO"].includes(eu.perfil)) return json403();
+  if (!ehGestao(eu.perfil)) return json403();
   const { id } = await req.json().catch(() => ({} as never));
   const doc = await db.documento.findFirst({
     where: { id: String(id ?? ""), condominioId: eu.condominio.id },
@@ -113,6 +119,13 @@ export async function DELETE(req: Request) {
       // ignora falha de exclusão remota
     }
   } else {
+    const condominio = await db.condominio.findUnique({
+      where: { id: doc.condominioId },
+      select: { slug: true },
+    });
+    const caminho = path.join(PASTA, "condominios", condominio?.slug ?? "geral", doc.nomeArquivo);
+    await unlink(caminho).catch(() => null);
+    // Compatibilidade com arquivos gravados no layout antigo (sem pasta por condomínio)
     await unlink(path.join(PASTA, doc.nomeArquivo)).catch(() => null);
   }
   await db.documento.delete({ where: { id: doc.id } });

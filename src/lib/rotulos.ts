@@ -54,6 +54,11 @@ export const ROTULO_ACAO: Record<string, string> = {
   DOCUMENTO_EXCLUIDO: "Excluiu documento",
   ASSEMBLEIA_CRIADA: "Agendou assembleia",
   ASSEMBLEIA_ALTERADA: "Atualizou assembleia",
+  TROCA_CONDOMINIO: "Trocou de condomínio",
+  IDENTIDADE_ATUALIZADA: "Atualizou identidade visual",
+  IDENTIDADE_ARQUIVO: "Atualizou arquivo da identidade",
+  CONDOMINIO_CRIADO: "Cadastrou condomínio",
+  SENHA_ALTERADA: "Alterou a própria senha",
 };
 
 export function formatarData(iso: string) {

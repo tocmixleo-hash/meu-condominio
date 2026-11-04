@@ -1,11 +1,29 @@
 /**
- * Tema visual por condomínio. O California mantém a paleta aprovada
- * (marrom #4D403A + neutros quentes); o Florida usa a variante cinza.
- * Condomínios novos recebem paleta derivada da cor cadastrada no banco.
+ * Tema visual por condomínio — a partir das variáveis de identidade do banco.
+ *
+ * Ordem de resolução (garante que ausência de configuração nunca quebra a UI):
+ * 1. Preset por slug (California/Flórida, aparência aprovada) ou derivação
+ *    automática a partir da corTema cadastrada;
+ * 2. Cores explícitas da identidade visual do condomínio (corPrimaria etc.)
+ *    sobrescrevem os slots correspondentes. Quando a cor principal muda em
+ *    relação ao preset, os tons dependentes são rederivados para coerência.
+ *
+ * Todas as cores da interface são consumidas via variáveis CSS geradas aqui —
+ * nenhum componente usa cores fixas do tema do condomínio.
  */
+
+export type IdentidadeTema = {
+  corPrimaria?: string | null;
+  corSecundaria?: string | null;
+  corDestaque?: string | null;
+  corSidebar?: string | null;
+  corFundo?: string | null;
+  corTexto?: string | null;
+};
 
 export type Tema = {
   tema: string; // cor primária (sidebar, botões, overlay)
+  sidebar: string; // fundo da barra lateral (padrão: cor primária)
   hover: string; // item ativo da sidebar
   botaoHover: string; // botão Entrar em hover
   escura: string; // gradiente do login (inferior)
@@ -22,6 +40,7 @@ export type Tema = {
 
 const CALIFORNIA: Tema = {
   tema: "#4D403A",
+  sidebar: "#4D403A",
   hover: "#61514A",
   botaoHover: "#3f352e",
   escura: "#2e2620",
@@ -38,6 +57,7 @@ const CALIFORNIA: Tema = {
 
 const FLORIDA: Tema = {
   tema: "#404040",
+  sidebar: "#404040",
   hover: "#525252",
   botaoHover: "#333333",
   escura: "#262626",
@@ -79,6 +99,7 @@ const PRETO: [number, number, number] = [0, 0, 0];
 function derivarTema(corTema: string): Tema {
   return {
     tema: corTema,
+    sidebar: corTema,
     hover: misturar(corTema, BRANCO, 0.15),
     botaoHover: misturar(corTema, PRETO, 0.15),
     escura: misturar(corTema, PRETO, 0.45),
@@ -94,8 +115,42 @@ function derivarTema(corTema: string): Tema {
   };
 }
 
-export function resolverTema(slug: string, corTema: string): Tema {
-  return TEMAS[slug] ?? derivarTema(corTema);
+function hexValido(valor?: string | null): valor is string {
+  return !!valor && /^#[0-9a-fA-F]{6}$/.test(valor.trim());
+}
+
+/** Normaliza uma cor recebida da identidade (aceita #rgb e #rrggbb). */
+export function corHex(valor?: string | null): string | null {
+  if (!valor) return null;
+  const h = valor.trim().replace("#", "");
+  const cheio = h.length === 3 ? h.split("").map((c) => c + c).join("") : h;
+  if (!/^[0-9a-fA-F]{6}$/.test(cheio)) return null;
+  return `#${cheio.toUpperCase()}`;
+}
+
+export function resolverTema(
+  slug: string,
+  corTema: string,
+  identidade?: IdentidadeTema | null,
+): Tema {
+  const t: Tema = { ...(TEMAS[slug] ?? derivarTema(corTema)) };
+
+  const primaria = corHex(identidade?.corPrimaria);
+  if (primaria && primaria.toLowerCase() !== t.tema.toLowerCase()) {
+    // A cor principal mudou em relação ao preset — rederiva os tons dependentes.
+    Object.assign(t, derivarTema(primaria));
+  }
+  const secundaria = corHex(identidade?.corSecundaria);
+  if (secundaria) t.hover = secundaria;
+  const destaque = corHex(identidade?.corDestaque);
+  if (destaque) t.suave = destaque;
+  const fundo = corHex(identidade?.corFundo);
+  if (fundo) t.fundo = fundo;
+  const texto = corHex(identidade?.corTexto);
+  if (texto) t.fg = texto;
+  const sidebar = corHex(identidade?.corSidebar);
+  t.sidebar = sidebar ?? t.tema;
+  return t;
 }
 
 /** Variáveis CSS a aplicar no elemento raiz (login ou shell). */
@@ -107,6 +162,7 @@ export function cssVarsDoTema(t: Tema): Record<string, string> {
   const claraRgb = hexParaRgb(t.clara);
   return {
     "--cor-tema": t.tema,
+    "--cor-sidebar": t.sidebar,
     "--cor-tema-hover": t.hover,
     "--cor-tema-hover-a60": `rgba(${hoverRgb}, 0.60)`,
     "--cor-tema-botao-hover": t.botaoHover,

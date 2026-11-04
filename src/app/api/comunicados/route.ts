@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { json401, json403, usuarioAtual } from "@/lib/auth";
+import { ehGestao, json401, json403, usuarioAtual } from "@/lib/auth";
 import { notificarCondominio } from "@/lib/notificacoes";
 import { registrarAcao } from "@/lib/auditoria";
 
@@ -17,7 +17,7 @@ export async function GET() {
 export async function POST(req: Request) {
   const eu = await usuarioAtual();
   if (!eu) return json401();
-  if (!["SINDICO", "ADMINISTRATIVO"].includes(eu.perfil)) return json403();
+  if (!ehGestao(eu.perfil)) return json403();
 
   const { titulo, conteudo, categoria, prioridade } = await req.json().catch(() => ({}) as never);
   if (!titulo?.trim() || !conteudo?.trim()) {
