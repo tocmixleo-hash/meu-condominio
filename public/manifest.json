@@ -1,0 +1,31 @@
+{
+  "name": "Meu Condomínio — Parque Califórnia",
+  "short_name": "Meu Condomínio",
+  "description": "Gestão e comunicação entre condomínio, síndico e moradores: reservas, encomendas, documentos, assembleias e comunicados.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F7F6F3",
+  "theme_color": "#4D403A",
+  "lang": "pt-BR",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
