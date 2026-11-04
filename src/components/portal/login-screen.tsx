@@ -1,7 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Eye, EyeOff, LoaderCircle, Lock, Mail, Smartphone } from "lucide-react";
+import {
+  Building2,
+  ClipboardList,
+  Eye,
+  EyeOff,
+  LoaderCircle,
+  Lock,
+  Mail,
+  ShieldCheck,
+  Smartphone,
+  User,
+  X,
+} from "lucide-react";
 import { cssVarsDoTema, resolverTema } from "@/lib/tema";
 import { corpoJson, mensagemDeErro, mensagemRede } from "@/lib/api-cliente";
 
@@ -10,6 +22,7 @@ type Usuario = {
   nome: string;
   email: string;
   perfil: string;
+  tutorialVisto?: boolean;
   unidade?: { bloco: string; numero: string } | null;
   condominio?: CondominioUI;
 };
@@ -39,13 +52,59 @@ export type CondominioUI = {
   logoCabecalho?: string | null;
 };
 
-// Modo demonstração detectado automaticamente pelo servidor (rota /api/ambiente):
-// sem banco Turso configurado, o login mostra o seletor de condomínio e os
-// acessos rápidos; em produção, entrada por e-mail e senha.
+// ── Tipos de usuário perguntados na tela de login ────────────────
+// O backend confere o tipo escolhido contra a conta informada e, se
+// diferir, responde com o tipo correto (perfilCorreto) — a seleção é
+// ajustada na tela e ninguém fica bloqueado.
+export type TipoUsuario = "MORADOR" | "GESTAO" | "PORTARIA" | "PLATAFORMA";
+
+const TIPOS: { id: TipoUsuario; rotulo: string; descricao: string; icone: typeof User }[] = [
+  {
+    id: "MORADOR",
+    rotulo: "Morador",
+    descricao: "Reservas, encomendas, comunicados e autorizações da sua unidade.",
+    icone: User,
+  },
+  {
+    id: "GESTAO",
+    rotulo: "Síndico ou administração",
+    descricao: "Gestão do condomínio: aprovações, ocorrências, manutenção e documentos.",
+    icone: ClipboardList,
+  },
+  {
+    id: "PORTARIA",
+    rotulo: "Portaria",
+    descricao: "Guarita: encomendas recebidas, autorizações de acesso e ocorrências do dia.",
+    icone: ShieldCheck,
+  },
+  {
+    id: "PLATAFORMA",
+    rotulo: "Administrador da plataforma",
+    descricao: "Gestão de todos os condomínios, identidades visuais e simulação de perfis.",
+    icone: Building2,
+  },
+];
+
+const ROTULO_TIPO: Record<TipoUsuario, string> = {
+  MORADOR: "Morador",
+  GESTAO: "Síndico ou administração",
+  PORTARIA: "Portaria",
+  PLATAFORMA: "Administrador da plataforma",
+};
+
+// Erro de login que carrega o tipo correto da conta (mismatch de tipo)
+export class ErroLogin extends Error {
+  perfilCorreto?: TipoUsuario;
+  constructor(mensagem: string, perfilCorreto?: string) {
+    super(mensagem);
+    this.perfilCorreto = perfilCorreto as TipoUsuario | undefined;
+  }
+}
 
 export async function entrarNoApp(dados: {
   email: string;
   senha: string;
+  tipo?: TipoUsuario;
   condominioId?: string; // informado apenas no modo demonstração
 }): Promise<Usuario> {
   let r: Response;
@@ -60,8 +119,13 @@ export async function entrarNoApp(dados: {
       "Não foi possível conectar ao portal. Verifique a conexão e tente novamente.",
     );
   }
-  const corpo = await corpoJson<{ usuario?: Usuario; erro?: string }>(r);
-  if (!r.ok) throw new Error(corpo?.erro || mensagemRede(r.status));
+  const corpo = await corpoJson<{ usuario?: Usuario; erro?: string; perfilCorreto?: string }>(r);
+  if (!r.ok) {
+    throw new ErroLogin(
+      corpo?.erro || mensagemRede(r.status),
+      r.status === 403 ? corpo?.perfilCorreto : undefined,
+    );
+  }
   if (!corpo?.usuario) {
     throw new Error(
       "Resposta inesperada do servidor. Recarregue a página e tente novamente.",
@@ -76,19 +140,23 @@ const DESTAQUES = [
   "Participe das assembleias e vote informado",
 ];
 
-// Acesso rápido por condomínio (elenco fictício de cada um, igual ao seed)
-const ACESSOS: Record<string, { email: string; senha: string; etiqueta: string }[]> = {
+// Acesso rápido por condomínio (elenco fictício de cada um, igual ao seed).
+// Cada acesso já carrega o próprio tipo — o teste fica certo sem atrito.
+const ACESSOS: Record<
+  string,
+  { email: string; senha: string; etiqueta: string; tipo: TipoUsuario }[]
+> = {
   california: [
-    { email: "maria@email.com", senha: "123456", etiqueta: "Maria — Morador (A-101)" },
-    { email: "sindico@parquecalifornia.com.br", senha: "admin123", etiqueta: "Carlos — Síndico (Gestão)" },
-    { email: "administrativo@parquecalifornia.com.br", senha: "admin123", etiqueta: "Fernanda — Administrativo" },
-    { email: "portaria@parquecalifornia.com.br", senha: "portaria123", etiqueta: "Jorge — Portaria" },
+    { email: "maria@email.com", senha: "123456", etiqueta: "Maria — Morador (A-101)", tipo: "MORADOR" },
+    { email: "sindico@parquecalifornia.com.br", senha: "admin123", etiqueta: "Carlos — Síndico (Gestão)", tipo: "GESTAO" },
+    { email: "administrativo@parquecalifornia.com.br", senha: "admin123", etiqueta: "Fernanda — Administrativo", tipo: "GESTAO" },
+    { email: "portaria@parquecalifornia.com.br", senha: "portaria123", etiqueta: "Jorge — Portaria", tipo: "PORTARIA" },
   ],
   florida: [
-    { email: "helena@email.com", senha: "123456", etiqueta: "Helena — Morador (A-101)" },
-    { email: "sindico@parqueflorida.com.br", senha: "admin123", etiqueta: "Ricardo — Síndico (Gestão)" },
-    { email: "administrativo@parqueflorida.com.br", senha: "admin123", etiqueta: "Patrícia — Administrativo" },
-    { email: "portaria@parqueflorida.com.br", senha: "portaria123", etiqueta: "Sérgio — Portaria" },
+    { email: "helena@email.com", senha: "123456", etiqueta: "Helena — Morador (A-101)", tipo: "MORADOR" },
+    { email: "sindico@parqueflorida.com.br", senha: "admin123", etiqueta: "Ricardo — Síndico (Gestão)", tipo: "GESTAO" },
+    { email: "administrativo@parqueflorida.com.br", senha: "admin123", etiqueta: "Patrícia — Administrativo", tipo: "GESTAO" },
+    { email: "portaria@parqueflorida.com.br", senha: "portaria123", etiqueta: "Sérgio — Portaria", tipo: "PORTARIA" },
   ],
 };
 
@@ -108,10 +176,12 @@ const FALLBACK: CondominioUI = {
 export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => void }) {
   const [condominios, setCondominios] = useState<CondominioUI[]>([FALLBACK]);
   const [condo, setCondo] = useState<CondominioUI>(FALLBACK);
+  const [tipo, setTipo] = useState<TipoUsuario | null>(null);
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [mostrarSenha, setMostrarSenha] = useState(false);
   const [erro, setErro] = useState("");
+  const [avisoTipo, setAvisoTipo] = useState("");
   const [enviando, setEnviando] = useState(false);
   const [MODO_DEMO, setModoDemo] = useState(false);
   // Recuperação de senha
@@ -137,12 +207,13 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
       .catch(() => null);
   }, []);
 
-  async function submeter(dados?: { email: string; senha: string }) {
+  async function submeter(dados?: { email: string; senha: string; tipo?: TipoUsuario }) {
     setErro("");
+    setAvisoTipo("");
     setEnviando(true);
     try {
       const usuario = await entrarNoApp({
-        ...(dados ?? { email, senha }),
+        ...(dados ?? { email, senha, tipo: tipo ?? undefined }),
         // Contexto do condomínio selecionado: orienta o login quando o mesmo
         // e-mail existir em mais de um parque; nunca bloqueia (o backend
         // recorre à conta correta quando o vínculo não coincide).
@@ -150,7 +221,16 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
       });
       aoEntrar(usuario);
     } catch (e) {
-      setErro(mensagemDeErro(e, "Falha ao entrar."));
+      if (e instanceof ErroLogin && e.perfilCorreto) {
+        // Tipo diferente da conta: ajustamos a seleção e avisamos com
+        // clareza — o usuário apenas confere e entra novamente.
+        setTipo(e.perfilCorreto);
+        setAvisoTipo(
+          `Esta conta é do tipo «${ROTULO_TIPO[e.perfilCorreto]}». Ajustamos a seleção acima — confira e entre novamente.`,
+        );
+      } else {
+        setErro(mensagemDeErro(e, "Falha ao entrar."));
+      }
     } finally {
       setEnviando(false);
     }
@@ -177,7 +257,7 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
   }
 
   const temaVars = cssVarsDoTema(resolverTema(condo.slug, condo.corTema)) as React.CSSProperties;
-  const rapidos = acessosRapidos(condo.slug);
+  const rapidos = tipo ? acessosRapidos(condo.slug).filter((r) => r.tipo === tipo) : [];
 
   return (
     <div style={temaVars} className="flex min-h-dvh bg-[var(--cor-fundo)]">
@@ -298,148 +378,228 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
 
           {/* Cartão de acesso */}
           <div className="mt-4 rounded-2xl bg-white p-6 shadow-[var(--sombra-cartao)] sm:p-7">
-            <h2 className="text-[22px] font-bold tracking-tight text-stone-900">
-              Entrar na plataforma
-            </h2>
-            <p className="mt-1.5 text-[15px] text-stone-500">
-              Acesse com o seu e-mail cadastrado pela administração do {condo.nome}.
-            </p>
-
-            <form
-              className="mt-6 space-y-4"
-              onSubmit={(e) => {
-                e.preventDefault();
-                submeter();
-              }}
-            >
-              <div>
-                <label htmlFor="email" className="mb-1.5 block text-[15px] font-semibold text-stone-800">
-                  E-mail
-                </label>
-                <div className="relative">
-                  <Mail className="pointer-events-none absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-stone-400" />
-                  <input
-                    id="email"
-                    type="email"
-                    autoComplete="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="seu@email.com"
-                    className="h-12 w-full rounded-xl border border-stone-200 bg-white pl-11 pr-4 text-[15px] text-stone-900 outline-none transition placeholder:text-stone-400 focus:border-stone-400 focus:ring-4 focus:ring-stone-400/10"
-                  />
+            {!tipo ? (
+              /* ── Etapa 1: pergunta o tipo de usuário ─────────────── */
+              <>
+                <h2 className="text-[22px] font-bold tracking-tight text-stone-900">
+                  Que tipo de usuário é você?
+                </h2>
+                <p className="mt-1.5 text-[15px] text-stone-500">
+                  Escolha o seu perfil para personalizarmos o seu acesso.
+                </p>
+                <div className="mt-5 grid gap-2.5">
+                  {TIPOS.map((t) => {
+                    const Icone = t.icone;
+                    return (
+                      <button
+                        key={t.id}
+                        type="button"
+                        onClick={() => {
+                          setTipo(t.id);
+                          setErro("");
+                          setAvisoTipo("");
+                        }}
+                        className="flex items-start gap-3.5 rounded-xl border border-stone-200 px-4 py-3.5 text-left transition hover:border-[var(--cor-tema)] hover:bg-[var(--cor-tema-suave,#faf9f7)]"
+                      >
+                        <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-stone-100 text-stone-600">
+                          <Icone className="h-[18px] w-[18px]" />
+                        </span>
+                        <span className="min-w-0">
+                          <span className="block text-[15px] font-semibold text-stone-900">
+                            {t.rotulo}
+                          </span>
+                          <span className="mt-0.5 block text-[13px] leading-relaxed text-stone-500">
+                            {t.descricao}
+                          </span>
+                        </span>
+                      </button>
+                    );
+                  })}
                 </div>
-              </div>
-
-              <div>
-                <label htmlFor="senha" className="mb-1.5 block text-[15px] font-semibold text-stone-800">
-                  Senha
-                </label>
-                <div className="relative">
-                  <Lock className="pointer-events-none absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-stone-400" />
-                  <input
-                    id="senha"
-                    type={mostrarSenha ? "text" : "password"}
-                    autoComplete="current-password"
-                    value={senha}
-                    onChange={(e) => setSenha(e.target.value)}
-                    placeholder="Sua senha"
-                    className="h-12 w-full rounded-xl border border-stone-200 bg-white pl-11 pr-11 text-[15px] text-stone-900 outline-none transition placeholder:text-stone-400 focus:border-stone-400 focus:ring-4 focus:ring-stone-400/10"
-                  />
+              </>
+            ) : (
+              /* ── Etapa 2: e-mail e senha (com o tipo escolhido) ──── */
+              <>
+                <div className="flex items-center justify-between gap-3">
+                  <h2 className="text-[22px] font-bold tracking-tight text-stone-900">
+                    Entrar na plataforma
+                  </h2>
                   <button
                     type="button"
-                    onClick={() => setMostrarSenha((v) => !v)}
-                    aria-label={mostrarSenha ? "Ocultar senha" : "Mostrar senha"}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-stone-400 transition hover:text-stone-600"
+                    onClick={() => {
+                      setTipo(null);
+                      setErro("");
+                      setAvisoTipo("");
+                    }}
+                    title="Trocar tipo de usuário"
+                    className="flex shrink-0 items-center gap-1.5 rounded-full bg-stone-100 px-3 py-1.5 text-xs font-semibold text-stone-700 transition hover:bg-stone-200"
                   >
-                    {mostrarSenha ? <EyeOff className="h-[18px] w-[18px]" /> : <Eye className="h-[18px] w-[18px]" />}
+                    {ROTULO_TIPO[tipo]}
+                    <X className="h-3.5 w-3.5" />
                   </button>
                 </div>
-              </div>
-
-              {erro && (
-                <p role="alert" className="rounded-xl bg-red-50 px-3.5 py-2.5 text-sm text-red-700">
-                  {erro}
+                <p className="mt-1.5 text-[15px] text-stone-500">
+                  Acesse com o seu e-mail cadastrado pela administração do {condo.nome}.
                 </p>
-              )}
 
-              <button
-                type="submit"
-                disabled={enviando}
-                className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-[var(--cor-tema)] text-[15px] font-semibold text-white transition hover:bg-[var(--cor-tema-botao-hover)] disabled:opacity-60"
-              >
-                {enviando ? (
-                  <>
-                    <LoaderCircle className="h-4 w-4 animate-spin" /> Entrando…
-                  </>
-                ) : (
-                  "Entrar"
-                )}
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setRecuperando((v) => !v);
-                  setAvisoRecuperacao("");
-                }}
-                className="w-full text-center text-sm font-medium text-stone-500 underline-offset-4 transition hover:text-stone-700 hover:underline"
-              >
-                Esqueci minha senha
-              </button>
-
-              {recuperando && (
-                <div className="rounded-xl border border-stone-200 bg-stone-50 p-3.5">
-                  <p className="text-sm text-stone-600">
-                    Informe o e-mail da conta — enviaremos um link para escolher uma nova senha
-                    (vale 1 hora).
-                  </p>
-                  <div className="mt-2.5 flex gap-2">
-                    <input
-                      type="email"
-                      placeholder="seu@email.com"
-                      value={emailRecuperacao}
-                      onChange={(e) => setEmailRecuperacao(e.target.value)}
-                      className="h-10 flex-1 rounded-lg border border-stone-200 bg-white px-3 text-sm text-stone-900 outline-none transition placeholder:text-stone-400 focus:border-stone-400 focus:ring-4 focus:ring-stone-400/10"
-                    />
-                    <button
-                      type="button"
-                      onClick={solicitarRecuperacao}
-                      disabled={enviandoRecuperacao || !emailRecuperacao.trim()}
-                      className="inline-flex h-10 items-center gap-1.5 rounded-lg bg-stone-800 px-3.5 text-sm font-semibold text-white transition hover:bg-stone-700 disabled:opacity-50"
-                    >
-                      {enviandoRecuperacao && <LoaderCircle className="h-4 w-4 animate-spin" />} Enviar
-                    </button>
+                <form
+                  className="mt-6 space-y-4"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    submeter();
+                  }}
+                >
+                  <div>
+                    <label htmlFor="email" className="mb-1.5 block text-[15px] font-semibold text-stone-800">
+                      E-mail
+                    </label>
+                    <div className="relative">
+                      <Mail className="pointer-events-none absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-stone-400" />
+                      <input
+                        id="email"
+                        type="email"
+                        autoComplete="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="seu@email.com"
+                        className="h-12 w-full rounded-xl border border-stone-200 bg-white pl-11 pr-4 text-[15px] text-stone-900 outline-none transition placeholder:text-stone-400 focus:border-stone-400 focus:ring-4 focus:ring-stone-400/10"
+                      />
+                    </div>
                   </div>
-                  {avisoRecuperacao && (
-                    <p className="mt-2 rounded-lg bg-white px-3 py-2 text-sm text-stone-700">{avisoRecuperacao}</p>
+
+                  <div>
+                    <label htmlFor="senha" className="mb-1.5 block text-[15px] font-semibold text-stone-800">
+                      Senha
+                    </label>
+                    <div className="relative">
+                      <Lock className="pointer-events-none absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-stone-400" />
+                      <input
+                        id="senha"
+                        type={mostrarSenha ? "text" : "password"}
+                        autoComplete="current-password"
+                        value={senha}
+                        onChange={(e) => setSenha(e.target.value)}
+                        placeholder="Sua senha"
+                        className="h-12 w-full rounded-xl border border-stone-200 bg-white pl-11 pr-11 text-[15px] text-stone-900 outline-none transition placeholder:text-stone-400 focus:border-stone-400 focus:ring-4 focus:ring-stone-400/10"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setMostrarSenha((v) => !v)}
+                        aria-label={mostrarSenha ? "Ocultar senha" : "Mostrar senha"}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-stone-400 transition hover:text-stone-600"
+                      >
+                        {mostrarSenha ? <EyeOff className="h-[18px] w-[18px]" /> : <Eye className="h-[18px] w-[18px]" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  {erro && (
+                    <p role="alert" className="rounded-xl bg-red-50 px-3.5 py-2.5 text-sm text-red-700">
+                      {erro}
+                    </p>
                   )}
-                </div>
-              )}
-            </form>
+
+                  {avisoTipo && (
+                    <p role="status" className="rounded-xl bg-amber-50 px-3.5 py-2.5 text-sm text-amber-800">
+                      {avisoTipo}
+                    </p>
+                  )}
+
+                  <button
+                    type="submit"
+                    disabled={enviando}
+                    className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-[var(--cor-tema)] text-[15px] font-semibold text-white transition hover:bg-[var(--cor-tema-botao-hover)] disabled:opacity-60"
+                  >
+                    {enviando ? (
+                      <>
+                        <LoaderCircle className="h-4 w-4 animate-spin" /> Entrando…
+                      </>
+                    ) : (
+                      "Entrar"
+                    )}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setRecuperando((v) => !v);
+                      setAvisoRecuperacao("");
+                    }}
+                    className="w-full text-center text-sm font-medium text-stone-500 underline-offset-4 transition hover:text-stone-700 hover:underline"
+                  >
+                    Esqueci minha senha
+                  </button>
+
+                  {recuperando && (
+                    <div className="rounded-xl border border-stone-200 bg-stone-50 p-3.5">
+                      <p className="text-sm text-stone-600">
+                        Informe o e-mail da conta — enviaremos um link para escolher uma nova senha
+                        (vale 1 hora).
+                      </p>
+                      <div className="mt-2.5 flex gap-2">
+                        <input
+                          type="email"
+                          placeholder="seu@email.com"
+                          value={emailRecuperacao}
+                          onChange={(e) => setEmailRecuperacao(e.target.value)}
+                          className="h-10 flex-1 rounded-lg border border-stone-200 bg-white px-3 text-sm text-stone-900 outline-none transition placeholder:text-stone-400 focus:border-stone-400 focus:ring-4 focus:ring-stone-400/10"
+                        />
+                        <button
+                          type="button"
+                          onClick={solicitarRecuperacao}
+                          disabled={enviandoRecuperacao || !emailRecuperacao.trim()}
+                          className="inline-flex h-10 items-center gap-1.5 rounded-lg bg-stone-800 px-3.5 text-sm font-semibold text-white transition hover:bg-stone-700 disabled:opacity-50"
+                        >
+                          {enviandoRecuperacao && <LoaderCircle className="h-4 w-4 animate-spin" />} Enviar
+                        </button>
+                      </div>
+                      {avisoRecuperacao && (
+                        <p className="mt-2 rounded-lg bg-white px-3 py-2 text-sm text-stone-700">{avisoRecuperacao}</p>
+                      )}
+                    </div>
+                  )}
+                </form>
+              </>
+            )}
           </div>
 
           {/* Acesso rápido para demonstração — visível também em produção,
               para que novas pessoas possam experimentar o portal livremente.
-              O administrador da plataforma NUNCA aparece aqui: o acesso de
+              Aparece na etapa 2, filtrado pelo tipo escolhido. O
+              administrador da plataforma NUNCA aparece aqui: o acesso de
               gestão é exclusivo do login pessoal dele. */}
-          <div className="mt-6">
-            <p className="text-[13px] font-medium uppercase tracking-[0.06em] text-stone-400">
-              Acesso rápido para demonstração
-            </p>
-            <div className="mt-3 grid grid-cols-1 gap-2.5 lg:grid-cols-2">
-              {rapidos.map((r) => (
-                <button
-                  key={r.email}
-                  type="button"
-                  disabled={enviando}
-                  onClick={() => submeter({ email: r.email, senha: r.senha })}
-                  className="whitespace-nowrap rounded-full bg-white px-4 py-3 text-left text-sm text-stone-800 transition hover:bg-stone-50 disabled:opacity-50"
-                >
-                  {r.etiqueta}
-                </button>
-              ))}
+          {tipo && tipo !== "PLATAFORMA" && (
+            <div className="mt-6">
+              <p className="text-[13px] font-medium uppercase tracking-[0.06em] text-stone-400">
+                Acesso rápido para demonstração
+              </p>
+              {rapidos.length > 0 ? (
+                <div className="mt-3 grid grid-cols-1 gap-2.5 lg:grid-cols-2">
+                  {rapidos.map((r) => (
+                    <button
+                      key={r.email}
+                      type="button"
+                      disabled={enviando}
+                      onClick={() => submeter({ email: r.email, senha: r.senha, tipo: r.tipo })}
+                      className="whitespace-nowrap rounded-full bg-white px-4 py-3 text-left text-sm text-stone-800 transition hover:bg-stone-50 disabled:opacity-50"
+                    >
+                      {r.etiqueta}
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <p className="mt-3 text-sm text-stone-500">
+                  Nenhum acesso de demonstração deste tipo no {condo.nome}.
+                </p>
+              )}
             </div>
-          </div>
+          )}
+          {tipo === "PLATAFORMA" && (
+            <p className="mt-6 rounded-xl border border-stone-200 bg-white px-4 py-3 text-[13px] leading-relaxed text-stone-500">
+              O acesso da plataforma é exclusivo por e-mail e senha do administrador — não existe
+              atalho de demonstração para este perfil.
+            </p>
+          )}
         </div>
       </div>
     </div>

@@ -14,6 +14,15 @@ import {
   limparTentativas,
 } from "@/lib/rate-limit";
 
+const TIPOS_VALIDOS = ["MORADOR", "GESTAO", "PORTARIA", "PLATAFORMA"];
+
+/** Grupo de tipo de usuário a partir do perfil do vínculo (tela de login). */
+function grupoDoPerfilVinculo(perfil: string): string {
+  if (perfil === "PORTARIA") return "PORTARIA";
+  if (perfil === "MORADOR") return "MORADOR";
+  return "GESTAO"; // SINDICO | ADMINISTRATIVO | FUNCAO — equipe de gestão
+}
+
 export async function POST(req: Request) {
   const chave = ipDaRequisicao(req);
   if (!(await permitirTentativa(chave))) {
@@ -23,7 +32,7 @@ export async function POST(req: Request) {
     );
   }
 
-  const { email, senha, condominioId } = await req.json().catch(() => ({}) as never);
+  const { email, senha, condominioId, tipo } = await req.json().catch(() => ({}) as never);
   if (!email?.trim() || !senha) {
     return Response.json({ erro: "Informe e-mail e senha." }, { status: 400 });
   }
@@ -69,7 +78,27 @@ export async function POST(req: Request) {
       vinculos[0].condominioId;
   }
 
-  await limparTentativas(chave);
+  // ── Conferência do tipo de usuário escolhido na tela de login ──
+  // A tela pergunta "Que tipo de usuário é você?". Quando o tipo não
+  // coincide com a conta (senha correta), devolvemos o tipo correto —
+  // a interface ajusta a seleção e o usuário entra na sequência
+  // (a senha já validada continua valendo; ninguém é bloqueado).
+  if (tipo && TIPOS_VALIDOS.includes(String(tipo))) {
+    const grupoConta =
+      alvo.perfil === "PLATAFORMA"
+        ? "PLATAFORMA"
+        : grupoDoPerfilVinculo(
+            alvo.vinculos.find((v) => v.condominioId === condominioAtivoId)?.perfil ??
+              alvo.vinculos[0]?.perfil ??
+              alvo.perfil,
+          );
+    if (grupoConta !== String(tipo)) {
+      return Response.json(
+        { erro: "Tipo de usuário diferente do selecionado.", perfilCorreto: grupoConta },
+        { status: 403 },
+      );
+    }
+  }
 
   const loja = await cookies();
   // Login novo começa limpo: encerra qualquer simulação anterior (o delete

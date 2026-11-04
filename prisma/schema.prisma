@@ -118,6 +118,7 @@ model Usuario {
   perfil       String // perfil principal: SINDICO | ADMINISTRATIVO | PORTARIA | MORADOR | PLATAFORMA
   telefone     String?
   ativo        Boolean    @default(true)
+  tutorialVisto Boolean   @default(false) // mini tutorial guiado do primeiro acesso já concluído
   unidadeId    String?
   unidade      Unidade?   @relation(fields: [unidadeId], references: [id])
   criadoEm     DateTime   @default(now())

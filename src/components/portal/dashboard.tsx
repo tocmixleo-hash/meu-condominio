@@ -221,7 +221,7 @@ export default function Dashboard({
             {DESCRICAO_PERFIL[perfil]}
           </p>
         </div>
-        <div className="hidden shrink-0 items-center gap-2 sm:flex">
+        <div data-tour="acoes-rapidas" className="hidden shrink-0 items-center gap-2 sm:flex">
           {ACOES[perfil].map((acao) => (
             <BotaoSecundario key={acao.destino + acao.rotulo} onClick={() => aoTrocar(acao.destino)}>
               {acao.rotulo}
@@ -231,7 +231,7 @@ export default function Dashboard({
       </header>
 
       {/* Ações rápidas no celular */}
-      <div className="flex flex-wrap gap-2 sm:hidden">
+      <div data-tour="acoes-rapidas" className="flex flex-wrap gap-2 sm:hidden">
         {ACOES[perfil].map((acao) => (
           <BotaoSecundario key={"m-" + acao.destino + acao.rotulo} onClick={() => aoTrocar(acao.destino)}>
             {acao.rotulo}
@@ -251,7 +251,7 @@ export default function Dashboard({
           {/* Morador */}
           {dados.perfil === "MORADOR" && (
             <>
-              <Secao titulo="Comunicados recentes">
+              <Secao titulo="Comunicados recentes" tour="dash-comunicados">
                 <Lista className="border-t border-[var(--cor-neutra)]">
                   {dados.comunicadosRecentes?.length ? (
                     dados.comunicadosRecentes.slice(0, 3).map((c) => (
@@ -268,7 +268,7 @@ export default function Dashboard({
                 </Lista>
               </Secao>
 
-              <Secao titulo="Minhas reservas próximas">
+              <Secao titulo="Minhas reservas próximas" tour="dash-reservas">
                 <Lista className="border-t border-[var(--cor-neutra)]">
                   {dados.reservasProximas?.length ? (
                     dados.reservasProximas.slice(0, 3).map((r) => (
@@ -351,7 +351,7 @@ export default function Dashboard({
           {/* Gestão (síndico/administrativo) */}
           {(dados.perfil === "SINDICO" || dados.perfil === "ADMINISTRATIVO") && (
             <>
-              <Secao titulo="Reservas aguardando aprovação">
+              <Secao titulo="Reservas aguardando aprovação" tour="dash-reservas-pendentes">
                 <Lista className="border-t border-[var(--cor-neutra)]">
                   {dados.reservasLista?.length ? (
                     dados.reservasLista.slice(0, 3).map((r) => (
@@ -416,7 +416,7 @@ export default function Dashboard({
                 </Lista>
               </Secao>
 
-              <Secao titulo="Ocorrências em andamento">
+              <Secao titulo="Ocorrências em andamento" tour="dash-ocorrencias">
                 <Lista className="border-t border-[var(--cor-neutra)]">
                   {dados.ocorrenciasRecentes?.length ? (
                     dados.ocorrenciasRecentes.slice(0, 4).map((o) => (
@@ -453,7 +453,7 @@ export default function Dashboard({
           {/* Portaria */}
           {dados.perfil === "PORTARIA" && (
             <>
-              <Secao titulo="Encomendas na portaria">
+              <Secao titulo="Encomendas na portaria" tour="dash-encomendas">
                 <Lista className="border-t border-[var(--cor-neutra)]">
                   {dados.encomendasRecentes?.length ? (
                     dados.encomendasRecentes.slice(0, 3).map((e) => (
@@ -475,7 +475,7 @@ export default function Dashboard({
                 </Lista>
               </Secao>
 
-              <Secao titulo="Autorizações de acesso válidas">
+              <Secao titulo="Autorizações de acesso válidas" tour="dash-autorizacoes">
                 <Lista className="border-t border-[var(--cor-neutra)]">
                   {dados.autorizacoesRecentes?.length ? (
                     dados.autorizacoesRecentes.slice(0, 3).map((a) => (

@@ -116,6 +116,7 @@ export type UsuarioSessao = {
   funcaoNome: string | null; // nome da função personalizada (quando o vínculo é FUNCAO)
   telefone: string | null;
   ativo: boolean;
+  tutorialVisto: boolean; // mini tutorial do primeiro acesso já concluído
   unidade: { id: string; bloco: string; numero: string } | null;
   condominio: CondominioSessao; // condomínio ativo
   condominios: CondominioSessao[]; // condomínios acessíveis (vínculos ou todos)
@@ -258,6 +259,7 @@ async function montarSessao(
     perfil: string;
     telefone: string | null;
     ativo: boolean;
+    tutorialVisto: boolean;
     condominioId: string;
     unidadeId: string | null;
     unidade: { id: string; bloco: string; numero: string } | null;
@@ -280,6 +282,7 @@ async function montarSessao(
       funcaoNome: null,
       telefone: u.telefone,
       ativo: u.ativo,
+      tutorialVisto: u.tutorialVisto,
       unidade: null,
       condominio: paraSessao(ativo),
       condominios: todos.map(paraSessao),
@@ -306,6 +309,7 @@ async function montarSessao(
     funcaoNome,
     telefone: u.telefone,
     ativo: u.ativo,
+    tutorialVisto: u.tutorialVisto,
     unidade: unidade
       ? { id: unidade.id, bloco: unidade.bloco, numero: unidade.numero }
       : null,

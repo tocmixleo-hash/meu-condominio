@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import AppShell, { type ModuloId, type Perfil } from "@/components/portal/app-shell";
 import type { SimulacaoUI } from "@/components/portal/app-shell";
 import LoginScreen, { type CondominioUI } from "@/components/portal/login-screen";
@@ -18,6 +18,8 @@ import Auditoria from "@/components/portal/auditoria";
 import Identidade from "@/components/portal/identidade";
 import Condominios from "@/components/portal/condominios";
 import Funcoes from "@/components/portal/funcoes";
+import TourGuiado from "@/components/portal/tour-guiado";
+import { passosDoTutorial } from "@/components/portal/tour-passos";
 import { mensagemDeErro } from "@/lib/api-cliente";
 
 type Usuario = {
@@ -27,6 +29,7 @@ type Usuario = {
   perfil: Perfil;
   funcaoNome?: string | null;
   permissoes?: string[];
+  tutorialVisto?: boolean;
   unidade?: { bloco: string; numero: string } | null;
   condominio?: CondominioUI;
   condominios?: CondominioUI[];
@@ -48,6 +51,9 @@ export default function Inicio() {
   const [carregando, setCarregando] = useState(true);
   const [modulo, setModulo] = useState<ModuloId>("inicio");
   const [aviso, setAviso] = useState("");
+  // Mini tutorial do primeiro acesso (passeio guiado)
+  const [tour, setTour] = useState(false);
+  const tourJaExibido = useRef(false);
 
   const verificar = useCallback(() => {
     fetch("/api/auth/verificar")
@@ -61,11 +67,53 @@ export default function Inicio() {
 
   useEffect(verificar, [verificar]);
 
+  // Abre o tutorial automaticamente: no primeiro acesso de cada usuário
+  // (flag tutorialVisto) e, durante a simulação de perfis, uma vez por
+  // navegador/sessão para cada perfil "vestido" — sem gravar nada no banco.
+  useEffect(() => {
+    if (!usuario || carregando || tour || tourJaExibido.current) return;
+    if (usuario.simulando) {
+      const chave = `mc-tour-sim:${usuario.simulando.funcaoId ?? usuario.simulando.perfil}`;
+      if (typeof window !== "undefined" && !window.sessionStorage.getItem(chave)) {
+        tourJaExibido.current = true;
+        setTour(true);
+      }
+    } else if (usuario.tutorialVisto === false) {
+      tourJaExibido.current = true;
+      setTour(true);
+    }
+  }, [usuario, carregando, tour]);
+
+  // Conclusão (ou pulo) do tutorial: persiste o flag do usuário real;
+  // na simulação fica apenas na sessão do navegador.
+  async function concluirTour() {
+    setTour(false);
+    if (!usuario) return;
+    if (usuario.simulando) {
+      const chave = `mc-tour-sim:${usuario.simulando.funcaoId ?? usuario.simulando.perfil}`;
+      window.sessionStorage.setItem(chave, "1");
+      return;
+    }
+    setUsuario({ ...usuario, tutorialVisto: true });
+    try {
+      await fetch("/api/usuario/tutorial", { method: "POST" });
+    } catch {
+      // sem conexão neste instante — o passeio apenas não fica marcado
+    }
+  }
+
+  // "Rever tutorial" no rodapé do menu: volta ao Início e reabre o passeio
+  function reverTutorial() {
+    setModulo("inicio");
+    setTour(true);
+  }
+
   async function sair() {
     await fetch("/api/auth/logout", { method: "POST" }).catch(() => null);
     setUsuario(null);
     setModulo("inicio");
     setAviso("");
+    setTour(false); // encerra o tutorial aberto, se houver
   }
 
   async function trocarCondominio(id: string) {
@@ -161,6 +209,7 @@ export default function Inicio() {
       aoTrocarCondominio={trocarCondominio}
       aoSimular={simular}
       aoEncerrarSimulacao={encerrarSimulacao}
+      aoReverTutorial={reverTutorial}
       aoSair={sair}
     >
       {aviso && (
@@ -197,6 +246,14 @@ export default function Inicio() {
       )}
       {modulo === "condominios" && (
         <Condominios ativoId={condominio.id} aoOperar={trocarCondominio} />
+      )}
+
+      {/* Mini tutorial do primeiro acesso (e "Rever tutorial") */}
+      {tour && usuario && (
+        <TourGuiado
+          passos={passosDoTutorial(usuario.perfil, usuario.nome)}
+          aoConcluir={concluirTour}
+        />
       )}
     </AppShell>
   );

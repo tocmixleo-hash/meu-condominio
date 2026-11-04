@@ -12,6 +12,7 @@ import {
   DoorOpen,
   Eye,
   FileText,
+  GraduationCap,
   History,
   Home,
   KeyRound,
@@ -153,7 +154,7 @@ function SeletorCondominio({
   if (condominios.length <= 1) {
     // Vínculo único — identificação simples do condomínio conectado
     return (
-      <div className="mt-3 flex items-center gap-2.5">
+      <div data-tour="seletor-condominio" className="mt-3 flex items-center gap-2.5">
         <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-white p-1">
           <Image
             src={condominio.logo}
@@ -171,7 +172,7 @@ function SeletorCondominio({
   }
 
   return (
-    <div className="relative mt-3">
+    <div data-tour="seletor-condominio" className="relative mt-3">
       <button
         onClick={() => setAberto((v) => !v)}
         aria-expanded={aberto}
@@ -459,6 +460,7 @@ export default function AppShell({
   aoTrocarCondominio,
   aoSimular,
   aoEncerrarSimulacao,
+  aoReverTutorial,
   aoSair,
   children,
 }: {
@@ -475,6 +477,7 @@ export default function AppShell({
   aoTrocarCondominio: (id: string) => void;
   aoSimular?: (perfil: string, funcaoId?: string) => void;
   aoEncerrarSimulacao?: () => void;
+  aoReverTutorial?: () => void;
   aoSair: () => void;
   children: React.ReactNode;
 }) {
@@ -502,7 +505,7 @@ export default function AppShell({
   }
 
   const nav = (
-    <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto px-3 py-4">
+    <nav data-tour="menu" className="flex flex-1 flex-col gap-0.5 overflow-y-auto px-3 py-4">
       {itens.map((item) => {
         const ativo = item.id === modulo;
         const Icone = item.icone;
@@ -550,7 +553,7 @@ export default function AppShell({
   );
 
   const rodape = (
-    <div className="border-t border-[var(--cor-tema-hover)] px-5 py-4">
+    <div data-tour="usuario" className="border-t border-[var(--cor-tema-hover)] px-5 py-4">
       <div className="flex items-center gap-3">
         <span
           aria-hidden
@@ -575,6 +578,13 @@ export default function AppShell({
           className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-[var(--cor-clara-a85)] transition-colors hover:bg-[var(--cor-tema-hover-a60)] hover:text-[var(--cor-fundo)]"
         >
           <KeyRound className="h-4 w-4" /> Alterar senha
+        </button>
+        <button
+          onClick={aoReverTutorial}
+          title="Rever o tutorial do portal"
+          className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-[var(--cor-clara-a85)] transition-colors hover:bg-[var(--cor-tema-hover-a60)] hover:text-[var(--cor-fundo)]"
+        >
+          <GraduationCap className="h-4 w-4" /> Rever tutorial
         </button>
         {perfil === "PLATAFORMA" && !simulando && aoSimular && (
           <button
@@ -647,6 +657,7 @@ export default function AppShell({
         <header className="flex items-center gap-3 border-b border-[var(--cor-neutra)] bg-white px-4 py-2.5 md:hidden">
           <button
             aria-label="Abrir menu"
+            data-tour="botao-menu"
             onClick={() => setMenuAberto(true)}
             className="rounded-md p-1.5 text-[var(--cor-fg-suave)] hover:bg-[var(--cor-neutra)]"
           >

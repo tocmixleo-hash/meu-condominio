@@ -44,14 +44,16 @@ export function Secao({
   acao,
   children,
   className = "",
+  tour, // marcador data-tour usado pelo tutorial guiado do primeiro acesso
 }: {
   titulo: string;
   acao?: ReactNode;
   children: ReactNode;
   className?: string;
+  tour?: string;
 }) {
   return (
-    <section className={className}>
+    <section data-tour={tour} className={className}>
       <div className="mb-1 flex items-center justify-between gap-3">
         <h2 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-500">
           {titulo}

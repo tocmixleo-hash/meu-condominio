@@ -121,3 +121,26 @@ apenas pelo e-mail e senha próprios.
   diariamente no seu CI/cron; execução é somente leitura e segura a qualquer momento).
 - Módulo financeiro: **fora do escopo** por decisão do cliente (empresa externa cuida do
   financeiro; a arquitetura de vínculos por condomínio fica pronta para integração futura).
+
+## 7. Fase 3 — Tipo de usuário no login e tutorial do primeiro acesso
+
+- **Pergunta de tipo na tela de login**: antes do e-mail/senha, o portal pergunta
+  "Que tipo de usuário é você?" (Morador · Síndico ou administração · Portaria ·
+  Administrador da plataforma). O backend confere a escolha contra a conta
+  informada; se diferir, responde `403 { perfilCorreto }` e a tela ajusta a
+  seleção com um aviso claro — **ninguém é bloqueado** (a senha já validada
+  continua valendo para a nova tentativa). O acesso rápido de demonstração
+  passou a ser filtrado pelo tipo escolhido e o administrador da plataforma
+  segue sem atalho (apenas e-mail e senha).
+- **Mini tutorial do primeiro acesso**: passeio guiado (holofote) de 4–6 passos
+  com roteiro próprio por perfil, destacando ações rápidas, seções do painel,
+  menu lateral e conta. Marcado por usuário em `Usuario.tutorialVisto`
+  (`POST /api/usuario/tutorial`); "Pular" também marca como visto e o rodapé do
+  menu ganhou **"Rever tutorial"**. Na simulação de perfis o passeio usa apenas
+  a sessão do navegador (`mc-tour-sim:<perfil>`) — nada é gravado no banco.
+- Migração incremental (idempotente, preserva dados):
+  `bun scripts/migrar-turso-tutorial.mjs` — já aplicada no Turso de produção
+  (todos os usuários existentes começam com `tutorialVisto = false` e verão o
+  passeio uma única vez no próximo acesso).
+- Suíte nova: `bun scripts/testes-tutorial.mjs` (13 — compatibilidade sem tipo,
+  tipos corretos/errados por perfil, sessão, marcação idempotente e 401).
