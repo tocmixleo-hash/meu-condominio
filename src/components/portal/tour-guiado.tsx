@@ -102,7 +102,7 @@ export default function TourGuiado({
   const ultimo = i === passos.length - 1;
 
   // ── Posição do cartão ─────────────────────────────────────────
-  const alturaCartao = 210; // estimativa — usada só para decidir acima/abaixo
+  const alturaCartao = 260; // estimativa — usada só para decidir acima/abaixo
   let cartao: React.CSSProperties;
   if (rect) {
     const acima = rect.bottom + alturaCartao + ESPACO > window.innerHeight - 16;
@@ -167,16 +167,15 @@ export default function TourGuiado({
         <h3 className="mt-1.5 text-[17px] font-bold leading-snug text-stone-900">{passo.titulo}</h3>
         <p className="mt-1.5 text-sm leading-relaxed text-stone-600">{passo.texto}</p>
 
-        <div className="mt-4 flex items-center justify-between gap-3">
-          <button
-            onClick={aoConcluir}
-            className="text-sm font-medium text-stone-400 underline-offset-4 transition hover:text-stone-600 hover:underline"
-          >
-            Pular
-          </button>
-          <div className="flex items-center gap-2">
-            {/* Indicadores de progresso */}
-            <div className="mr-1 flex items-center gap-1.5" aria-hidden>
+        {/* Rodapé em duas linhas: cabe em qualquer largura de cartão
+            (na versão anterior, Pular + pontos + Voltar + Próximo na mesma
+            linha somavam ~337px numa área interna de 300px e o botão de
+            confirmação saía para fora do cartão — inclusive da tela no
+            celular). */}
+        <div className="mt-4 space-y-3">
+          {/* Linha 1: progresso + pular */}
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex min-w-0 flex-1 items-center gap-1.5" aria-hidden>
               {passos.map((_, n) => (
                 <span
                   key={n}
@@ -186,17 +185,26 @@ export default function TourGuiado({
                 />
               ))}
             </div>
+            <button
+              onClick={aoConcluir}
+              className="shrink-0 text-sm font-medium text-stone-400 underline-offset-4 transition hover:text-stone-600 hover:underline"
+            >
+              Pular
+            </button>
+          </div>
+          {/* Linha 2: navegação (botões dividem a largura total) */}
+          <div className="flex items-center gap-2">
             {i > 0 && (
               <button
                 onClick={() => setI((v) => Math.max(0, v - 1))}
-                className="flex items-center gap-1 rounded-lg border border-stone-200 px-3 py-2 text-sm font-medium text-stone-600 transition hover:bg-stone-50"
+                className="flex flex-1 items-center justify-center gap-1 whitespace-nowrap rounded-lg border border-stone-200 px-3 py-2 text-sm font-medium text-stone-600 transition hover:bg-stone-50"
               >
                 <ChevronLeft className="h-4 w-4" /> Voltar
               </button>
             )}
             <button
               onClick={() => (ultimo ? aoConcluir() : setI((v) => v + 1))}
-              className="flex items-center gap-1 rounded-lg bg-[var(--cor-tema,#4D403A)] px-3.5 py-2 text-sm font-semibold text-white transition hover:bg-[var(--cor-tema-botao-hover,#3f3730)]"
+              className="flex flex-1 items-center justify-center gap-1 whitespace-nowrap rounded-lg bg-[var(--cor-tema,#4D403A)] px-3.5 py-2 text-sm font-semibold text-white transition hover:bg-[var(--cor-tema-botao-hover,#3f3730)]"
             >
               {ultimo ? (
                 <>
