@@ -60,3 +60,4 @@ server.log
 
 # CI habilitado manualmente (token sem escopo workflow)
 .github/workflows/
+.vercel
