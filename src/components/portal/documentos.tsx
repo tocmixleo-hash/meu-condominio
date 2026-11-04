@@ -116,7 +116,7 @@ export default function Documentos({ perfil }: { perfil: Perfil }) {
                   <div className="flex items-center gap-3">
                     <Badge>{ROTULO_CATEGORIA_DOCUMENTO[d.categoria] ?? d.categoria}</Badge>
                     <a
-                      href={`/uploads/${d.nomeArquivo}`}
+                      href={`/api/documentos/arquivo/${d.nomeArquivo}`}
                       target="_blank"
                       rel="noreferrer"
                       className="text-sm font-medium text-[#4D403A] underline-offset-4 hover:underline"

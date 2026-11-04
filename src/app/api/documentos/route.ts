@@ -3,7 +3,13 @@ import { json401, json403, usuarioAtual } from "@/lib/auth";
 import { mkdir, writeFile, unlink } from "fs/promises";
 import path from "path";
 
-const PASTA = path.join(process.cwd(), "public", "uploads");
+// No Vercel o filesystem é somente leitura (exceto /tmp); local usa public/uploads.
+const PASTA =
+  process.env.PASTA_UPLOADS
+    ? path.resolve(process.env.PASTA_UPLOADS)
+    : process.env.VERCEL
+      ? "/tmp/uploads"
+      : path.join(process.cwd(), "public", "uploads");
 const MAX_BYTES = 8 * 1024 * 1024;
 
 export async function GET() {
@@ -54,11 +60,11 @@ export async function DELETE(req: Request) {
   const eu = await usuarioAtual();
   if (!eu) return json401();
   if (!["SINDICO", "ADMINISTRATIVO"].includes(eu.perfil)) return json403();
-  const { id } = await req.json().catch(() => ({}) as never);
+  const { id } = await req.json().catch(() => ({} as never));
   const doc = await db.documento.findUnique({ where: { id } });
   if (!doc) return Response.json({ erro: "Documento não encontrado." }, { status: 404 });
 
   await unlink(path.join(PASTA, doc.nomeArquivo)).catch(() => null);
-  await db.documento.delete({ where: { id } });
+  await db.documento.delete({ where: { id: doc.id } });
   return Response.json({ ok: true });
 }

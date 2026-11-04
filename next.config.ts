@@ -2,7 +2,10 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: "standalone",
-  /* config options here */
+  // Garante que o banco de demonstração entre no bundle serverless do Vercel.
+  outputFileTracingIncludes: {
+    "/**": ["./db/custom.db"],
+  },
   typescript: {
     ignoreBuildErrors: true,
   },
