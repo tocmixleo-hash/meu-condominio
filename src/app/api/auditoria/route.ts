@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { ehGestao, json401, json403, usuarioAtual } from "@/lib/auth";
-import { ROTULO_ACAO } from "@/lib/auditoria";
+import { ROTULO_ACAO } from "@/lib/rotulos";
 
 // Histórico de ações do condomínio — apenas gestão.
 export async function GET(req: Request) {

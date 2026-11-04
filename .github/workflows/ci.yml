@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Instalar dependências
+        run: bun install
+
+      - name: Lint
+        run: bun run lint
+
+      - name: Verificação de tipos
+        run: bunx tsc --noEmit
+
+      - name: Build
+        run: bun run build

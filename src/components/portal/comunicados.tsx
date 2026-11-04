@@ -83,7 +83,7 @@ export default function Comunicados({ perfil }: { perfil: Perfil }) {
         ) : lista.length === 0 ? (
           <EstadoVazio mensagem="Nenhum comunicado publicado ainda." />
         ) : (
-          <Lista className="border-t border-[#EFE9E1]">
+          <Lista className="border-t border-[var(--cor-neutra)]">
             {lista.map((c) => (
               <div key={c.id} className="py-4">
                 <div className="flex items-start justify-between gap-3">
@@ -116,7 +116,7 @@ export default function Comunicados({ perfil }: { perfil: Perfil }) {
             className="absolute inset-0 bg-black/40"
             onClick={() => setAberto(false)}
           />
-          <div className="relative w-full max-w-lg rounded-lg border border-[#EFE9E1] bg-white p-6 shadow-xl">
+          <div className="relative w-full max-w-lg rounded-lg border border-[var(--cor-neutra)] bg-white p-6 shadow-xl">
             <h3 className="text-base font-semibold text-stone-900">Publicar comunicado</h3>
             <p className="mt-0.5 text-sm text-stone-500">
               Visível para todos os moradores e funcionários.
@@ -126,20 +126,20 @@ export default function Comunicados({ perfil }: { perfil: Perfil }) {
                 placeholder="Título"
                 value={form.titulo}
                 onChange={(e) => setForm({ ...form, titulo: e.target.value })}
-                className="h-10 w-full rounded-md border border-[#dfdacf] px-3 text-sm outline-none focus:border-[#a3968d] focus:ring-2 focus:ring-[#a3968d]/30"
+                className="h-10 w-full rounded-md border border-[var(--cor-neutra-2)] px-3 text-sm outline-none focus:border-[var(--cor-tema-suave)] focus:ring-2 focus:ring-[var(--cor-tema-suave)]/30"
               />
               <textarea
                 placeholder="Conteúdo do comunicado"
                 rows={5}
                 value={form.conteudo}
                 onChange={(e) => setForm({ ...form, conteudo: e.target.value })}
-                className="w-full rounded-md border border-[#dfdacf] px-3 py-2 text-sm outline-none focus:border-[#a3968d] focus:ring-2 focus:ring-[#a3968d]/30"
+                className="w-full rounded-md border border-[var(--cor-neutra-2)] px-3 py-2 text-sm outline-none focus:border-[var(--cor-tema-suave)] focus:ring-2 focus:ring-[var(--cor-tema-suave)]/30"
               />
               <div className="grid grid-cols-2 gap-3">
                 <select
                   value={form.categoria}
                   onChange={(e) => setForm({ ...form, categoria: e.target.value })}
-                  className="h-10 w-full rounded-md border border-[#dfdacf] bg-white px-3 text-sm outline-none focus:border-[#a3968d]"
+                  className="h-10 w-full rounded-md border border-[var(--cor-neutra-2)] bg-white px-3 text-sm outline-none focus:border-[var(--cor-tema-suave)]"
                 >
                   {Object.entries(ROTULO_CATEGORIA_COMUNICADO).map(([k, v]) => (
                     <option key={k} value={k}>
@@ -150,7 +150,7 @@ export default function Comunicados({ perfil }: { perfil: Perfil }) {
                 <select
                   value={form.prioridade}
                   onChange={(e) => setForm({ ...form, prioridade: e.target.value })}
-                  className="h-10 w-full rounded-md border border-[#dfdacf] bg-white px-3 text-sm outline-none focus:border-[#a3968d]"
+                  className="h-10 w-full rounded-md border border-[var(--cor-neutra-2)] bg-white px-3 text-sm outline-none focus:border-[var(--cor-tema-suave)]"
                 >
                   <option value="NORMAL">Prioridade normal</option>
                   <option value="ALTA">Prioridade alta</option>

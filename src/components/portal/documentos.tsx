@@ -103,7 +103,7 @@ export default function Documentos({ perfil }: { perfil: Perfil }) {
         ) : lista.length === 0 ? (
           <EstadoVazio mensagem="Nenhum documento disponível." />
         ) : (
-          <Lista className="border-t border-[#EFE9E1]">
+          <Lista className="border-t border-[var(--cor-neutra)]">
             {lista.map((d) => (
               <LinhaLista
                 key={d.id}
@@ -119,7 +119,7 @@ export default function Documentos({ perfil }: { perfil: Perfil }) {
                       href={`/api/documentos/arquivo/${d.nomeArquivo}`}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-sm font-medium text-[#4D403A] underline-offset-4 hover:underline"
+                      className="text-sm font-medium text-[var(--cor-tema)] underline-offset-4 hover:underline"
                     >
                       Abrir
                     </a>
@@ -143,7 +143,7 @@ export default function Documentos({ perfil }: { perfil: Perfil }) {
             className="absolute inset-0 bg-black/40"
             onClick={() => setAberto(false)}
           />
-          <div className="relative w-full max-w-md rounded-lg border border-[#EFE9E1] bg-white p-6 shadow-xl">
+          <div className="relative w-full max-w-md rounded-lg border border-[var(--cor-neutra)] bg-white p-6 shadow-xl">
             <h3 className="text-base font-semibold text-stone-900">Enviar documento</h3>
             <p className="mt-0.5 text-sm text-stone-500">PDF ou imagem, até 8 MB.</p>
             <div className="mt-4 space-y-3">
@@ -151,12 +151,12 @@ export default function Documentos({ perfil }: { perfil: Perfil }) {
                 placeholder="Título do documento"
                 value={titulo}
                 onChange={(e) => setTitulo(e.target.value)}
-                className="h-10 w-full rounded-md border border-[#dfdacf] px-3 text-sm outline-none focus:border-[#a3968d] focus:ring-2 focus:ring-[#a3968d]/30"
+                className="h-10 w-full rounded-md border border-[var(--cor-neutra-2)] px-3 text-sm outline-none focus:border-[var(--cor-tema-suave)] focus:ring-2 focus:ring-[var(--cor-tema-suave)]/30"
               />
               <select
                 value={categoria}
                 onChange={(e) => setCategoria(e.target.value)}
-                className="h-10 w-full rounded-md border border-[#dfdacf] bg-white px-3 text-sm outline-none focus:border-[#a3968d]"
+                className="h-10 w-full rounded-md border border-[var(--cor-neutra-2)] bg-white px-3 text-sm outline-none focus:border-[var(--cor-tema-suave)]"
               >
                 {Object.entries(ROTULO_CATEGORIA_DOCUMENTO).map(([k, v]) => (
                   <option key={k} value={k}>
@@ -169,7 +169,7 @@ export default function Documentos({ perfil }: { perfil: Perfil }) {
                 type="file"
                 accept=".pdf,image/*"
                 onChange={(e) => setArquivo(e.target.files?.[0] ?? null)}
-                className="block w-full text-sm text-stone-600 file:mr-3 file:rounded-md file:border-0 file:bg-[#EFE9E1] file:px-3 file:py-2 file:text-sm file:font-medium file:text-[#4D403A] hover:file:bg-[#dfdacf]"
+                className="block w-full text-sm text-stone-600 file:mr-3 file:rounded-md file:border-0 file:bg-[var(--cor-neutra)] file:px-3 file:py-2 file:text-sm file:font-medium file:text-[var(--cor-tema)] hover:file:bg-[var(--cor-neutra-2)]"
               />
               {erro && <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{erro}</p>}
             </div>

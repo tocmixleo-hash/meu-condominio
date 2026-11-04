@@ -1,13 +1,18 @@
 import { db } from "@/lib/db";
 import { COOKIE_SESSAO, conferirSenha, criarToken } from "@/lib/auth";
 import { cookies } from "next/headers";
-import { ipDaRequisicao, permitirTentativa } from "@/lib/rate-limit";
+import {
+  ipDaRequisicao,
+  permitirTentativa,
+  registrarFalha,
+  limparTentativas,
+} from "@/lib/rate-limit";
 
 export async function POST(req: Request) {
-  const ip = ipDaRequisicao(req);
-  if (!permitirTentativa(ip)) {
+  const chave = ipDaRequisicao(req);
+  if (!permitirTentativa(chave)) {
     return Response.json(
-      { erro: "Muitas tentativas. Aguarde alguns minutos antes de tentar novamente." },
+      { erro: "Muitas tentativas incorretas. Aguarde alguns minutos antes de tentar novamente." },
       { status: 429 },
     );
   }
@@ -25,11 +30,14 @@ export async function POST(req: Request) {
     include: { unidade: true, condominio: true },
   });
   if (!u || !conferirSenha(String(senha), u.senha)) {
+    registrarFalha(chave);
     return Response.json({ erro: "E-mail ou senha incorretos." }, { status: 401 });
   }
   if (!u.ativo) {
     return Response.json({ erro: "Cadastro desativado. Fale com a administração." }, { status: 403 });
   }
+
+  limparTentativas(chave);
 
   const loja = await cookies();
   loja.set(COOKIE_SESSAO, criarToken(u.id), {

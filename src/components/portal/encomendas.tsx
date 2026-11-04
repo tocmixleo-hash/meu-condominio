@@ -131,7 +131,7 @@ export default function Encomendas({ perfil }: { perfil: Perfil }) {
             }
           />
         ) : (
-          <Lista className="border-t border-[#EFE9E1]">
+          <Lista className="border-t border-[var(--cor-neutra)]">
             {lista.map((e) => (
               <LinhaLista
                 key={e.id}
@@ -182,7 +182,7 @@ export default function Encomendas({ perfil }: { perfil: Perfil }) {
             className="absolute inset-0 bg-black/40"
             onClick={() => setRegistrar(false)}
           />
-          <div className="relative w-full max-w-md rounded-lg border border-[#EFE9E1] bg-white p-6 shadow-xl">
+          <div className="relative w-full max-w-md rounded-lg border border-[var(--cor-neutra)] bg-white p-6 shadow-xl">
             <h3 className="text-base font-semibold text-stone-900">Registrar encomenda</h3>
             <p className="mt-0.5 text-sm text-stone-500">
               Um código de retirada é gerado automaticamente para o morador.
@@ -192,19 +192,19 @@ export default function Encomendas({ perfil }: { perfil: Perfil }) {
                 placeholder="Descrição (ex.: caixa média dos Correios)"
                 value={form.descricao}
                 onChange={(e) => setForm({ ...form, descricao: e.target.value })}
-                className="h-10 w-full rounded-md border border-[#dfdacf] px-3 text-sm outline-none focus:border-[#a3968d] focus:ring-2 focus:ring-[#a3968d]/30"
+                className="h-10 w-full rounded-md border border-[var(--cor-neutra-2)] px-3 text-sm outline-none focus:border-[var(--cor-tema-suave)] focus:ring-2 focus:ring-[var(--cor-tema-suave)]/30"
               />
               <input
                 placeholder="Remetente (opcional)"
                 value={form.remetente}
                 onChange={(e) => setForm({ ...form, remetente: e.target.value })}
-                className="h-10 w-full rounded-md border border-[#dfdacf] px-3 text-sm outline-none focus:border-[#a3968d] focus:ring-2 focus:ring-[#a3968d]/30"
+                className="h-10 w-full rounded-md border border-[var(--cor-neutra-2)] px-3 text-sm outline-none focus:border-[var(--cor-tema-suave)] focus:ring-2 focus:ring-[var(--cor-tema-suave)]/30"
               />
               <div className="grid grid-cols-2 gap-3">
                 <select
                   value={form.categoria}
                   onChange={(e) => setForm({ ...form, categoria: e.target.value })}
-                  className="h-10 w-full rounded-md border border-[#dfdacf] bg-white px-3 text-sm outline-none focus:border-[#a3968d]"
+                  className="h-10 w-full rounded-md border border-[var(--cor-neutra-2)] bg-white px-3 text-sm outline-none focus:border-[var(--cor-tema-suave)]"
                 >
                   {Object.entries(ROTULO_CATEGORIA_ENCOMENDA).map(([k, v]) => (
                     <option key={k} value={k}>
@@ -215,7 +215,7 @@ export default function Encomendas({ perfil }: { perfil: Perfil }) {
                 <select
                   value={form.destinatarioId}
                   onChange={(e) => setForm({ ...form, destinatarioId: e.target.value })}
-                  className="h-10 w-full rounded-md border border-[#dfdacf] bg-white px-3 text-sm outline-none focus:border-[#a3968d]"
+                  className="h-10 w-full rounded-md border border-[var(--cor-neutra-2)] bg-white px-3 text-sm outline-none focus:border-[var(--cor-tema-suave)]"
                 >
                   <option value="">Destinatário…</option>
                   {moradores.map((m) => (
@@ -247,7 +247,7 @@ export default function Encomendas({ perfil }: { perfil: Perfil }) {
             className="absolute inset-0 bg-black/40"
             onClick={() => setLiberar(null)}
           />
-          <div className="relative w-full max-w-sm rounded-lg border border-[#EFE9E1] bg-white p-6 shadow-xl">
+          <div className="relative w-full max-w-sm rounded-lg border border-[var(--cor-neutra)] bg-white p-6 shadow-xl">
             <h3 className="text-base font-semibold text-stone-900">Liberar retirada</h3>
             <p className="mt-0.5 text-sm text-stone-500">
               Confirme o código informado pelo morador de{" "}
@@ -258,7 +258,7 @@ export default function Encomendas({ perfil }: { perfil: Perfil }) {
               placeholder="Código de 6 dígitos"
               value={codigo}
               onChange={(e) => setCodigo(e.target.value.replace(/\D/g, "").slice(0, 6))}
-              className="mt-4 h-11 w-full rounded-md border border-[#dfdacf] px-3 text-center text-lg font-semibold tracking-[0.3em] outline-none focus:border-[#a3968d] focus:ring-2 focus:ring-[#a3968d]/30"
+              className="mt-4 h-11 w-full rounded-md border border-[var(--cor-neutra-2)] px-3 text-center text-lg font-semibold tracking-[0.3em] outline-none focus:border-[var(--cor-tema-suave)] focus:ring-2 focus:ring-[var(--cor-tema-suave)]/30"
             />
             {erroCodigo && (
               <p className="mt-3 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{erroCodigo}</p>

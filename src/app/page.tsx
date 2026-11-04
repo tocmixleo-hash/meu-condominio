@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import AppShell, { type ModuloId, type Perfil } from "@/components/portal/app-shell";
-import LoginScreen from "@/components/portal/login-screen";
+import LoginScreen, { type CondominioUI } from "@/components/portal/login-screen";
 import Dashboard from "@/components/portal/dashboard";
 import Comunicados from "@/components/portal/comunicados";
 import Reservas from "@/components/portal/reservas";
@@ -11,6 +11,7 @@ import Autorizacoes from "@/components/portal/autorizacoes";
 import Documentos from "@/components/portal/documentos";
 import Assembleias from "@/components/portal/assembleias";
 import Moradores from "@/components/portal/moradores";
+import Auditoria from "@/components/portal/auditoria";
 
 type Usuario = {
   id: string;
@@ -18,6 +19,16 @@ type Usuario = {
   email: string;
   perfil: Perfil;
   unidade?: { bloco: string; numero: string } | null;
+  condominio?: CondominioUI;
+};
+
+const CONDOMINIO_PADRAO: CondominioUI = {
+  id: "",
+  nome: "Parque California",
+  slug: "california",
+  corTema: "#4D403A",
+  logo: "/fotos/logo-parque-california.png",
+  foto: "/fotos/parque-california.jpg",
 };
 
 export default function Inicio() {
@@ -45,7 +56,7 @@ export default function Inicio() {
 
   if (carregando) {
     return (
-      <div className="flex h-dvh items-center justify-center bg-[#f7f6f3]">
+      <div className="flex h-dvh items-center justify-center bg-[var(--cor-fundo,#f7f6f3)]">
         <div className="flex items-center gap-3 text-sm text-stone-500">
           <span className="h-4 w-4 animate-spin rounded-full border border-stone-300 border-t-[#4D403A]" />
           Carregando…
@@ -62,11 +73,14 @@ export default function Inicio() {
     );
   }
 
+  const condominio = usuario.condominio ?? CONDOMINIO_PADRAO;
+
   return (
     <AppShell
       perfil={usuario.perfil}
       nome={usuario.nome}
       unidade={usuario.unidade}
+      condominio={condominio}
       modulo={modulo}
       aoTrocar={setModulo}
       aoSair={sair}
@@ -76,6 +90,7 @@ export default function Inicio() {
           nome={usuario.nome}
           perfil={usuario.perfil}
           unidade={usuario.unidade}
+          condominio={condominio}
           aoTrocar={setModulo}
         />
       )}
@@ -86,6 +101,7 @@ export default function Inicio() {
       {modulo === "documentos" && <Documentos perfil={usuario.perfil} />}
       {modulo === "assembleias" && <Assembleias perfil={usuario.perfil} />}
       {modulo === "moradores" && <Moradores />}
+      {modulo === "auditoria" && <Auditoria />}
     </AppShell>
   );
 }

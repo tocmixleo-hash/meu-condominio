@@ -1,7 +1,8 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
+import RegistroSW from "@/components/registro-sw";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,13 +15,24 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Meu Condomínio — Parque Califórnia",
+  title: "Meu Condomínio — Portal do Morador",
   description:
-    "Plataforma de gestão comunitária do Parque Califórnia: comunicados, reservas, encomendas, autorizações de acesso, documentos e assembleias.",
-  keywords: ["condomínio", "Parque Califórnia", "moradores", "síndico", "portaria"],
+    "Plataforma multi-condomínio de gestão comunitária: comunicados, reservas, encomendas, autorizações de acesso, documentos e assembleias.",
+  keywords: ["condomínio", "portal do morador", "síndico", "portaria", "reservas", "encomendas"],
+  manifest: "/manifest.webmanifest",
   icons: {
-    icon: "/fotos/logo-parque-california.png",
+    icon: "/icons/icon-192.png",
+    apple: "/icons/icon-192.png",
   },
+  appleWebApp: {
+    capable: true,
+    title: "Meu Condomínio",
+    statusBarStyle: "default",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#4D403A",
 };
 
 export default function RootLayout({
@@ -35,6 +47,7 @@ export default function RootLayout({
       >
         {children}
         <Toaster />
+        <RegistroSW />
       </body>
     </html>
   );

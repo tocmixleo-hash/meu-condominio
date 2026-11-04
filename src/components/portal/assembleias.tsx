@@ -112,7 +112,7 @@ export default function Assembleias({ perfil }: { perfil: Perfil }) {
         ) : lista.length === 0 ? (
           <EstadoVazio mensagem="Nenhuma assembleia convocada." />
         ) : (
-          <Lista className="border-t border-[#EFE9E1]">
+          <Lista className="border-t border-[var(--cor-neutra)]">
             {lista.map((a) => (
               <div key={a.id} className="py-4">
                 <div className="flex items-start justify-between gap-3">
@@ -151,7 +151,7 @@ export default function Assembleias({ perfil }: { perfil: Perfil }) {
                   )}
                 </div>
                 {pautaAberta === a.id && a.pauta && (
-                  <pre className="mt-3 whitespace-pre-wrap rounded-md bg-[#f7f6f3] px-4 py-3 font-sans text-sm leading-relaxed text-stone-700">
+                  <pre className="mt-3 whitespace-pre-wrap rounded-md bg-[var(--cor-fundo)] px-4 py-3 font-sans text-sm leading-relaxed text-stone-700">
                     {a.pauta}
                   </pre>
                 )}
@@ -168,7 +168,7 @@ export default function Assembleias({ perfil }: { perfil: Perfil }) {
             className="absolute inset-0 bg-black/40"
             onClick={() => setAberto(false)}
           />
-          <div className="relative w-full max-w-lg rounded-lg border border-[#EFE9E1] bg-white p-6 shadow-xl">
+          <div className="relative w-full max-w-lg rounded-lg border border-[var(--cor-neutra)] bg-white p-6 shadow-xl">
             <h3 className="text-base font-semibold text-stone-900">Convocar assembleia</h3>
             <p className="mt-0.5 text-sm text-stone-500">Todos os moradores recebem a convocação.</p>
             <div className="mt-4 space-y-3">
@@ -176,20 +176,20 @@ export default function Assembleias({ perfil }: { perfil: Perfil }) {
                 placeholder="Título (ex.: Assembleia Geral Ordinária)"
                 value={form.titulo}
                 onChange={(e) => setForm({ ...form, titulo: e.target.value })}
-                className="h-10 w-full rounded-md border border-[#dfdacf] px-3 text-sm outline-none focus:border-[#a3968d] focus:ring-2 focus:ring-[#a3968d]/30"
+                className="h-10 w-full rounded-md border border-[var(--cor-neutra-2)] px-3 text-sm outline-none focus:border-[var(--cor-tema-suave)] focus:ring-2 focus:ring-[var(--cor-tema-suave)]/30"
               />
               <textarea
                 placeholder="Descrição"
                 rows={2}
                 value={form.descricao}
                 onChange={(e) => setForm({ ...form, descricao: e.target.value })}
-                className="w-full rounded-md border border-[#dfdacf] px-3 py-2 text-sm outline-none focus:border-[#a3968d] focus:ring-2 focus:ring-[#a3968d]/30"
+                className="w-full rounded-md border border-[var(--cor-neutra-2)] px-3 py-2 text-sm outline-none focus:border-[var(--cor-tema-suave)] focus:ring-2 focus:ring-[var(--cor-tema-suave)]/30"
               />
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                 <select
                   value={form.tipo}
                   onChange={(e) => setForm({ ...form, tipo: e.target.value })}
-                  className="h-10 w-full rounded-md border border-[#dfdacf] bg-white px-3 text-sm outline-none focus:border-[#a3968d]"
+                  className="h-10 w-full rounded-md border border-[var(--cor-neutra-2)] bg-white px-3 text-sm outline-none focus:border-[var(--cor-tema-suave)]"
                 >
                   <option value="ORDINARIA">Ordinária</option>
                   <option value="EXTRAORDINARIA">Extraordinária</option>
@@ -199,18 +199,18 @@ export default function Assembleias({ perfil }: { perfil: Perfil }) {
                   min={hojeISO()}
                   value={form.data}
                   onChange={(e) => setForm({ ...form, data: e.target.value })}
-                  className="h-10 w-full rounded-md border border-[#dfdacf] bg-white px-3 text-sm outline-none focus:border-[#a3968d]"
+                  className="h-10 w-full rounded-md border border-[var(--cor-neutra-2)] bg-white px-3 text-sm outline-none focus:border-[var(--cor-tema-suave)]"
                 />
                 <input
                   type="time"
                   value={form.horario}
                   onChange={(e) => setForm({ ...form, horario: e.target.value })}
-                  className="h-10 w-full rounded-md border border-[#dfdacf] bg-white px-3 text-sm outline-none focus:border-[#a3968d]"
+                  className="h-10 w-full rounded-md border border-[var(--cor-neutra-2)] bg-white px-3 text-sm outline-none focus:border-[var(--cor-tema-suave)]"
                 />
                 <select
                   value={form.local}
                   onChange={(e) => setForm({ ...form, local: e.target.value })}
-                  className="h-10 w-full rounded-md border border-[#dfdacf] bg-white px-3 text-sm outline-none focus:border-[#a3968d]"
+                  className="h-10 w-full rounded-md border border-[var(--cor-neutra-2)] bg-white px-3 text-sm outline-none focus:border-[var(--cor-tema-suave)]"
                 >
                   <option value="SALAO_FESTAS">Salão de festas</option>
                   <option value="VIRTUAL">Virtual</option>
@@ -221,7 +221,7 @@ export default function Assembleias({ perfil }: { perfil: Perfil }) {
                 rows={4}
                 value={form.pauta}
                 onChange={(e) => setForm({ ...form, pauta: e.target.value })}
-                className="w-full rounded-md border border-[#dfdacf] px-3 py-2 text-sm outline-none focus:border-[#a3968d] focus:ring-2 focus:ring-[#a3968d]/30"
+                className="w-full rounded-md border border-[var(--cor-neutra-2)] px-3 py-2 text-sm outline-none focus:border-[var(--cor-tema-suave)] focus:ring-2 focus:ring-[var(--cor-tema-suave)]/30"
               />
               {erro && <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{erro}</p>}
             </div>

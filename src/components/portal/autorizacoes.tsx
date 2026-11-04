@@ -118,7 +118,7 @@ export default function Autorizacoes({ perfil }: { perfil: Perfil }) {
             }
           />
         ) : (
-          <Lista className="border-t border-[#EFE9E1]">
+          <Lista className="border-t border-[var(--cor-neutra)]">
             {lista.map((a) => (
               <LinhaLista
                 key={a.id}
@@ -164,7 +164,7 @@ export default function Autorizacoes({ perfil }: { perfil: Perfil }) {
             className="absolute inset-0 bg-black/40"
             onClick={() => setAberto(false)}
           />
-          <div className="relative w-full max-w-md rounded-lg border border-[#EFE9E1] bg-white p-6 shadow-xl">
+          <div className="relative w-full max-w-md rounded-lg border border-[var(--cor-neutra)] bg-white p-6 shadow-xl">
             <h3 className="text-base font-semibold text-stone-900">Autorizar acesso</h3>
             <p className="mt-0.5 text-sm text-stone-500">
               A portaria recebe a autorização imediatamente.
@@ -174,13 +174,13 @@ export default function Autorizacoes({ perfil }: { perfil: Perfil }) {
                 placeholder="Nome do visitante ou prestador"
                 value={form.visitanteNome}
                 onChange={(e) => setForm({ ...form, visitanteNome: e.target.value })}
-                className="h-10 w-full rounded-md border border-[#dfdacf] px-3 text-sm outline-none focus:border-[#a3968d] focus:ring-2 focus:ring-[#a3968d]/30"
+                className="h-10 w-full rounded-md border border-[var(--cor-neutra-2)] px-3 text-sm outline-none focus:border-[var(--cor-tema-suave)] focus:ring-2 focus:ring-[var(--cor-tema-suave)]/30"
               />
               <div className="grid grid-cols-2 gap-3">
                 <select
                   value={form.tipo}
                   onChange={(e) => setForm({ ...form, tipo: e.target.value })}
-                  className="h-10 w-full rounded-md border border-[#dfdacf] bg-white px-3 text-sm outline-none focus:border-[#a3968d]"
+                  className="h-10 w-full rounded-md border border-[var(--cor-neutra-2)] bg-white px-3 text-sm outline-none focus:border-[var(--cor-tema-suave)]"
                 >
                   <option value="VISITANTE">Visitante</option>
                   <option value="PRESTADOR">Prestador de serviço</option>
@@ -189,14 +189,14 @@ export default function Autorizacoes({ perfil }: { perfil: Perfil }) {
                   placeholder="Documento (opcional)"
                   value={form.documento}
                   onChange={(e) => setForm({ ...form, documento: e.target.value })}
-                  className="h-10 w-full rounded-md border border-[#dfdacf] px-3 text-sm outline-none focus:border-[#a3968d] focus:ring-2 focus:ring-[#a3968d]/30"
+                  className="h-10 w-full rounded-md border border-[var(--cor-neutra-2)] px-3 text-sm outline-none focus:border-[var(--cor-tema-suave)] focus:ring-2 focus:ring-[var(--cor-tema-suave)]/30"
                 />
               </div>
               <input
                 placeholder="Veículo (opcional — placa/modelo)"
                 value={form.veiculo}
                 onChange={(e) => setForm({ ...form, veiculo: e.target.value })}
-                className="h-10 w-full rounded-md border border-[#dfdacf] px-3 text-sm outline-none focus:border-[#a3968d] focus:ring-2 focus:ring-[#a3968d]/30"
+                className="h-10 w-full rounded-md border border-[var(--cor-neutra-2)] px-3 text-sm outline-none focus:border-[var(--cor-tema-suave)] focus:ring-2 focus:ring-[var(--cor-tema-suave)]/30"
               />
               <div className="grid grid-cols-2 gap-3">
                 <div>
@@ -208,7 +208,7 @@ export default function Autorizacoes({ perfil }: { perfil: Perfil }) {
                     min={hojeISO()}
                     value={form.dataInicio}
                     onChange={(e) => setForm({ ...form, dataInicio: e.target.value })}
-                    className="h-10 w-full rounded-md border border-[#dfdacf] bg-white px-3 text-sm outline-none focus:border-[#a3968d]"
+                    className="h-10 w-full rounded-md border border-[var(--cor-neutra-2)] bg-white px-3 text-sm outline-none focus:border-[var(--cor-tema-suave)]"
                   />
                 </div>
                 <div>
@@ -220,7 +220,7 @@ export default function Autorizacoes({ perfil }: { perfil: Perfil }) {
                     min={form.dataInicio || hojeISO()}
                     value={form.dataFim}
                     onChange={(e) => setForm({ ...form, dataFim: e.target.value })}
-                    className="h-10 w-full rounded-md border border-[#dfdacf] bg-white px-3 text-sm outline-none focus:border-[#a3968d]"
+                    className="h-10 w-full rounded-md border border-[var(--cor-neutra-2)] bg-white px-3 text-sm outline-none focus:border-[var(--cor-tema-suave)]"
                   />
                 </div>
               </div>

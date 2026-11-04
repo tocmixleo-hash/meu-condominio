@@ -69,7 +69,7 @@ function misturar(hex: string, alvo: [number, number, number], f: number): strin
   const cheio = h.length === 3 ? h.split("").map((c) => c + c).join("") : h;
   const n = parseInt(cheio, 16);
   const canais = [(n >> 16) & 255, (n >> 8) & 255, n & 255];
-  const [r, g, b] = canais.map((c) => Math.round(c * (1 - f) + alvo * f));
+  const [r, g, b] = canais.map((c, i) => Math.round(c * (1 - f) + alvo[i] * f));
   return `#${[r, g, b].map((v) => v.toString(16).padStart(2, "0")).join("")}`;
 }
 

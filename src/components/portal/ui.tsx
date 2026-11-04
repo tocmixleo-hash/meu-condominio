@@ -233,19 +233,29 @@ export function BotaoSecundario({
   disabled,
   type = "button",
   className = "",
+  href,
 }: {
   children: ReactNode;
   onClick?: () => void;
   disabled?: boolean;
   type?: "button" | "submit";
   className?: string;
+  href?: string;
 }) {
+  const classes = `inline-flex h-9 items-center justify-center gap-2 rounded-md border border-[var(--cor-neutra-2)] bg-white px-4 text-sm font-medium text-stone-700 transition-colors hover:bg-[var(--cor-neutra)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cor-tema-suave)] disabled:pointer-events-none disabled:opacity-50 ${className}`;
+  if (href) {
+    return (
+      <a href={href} className={classes}>
+        {children}
+      </a>
+    );
+  }
   return (
     <button
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={`inline-flex h-9 items-center justify-center gap-2 rounded-md border border-[var(--cor-neutra-2)] bg-white px-4 text-sm font-medium text-stone-700 transition-colors hover:bg-[var(--cor-neutra)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cor-tema-suave)] disabled:pointer-events-none disabled:opacity-50 ${className}`}
+      className={classes}
     >
       {children}
     </button>

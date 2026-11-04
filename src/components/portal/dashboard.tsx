@@ -134,11 +134,13 @@ export default function Dashboard({
   nome,
   perfil,
   unidade,
+  condominio,
   aoTrocar,
 }: {
   nome: string;
   perfil: Perfil;
   unidade?: { bloco: string; numero: string } | null;
+  condominio: { nome: string; slug: string; corTema: string; logo: string; foto: string };
   aoTrocar: (m: ModuloId) => void;
 }) {
   const [dados, setDados] = useState<DashboardData | null>(null);
@@ -155,28 +157,28 @@ export default function Dashboard({
       {/* Faixa panorâmica — largura total, cantos retos, degradê para o fundo */}
       <div className="relative -mx-4 h-[104px] overflow-hidden sm:-mx-6 sm:h-[116px] lg:-mx-8 lg:h-[128px]">
         <Image
-          src="/fotos/parque-california.jpg"
-          alt="Área de lazer do Parque Califórnia com pergolado, quadra e residências"
+          src={condominio.foto}
+          alt={`Área comum do ${condominio.nome}`}
           fill
           priority
           className="object-cover object-[50%_42%]"
           sizes="100vw"
         />
-        <div className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-b from-transparent to-[#f7f6f3]" />
+        <div className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-b from-transparent to-[var(--cor-fundo)]" />
       </div>
 
       {/* Cabeçalho — texto direto no fundo, sem card */}
       <header className="-mt-4 space-y-1.5">
         <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-500">
-          Parque Califórnia · {dataLonga()}
+          {condominio.nome.toUpperCase()} · {dataLonga()}
         </p>
         <div className="flex items-center gap-3">
           <Image
-            src="/fotos/logo-parque-california.png"
-            alt="Logo do Parque Califórnia"
+            src={condominio.logo}
+            alt={`Logo do ${condominio.nome}`}
             width={44}
             height={44}
-            className="h-11 w-11 shrink-0 rounded-md border border-[#EFE9E1] bg-white object-contain p-0.5"
+            className="h-11 w-11 shrink-0 rounded-md border border-[var(--cor-neutra)] bg-white object-contain p-0.5"
           />
           <div>
             <h1 className="text-2xl font-semibold leading-tight text-stone-900">
@@ -216,7 +218,7 @@ export default function Dashboard({
           {dados.perfil === "MORADOR" && (
             <>
               <Secao titulo="Comunicados recentes">
-                <Lista className="border-t border-[#EFE9E1]">
+                <Lista className="border-t border-[var(--cor-neutra)]">
                   {dados.comunicadosRecentes?.length ? (
                     dados.comunicadosRecentes.map((c) => (
                       <LinhaLista
@@ -233,7 +235,7 @@ export default function Dashboard({
               </Secao>
 
               <Secao titulo="Minhas reservas próximas">
-                <Lista className="border-t border-[#EFE9E1]">
+                <Lista className="border-t border-[var(--cor-neutra)]">
                   {dados.reservasProximas?.length ? (
                     dados.reservasProximas.map((r) => (
                       <LinhaLista
@@ -252,7 +254,7 @@ export default function Dashboard({
               </Secao>
 
               <Secao titulo="Encomendas aguardando retirada">
-                <Lista className="border-t border-[#EFE9E1]">
+                <Lista className="border-t border-[var(--cor-neutra)]">
                   {dados.encomendasRecentes?.length ? (
                     dados.encomendasRecentes.map((e) => (
                       <LinhaLista
@@ -271,7 +273,7 @@ export default function Dashboard({
               </Secao>
 
               <Secao titulo="Autorizações ativas">
-                <Lista className="border-t border-[#EFE9E1]">
+                <Lista className="border-t border-[var(--cor-neutra)]">
                   {dados.autorizacoesAtivas?.length ? (
                     dados.autorizacoesAtivas.map((a) => (
                       <LinhaLista
@@ -297,7 +299,7 @@ export default function Dashboard({
           {(dados.perfil === "SINDICO" || dados.perfil === "ADMINISTRATIVO") && (
             <>
               <Secao titulo="Reservas aguardando aprovação">
-                <Lista className="border-t border-[#EFE9E1]">
+                <Lista className="border-t border-[var(--cor-neutra)]">
                   {dados.reservasLista?.length ? (
                     dados.reservasLista.map((r) => (
                       <LinhaLista
@@ -308,7 +310,7 @@ export default function Dashboard({
                           <div className="flex items-center gap-2">
                             <Badge tom={tomStatusReserva(r.status)}>{rotuloStatusReserva(r.status)}</Badge>
                             <button
-                              className="text-sm font-medium text-[#4D403A] underline-offset-4 hover:underline"
+                              className="text-sm font-medium text-[var(--cor-tema)] underline-offset-4 hover:underline"
                               onClick={() => aoTrocar("reservas")}
                             >
                               Analisar
@@ -324,7 +326,7 @@ export default function Dashboard({
               </Secao>
 
               <Secao titulo="Próximas assembleias">
-                <Lista className="border-t border-[#EFE9E1]">
+                <Lista className="border-t border-[var(--cor-neutra)]">
                   {dados.assembleiasProximas?.length ? (
                     dados.assembleiasProximas.map((a) => (
                       <LinhaLista
@@ -345,7 +347,7 @@ export default function Dashboard({
               </Secao>
 
               <Secao titulo="Comunicados recentes">
-                <Lista className="border-t border-[#EFE9E1]">
+                <Lista className="border-t border-[var(--cor-neutra)]">
                   {dados.comunicadosRecentes?.length ? (
                     dados.comunicadosRecentes.map((c) => (
                       <LinhaLista
@@ -367,7 +369,7 @@ export default function Dashboard({
           {dados.perfil === "PORTARIA" && (
             <>
               <Secao titulo="Encomendas na portaria">
-                <Lista className="border-t border-[#EFE9E1]">
+                <Lista className="border-t border-[var(--cor-neutra)]">
                   {dados.encomendasRecentes?.length ? (
                     dados.encomendasRecentes.map((e) => (
                       <LinhaLista
@@ -389,7 +391,7 @@ export default function Dashboard({
               </Secao>
 
               <Secao titulo="Autorizações de acesso válidas">
-                <Lista className="border-t border-[#EFE9E1]">
+                <Lista className="border-t border-[var(--cor-neutra)]">
                   {dados.autorizacoesRecentes?.length ? (
                     dados.autorizacoesRecentes.map((a) => (
                       <LinhaLista
