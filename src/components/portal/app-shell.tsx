@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import {
-  Bell,
   CalendarDays,
   ClipboardList,
   Crown,
@@ -21,7 +20,6 @@ import {
   X,
 } from "lucide-react";
 import { cssVarsDoTema, resolverTema } from "@/lib/tema";
-import { dataHoraCurta } from "@/lib/rotulos";
 import type { CondominioUI } from "@/components/portal/login-screen";
 
 export type ModuloId =
@@ -91,135 +89,6 @@ const ICONE_PERFIL: Record<Perfil, typeof Home> = {
   MORADOR: User,
 };
 
-// ── Sino de notificações ─────────────────────────────────────────
-
-type Notificacao = {
-  id: string;
-  titulo: string;
-  mensagem: string;
-  lida: boolean;
-  criadoEm: string;
-};
-
-function SinoNotificacoes({ sobreClaro = false }: { sobreClaro?: boolean }) {
-  const [aberto, setAberto] = useState(false);
-  const [lista, setLista] = useState<Notificacao[]>([]);
-  const [naoLidas, setNaoLidas] = useState(0);
-  const [carregando, setCarregando] = useState(false);
-  const caixa = useRef<HTMLDivElement>(null);
-
-  async function carregar() {
-    setCarregando(true);
-    try {
-      const r = await fetch("/api/notificacoes");
-      if (r.ok) {
-        const d = await r.json();
-        setLista(d.lista ?? []);
-        setNaoLidas(d.naoLidas ?? 0);
-      }
-    } finally {
-      setCarregando(false);
-    }
-  }
-
-  useEffect(() => {
-    carregar();
-    const t = setInterval(carregar, 60_000); // atualiza a cada minuto
-    return () => clearInterval(t);
-  }, []);
-
-  useEffect(() => {
-    function fora(e: MouseEvent) {
-      if (caixa.current && !caixa.current.contains(e.target as Node)) setAberto(false);
-    }
-    document.addEventListener("mousedown", fora);
-    return () => document.removeEventListener("mousedown", fora);
-  }, []);
-
-  async function marcarTodas() {
-    await fetch("/api/notificacoes", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({}),
-    }).catch(() => null);
-    carregar();
-  }
-
-  return (
-    <div ref={caixa} className="relative">
-      <button
-        aria-label={`Notificações${naoLidas ? ` (${naoLidas} não lidas)` : ""}`}
-        onClick={() => {
-          setAberto((v) => !v);
-          if (!aberto) carregar();
-        }}
-        className={`relative flex h-8 w-8 items-center justify-center rounded-md transition-colors ${
-          sobreClaro
-            ? "text-stone-600 hover:bg-[var(--cor-neutra)]"
-            : "text-[var(--cor-clara-a85)] hover:bg-[var(--cor-tema-hover-a60)] hover:text-[var(--cor-fundo)]"
-        }`}
-      >
-        <Bell className="h-[18px] w-[18px]" />
-        {naoLidas > 0 && (
-          <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-semibold text-white">
-            {naoLidas > 9 ? "9+" : naoLidas}
-          </span>
-        )}
-      </button>
-
-      {aberto && (
-        <div
-          className={`absolute top-full z-50 mt-2 w-80 rounded-xl border border-[var(--cor-neutra)] bg-white shadow-xl ${
-            sobreClaro ? "right-0" : "left-0"
-          }`}
-        >
-          <div className="flex items-center justify-between border-b border-[var(--cor-neutra)] px-4 py-3">
-            <p className="text-sm font-semibold text-stone-900">Notificações</p>
-            {naoLidas > 0 && (
-              <button
-                onClick={marcarTodas}
-                className="text-xs font-medium text-[var(--cor-tema)] underline-offset-4 hover:underline"
-              >
-                Marcar todas como lidas
-              </button>
-            )}
-          </div>
-          <div className="max-h-80 overflow-y-auto">
-            {carregando && lista.length === 0 ? (
-              <p className="px-4 py-6 text-sm text-stone-400">Carregando…</p>
-            ) : lista.length === 0 ? (
-              <p className="px-4 py-6 text-sm text-stone-400">
-                Nenhuma notificação por aqui. Você será avisado quando houver novidades.
-              </p>
-            ) : (
-              lista.map((n) => (
-                <div
-                  key={n.id}
-                  className={`border-b border-[var(--cor-neutra)] px-4 py-3 last:border-0 ${
-                    n.lida ? "" : "bg-[var(--cor-fundo)]"
-                  }`}
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <p className="text-sm font-medium text-stone-900">{n.titulo}</p>
-                    {!n.lida && (
-                      <span
-                        aria-hidden
-                        className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[var(--cor-tema)]"
-                      />
-                    )}
-                  </div>
-                  <p className="mt-0.5 text-xs leading-relaxed text-stone-500">{n.mensagem}</p>
-                  <p className="mt-1 text-[11px] text-stone-400">{dataHoraCurta(n.criadoEm)}</p>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
 export default function AppShell({
   perfil,
   nome,
@@ -276,19 +145,33 @@ export default function AppShell({
   );
 
   const marca = (
-    <div className="flex items-center gap-3 border-b border-[var(--cor-tema-hover)] px-5 py-4">
-      <Image
-        src={condominio.logo}
-        alt={`Logo do ${condominio.nome}`}
-        width={36}
-        height={36}
-        className="h-9 w-9 shrink-0 rounded-md bg-white object-contain p-0.5"
-      />
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-semibold leading-tight text-[var(--cor-fundo)]">Meu Condomínio</p>
-        <p className="truncate text-xs text-[var(--cor-clara-a70)]">{condominio.nome}</p>
+    <div className="border-b border-[var(--cor-tema-hover)] px-4 py-4">
+      {/* Marca da plataforma — logo criada pelo usuário */}
+      <div className="flex h-14 items-center justify-center rounded-xl bg-white px-3 shadow-sm">
+        <Image
+          src="/fotos/logo-meu-condominio.png"
+          alt="Meu Condomínio"
+          width={120}
+          height={44}
+          className="h-11 w-auto object-contain"
+          priority
+        />
       </div>
-      <SinoNotificacoes />
+      {/* Condomínio conectado */}
+      <div className="mt-3 flex items-center gap-2.5">
+        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-white p-1">
+          <Image
+            src={condominio.logo}
+            alt={`Logo do ${condominio.nome}`}
+            width={32}
+            height={32}
+            className="h-full w-auto object-contain"
+          />
+        </span>
+        <p className="min-w-0 truncate text-xs font-medium text-[var(--cor-clara-a70)]">
+          {condominio.nome}
+        </p>
+      </div>
     </div>
   );
 
@@ -352,7 +235,7 @@ export default function AppShell({
 
       {/* Conteúdo */}
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex items-center gap-3 border-b border-[var(--cor-neutra)] bg-white px-4 py-3 md:hidden">
+        <header className="flex items-center gap-3 border-b border-[var(--cor-neutra)] bg-white px-4 py-2.5 md:hidden">
           <button
             aria-label="Abrir menu"
             onClick={() => setMenuAberto(true)}
@@ -360,11 +243,16 @@ export default function AppShell({
           >
             <Menu className="h-5 w-5" />
           </button>
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-semibold leading-tight text-[var(--cor-fg)]">Meu Condomínio</p>
-            <p className="truncate text-xs text-stone-500">{condominio.nome}</p>
+          <div className="flex min-w-0 flex-1 items-center gap-2.5">
+            <Image
+              src="/fotos/logo-meu-condominio.png"
+              alt="Meu Condomínio"
+              width={52}
+              height={36}
+              className="h-9 w-auto object-contain"
+            />
+            <span className="truncate text-xs text-stone-500">{condominio.nome}</span>
           </div>
-          <SinoNotificacoes sobreClaro />
         </header>
         <main className="flex-1 overflow-y-auto">
           <div className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 lg:px-8">{children}</div>

@@ -44,14 +44,24 @@ const DESTAQUES = [
   "Participe das assembleias e vote informado",
 ];
 
-// Acesso rápido por condomínio (dados de demonstração)
-function acessosRapidos(slug: string) {
-  return [
+// Acesso rápido por condomínio (elenco fictício de cada um, igual ao seed)
+const ACESSOS: Record<string, { email: string; senha: string; etiqueta: string }[]> = {
+  california: [
     { email: "maria@email.com", senha: "123456", etiqueta: "Maria — Morador (A-101)" },
-    { email: `sindico@parque${slug}.com.br`, senha: "admin123", etiqueta: "Carlos — Síndico (Gestão)" },
-    { email: `administrativo@parque${slug}.com.br`, senha: "admin123", etiqueta: "Fernanda — Administrativo" },
-    { email: `portaria@parque${slug}.com.br`, senha: "portaria123", etiqueta: "Jorge — Portaria" },
-  ];
+    { email: "sindico@parquecalifornia.com.br", senha: "admin123", etiqueta: "Carlos — Síndico (Gestão)" },
+    { email: "administrativo@parquecalifornia.com.br", senha: "admin123", etiqueta: "Fernanda — Administrativo" },
+    { email: "portaria@parquecalifornia.com.br", senha: "portaria123", etiqueta: "Jorge — Portaria" },
+  ],
+  florida: [
+    { email: "helena@email.com", senha: "123456", etiqueta: "Helena — Morador (A-101)" },
+    { email: "sindico@parqueflorida.com.br", senha: "admin123", etiqueta: "Ricardo — Síndico (Gestão)" },
+    { email: "administrativo@parqueflorida.com.br", senha: "admin123", etiqueta: "Patrícia — Administrativo" },
+    { email: "portaria@parqueflorida.com.br", senha: "portaria123", etiqueta: "Sérgio — Portaria" },
+  ],
+};
+
+function acessosRapidos(slug: string) {
+  return ACESSOS[slug] ?? ACESSOS.california;
 }
 
 const FALLBACK: CondominioUI = {
@@ -117,16 +127,14 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
         <div className="absolute inset-0 bg-gradient-to-t from-[var(--cor-tema-escura-a70)] via-[var(--cor-tema-a20)] to-[var(--cor-tema-escura2-a50)]" />
 
         <div className="relative z-10 flex h-full flex-col p-10 text-white lg:px-14 lg:py-12">
-          {/* Marca */}
-          <div className="flex items-center gap-3.5">
-            <span className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-xl bg-white shadow-sm">
-                <img src="/fotos/logo-flor.png" alt="" className="h-8 w-8 object-contain" />
-            </span>
-            <div>
-              <p className="text-lg font-bold leading-tight">Meu Condomínio</p>
-              <p className="text-sm text-white/65">Gestão e comunicação condominial</p>
-            </div>
-          </div>
+          {/* Marca — logo criada pelo usuário */}
+          <span className="inline-flex items-center self-start rounded-2xl bg-white px-4 py-3 shadow-sm">
+            <img
+              src="/fotos/logo-meu-condominio.png"
+              alt="Meu Condomínio"
+              className="h-16 w-auto object-contain"
+            />
+          </span>
 
           {/* Mensagem */}
           <div className="mt-12 lg:mt-14">

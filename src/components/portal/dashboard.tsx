@@ -153,9 +153,9 @@ export default function Dashboard({
   }, []);
 
   return (
-    <div className="space-y-7">
+    <div className="space-y-5">
       {/* Faixa panorâmica — largura total, cantos retos, degradê para o fundo */}
-      <div className="relative -mx-4 h-[104px] overflow-hidden sm:-mx-6 sm:h-[116px] lg:-mx-8 lg:h-[128px]">
+      <div className="relative -mx-4 h-[72px] overflow-hidden sm:-mx-6 sm:h-[76px] lg:-mx-8 lg:h-[92px]">
         <Image
           src={condominio.foto}
           alt={`Área comum do ${condominio.nome}`}
@@ -164,63 +164,72 @@ export default function Dashboard({
           className="object-cover object-[50%_42%]"
           sizes="100vw"
         />
-        <div className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-b from-transparent to-[var(--cor-fundo)]" />
+        <div className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-b from-transparent to-[var(--cor-fundo)]" />
       </div>
 
-      {/* Cabeçalho — texto direto no fundo, sem card */}
-      <header className="-mt-4 space-y-1.5">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-500">
-          {condominio.nome.toUpperCase()} · {dataLonga()}
-        </p>
-        <div className="flex items-center gap-3">
-          <Image
-            src={condominio.logo}
-            alt={`Logo do ${condominio.nome}`}
-            width={44}
-            height={44}
-            className="h-11 w-11 shrink-0 rounded-md border border-[var(--cor-neutra)] bg-white object-contain p-0.5"
-          />
-          <div>
-            <h1 className="text-2xl font-semibold leading-tight text-stone-900">
-              {saudacao()}, {nome.split(" ")[0]}
-            </h1>
-            {perfil === "MORADOR" && unidade && (
-              <p className="text-sm text-stone-500">
-                Unidade {unidade.bloco}-{unidade.numero}
-              </p>
-            )}
+      {/* Cabeçalho — texto direto no fundo + ações rápidas à direita */}
+      <header className="-mt-3 flex items-end justify-between gap-6">
+        <div className="min-w-0 space-y-1.5">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-500">
+            {condominio.nome.toUpperCase()} · {dataLonga()}
+          </p>
+          <div className="flex items-center gap-3">
+            <Image
+              src={condominio.logo}
+              alt={`Logo do ${condominio.nome}`}
+              width={44}
+              height={44}
+              className="h-11 w-11 shrink-0 rounded-md border border-[var(--cor-neutra)] bg-white object-contain p-0.5"
+            />
+            <div>
+              <h1 className="text-2xl font-semibold leading-tight text-stone-900">
+                {saudacao()}, {nome.split(" ")[0]}
+              </h1>
+              {perfil === "MORADOR" && unidade && (
+                <p className="text-sm text-stone-500">
+                  Unidade {unidade.bloco}-{unidade.numero}
+                </p>
+              )}
+            </div>
           </div>
+          <p className="max-w-2xl text-sm leading-relaxed text-stone-500">
+            {DESCRICAO_PERFIL[perfil]}
+          </p>
         </div>
-        <p className="max-w-2xl text-sm leading-relaxed text-stone-500">
-          {DESCRICAO_PERFIL[perfil]}
-        </p>
+        <div className="hidden shrink-0 items-center gap-2 sm:flex">
+          {ACOES[perfil].map((acao) => (
+            <BotaoSecundario key={acao.destino + acao.rotulo} onClick={() => aoTrocar(acao.destino)}>
+              {acao.rotulo}
+            </BotaoSecundario>
+          ))}
+        </div>
       </header>
+
+      {/* Ações rápidas no celular */}
+      <div className="flex flex-wrap gap-2 sm:hidden">
+        {ACOES[perfil].map((acao) => (
+          <BotaoSecundario key={"m-" + acao.destino + acao.rotulo} onClick={() => aoTrocar(acao.destino)}>
+            {acao.rotulo}
+          </BotaoSecundario>
+        ))}
+      </div>
 
       {/* Indicadores */}
       {!dados ? (
         <Carregando />
       ) : (
         <>
-          <LinhaIndicadores itens={dados.indicadores} className="-mt-1" />
+          <LinhaIndicadores itens={dados.indicadores} className="-mt-2" />
 
-          {/* Ações rápidas */}
-          <Secao titulo="Ações rápidas">
-            <div className="flex flex-wrap gap-2 pt-1">
-              {ACOES[perfil].map((acao) => (
-                <BotaoSecundario key={acao.destino + acao.rotulo} onClick={() => aoTrocar(acao.destino)}>
-                  {acao.rotulo}
-                </BotaoSecundario>
-              ))}
-            </div>
-          </Secao>
-
+          {/* Seções em duas colunas — a tela inicial cabe sem rolagem no desktop */}
+          <div className="grid gap-x-10 gap-y-4 lg:grid-cols-2">
           {/* Morador */}
           {dados.perfil === "MORADOR" && (
             <>
               <Secao titulo="Comunicados recentes">
                 <Lista className="border-t border-[var(--cor-neutra)]">
                   {dados.comunicadosRecentes?.length ? (
-                    dados.comunicadosRecentes.map((c) => (
+                    dados.comunicadosRecentes.slice(0, 3).map((c) => (
                       <LinhaLista
                         key={c.id}
                         principal={c.titulo}
@@ -237,7 +246,7 @@ export default function Dashboard({
               <Secao titulo="Minhas reservas próximas">
                 <Lista className="border-t border-[var(--cor-neutra)]">
                   {dados.reservasProximas?.length ? (
-                    dados.reservasProximas.map((r) => (
+                    dados.reservasProximas.slice(0, 3).map((r) => (
                       <LinhaLista
                         key={r.id}
                         principal={ROTULO_ESPACO[r.espaco] ?? r.espaco}
@@ -256,7 +265,7 @@ export default function Dashboard({
               <Secao titulo="Encomendas aguardando retirada">
                 <Lista className="border-t border-[var(--cor-neutra)]">
                   {dados.encomendasRecentes?.length ? (
-                    dados.encomendasRecentes.map((e) => (
+                    dados.encomendasRecentes.slice(0, 3).map((e) => (
                       <LinhaLista
                         key={e.id}
                         principal={e.descricao}
@@ -275,7 +284,7 @@ export default function Dashboard({
               <Secao titulo="Autorizações ativas">
                 <Lista className="border-t border-[var(--cor-neutra)]">
                   {dados.autorizacoesAtivas?.length ? (
-                    dados.autorizacoesAtivas.map((a) => (
+                    dados.autorizacoesAtivas.slice(0, 3).map((a) => (
                       <LinhaLista
                         key={a.id}
                         principal={a.visitanteNome}
@@ -301,7 +310,7 @@ export default function Dashboard({
               <Secao titulo="Reservas aguardando aprovação">
                 <Lista className="border-t border-[var(--cor-neutra)]">
                   {dados.reservasLista?.length ? (
-                    dados.reservasLista.map((r) => (
+                    dados.reservasLista.slice(0, 3).map((r) => (
                       <LinhaLista
                         key={r.id}
                         principal={`${ROTULO_ESPACO[r.espaco] ?? r.espaco} · ${formatarData(r.data)}`}
@@ -328,7 +337,7 @@ export default function Dashboard({
               <Secao titulo="Próximas assembleias">
                 <Lista className="border-t border-[var(--cor-neutra)]">
                   {dados.assembleiasProximas?.length ? (
-                    dados.assembleiasProximas.map((a) => (
+                    dados.assembleiasProximas.slice(0, 3).map((a) => (
                       <LinhaLista
                         key={a.id}
                         principal={a.titulo}
@@ -349,7 +358,7 @@ export default function Dashboard({
               <Secao titulo="Comunicados recentes">
                 <Lista className="border-t border-[var(--cor-neutra)]">
                   {dados.comunicadosRecentes?.length ? (
-                    dados.comunicadosRecentes.map((c) => (
+                    dados.comunicadosRecentes.slice(0, 3).map((c) => (
                       <LinhaLista
                         key={c.id}
                         principal={c.titulo}
@@ -371,7 +380,7 @@ export default function Dashboard({
               <Secao titulo="Encomendas na portaria">
                 <Lista className="border-t border-[var(--cor-neutra)]">
                   {dados.encomendasRecentes?.length ? (
-                    dados.encomendasRecentes.map((e) => (
+                    dados.encomendasRecentes.slice(0, 3).map((e) => (
                       <LinhaLista
                         key={e.id}
                         principal={e.descricao}
@@ -393,7 +402,7 @@ export default function Dashboard({
               <Secao titulo="Autorizações de acesso válidas">
                 <Lista className="border-t border-[var(--cor-neutra)]">
                   {dados.autorizacoesRecentes?.length ? (
-                    dados.autorizacoesRecentes.map((a) => (
+                    dados.autorizacoesRecentes.slice(0, 3).map((a) => (
                       <LinhaLista
                         key={a.id}
                         principal={a.visitanteNome}
@@ -411,6 +420,7 @@ export default function Dashboard({
               </Secao>
             </>
           )}
+          </div>
         </>
       )}
     </div>
