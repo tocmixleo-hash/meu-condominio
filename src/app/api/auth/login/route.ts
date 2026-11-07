@@ -39,17 +39,28 @@ export async function POST(req: Request) {
 
   const emailNorm = String(email).trim().toLowerCase();
   // E-mail pode existir em mais de um condomínio (cadastros legados por
-  // condomínio): aceita o condomínio explícito (seletor da tela de login);
-  // se o vínculo principal não coincidir, recorre à conta correta — a
-  // escolha visual nunca bloqueia o acesso de quem tem senha válida.
+  // condomínio). A senha é conferida em TODAS as contas ativas com esse
+  // e-mail, priorizando o condomínio escolhido na tela — antes, apenas o
+  // primeiro registro da lista era testado e a senha válida da conta
+  // correta era rejeitada ("E-mail ou senha incorretos" com senha certa).
   const candidatos = await db.usuario.findMany({
     where: { email: emailNorm, ativo: true },
     include: { vinculos: { where: { ativo: true }, orderBy: { criadoEm: "asc" } } },
   });
-  const alvo = condominioId
-    ? candidatos.find((u) => u.condominioId === String(condominioId)) ?? candidatos[0] ?? null
-    : candidatos[0] ?? null;
-  if (!alvo || !conferirSenha(String(senha), alvo.senha)) {
+  const ordem = condominioId
+    ? [
+        ...candidatos.filter((u) => u.condominioId === String(condominioId)),
+        ...candidatos.filter((u) => u.condominioId !== String(condominioId)),
+      ]
+    : candidatos;
+  let alvo: (typeof candidatos)[number] | null = null;
+  for (const candidato of ordem) {
+    if (conferirSenha(String(senha), candidato.senha)) {
+      alvo = candidato;
+      break;
+    }
+  }
+  if (!alvo) {
     await registrarFalha(chave);
     return Response.json({ erro: "E-mail ou senha incorretos." }, { status: 401 });
   }
