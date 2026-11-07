@@ -120,9 +120,10 @@ async function main() {
     let usuarioId;
     if (existente.rows.length > 0) {
       usuarioId = existente.rows[0].id;
-      // Reset do ambiente de demonstração: senha canônica, nome, perfil, unidade e ativo
+      // Reset do ambiente de demonstração: senha canônica, nome, perfil,
+      // unidade, ativo e tutorial (o passeio guiado volta a ser exibido)
       await turso.execute({
-        sql: "UPDATE Usuario SET nome = ?, senha = ?, perfil = ?, ativo = 1, unidadeId = ?, condominioId = ? WHERE id = ?",
+        sql: "UPDATE Usuario SET nome = ?, senha = ?, perfil = ?, ativo = 1, unidadeId = ?, condominioId = ?, tutorialVisto = 0 WHERE id = ?",
         args: [demoUsuario.nome, demoUsuario.senha, item.perfil, unidadeId, condoId, usuarioId],
       });
       atualizados++;
