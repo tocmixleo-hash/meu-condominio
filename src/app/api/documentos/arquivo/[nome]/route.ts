@@ -38,7 +38,14 @@ export async function GET(_req: Request, { params }: { params: Promise<{ nome: s
     where: { nomeArquivo: limpo, condominioId: eu.condominio.id },
   });
   if (doc?.url) {
-    const resposta = await fetch(doc.url).catch(() => null);
+    // URL absoluta (Vercel Blob) ou relativa (arquivo estático do próprio
+    // site, ex.: "/docs/regimento-interno.pdf" — sobrevive a deploys sem
+    // armazenamento externo). Ambas são buscadas e servidas pelo servidor
+    // após validar a sessão e o vínculo com o condomínio.
+    const destino = doc.url.startsWith("http")
+      ? doc.url
+      : new URL(doc.url, new URL(_req.url).origin).toString();
+    const resposta = await fetch(destino).catch(() => null);
     if (!resposta || !resposta.ok || !resposta.body) {
       return Response.json({ erro: "Arquivo não encontrado no armazenamento." }, { status: 404 });
     }

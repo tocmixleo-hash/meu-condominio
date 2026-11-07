@@ -96,6 +96,7 @@ const MENUS: Record<Perfil, ItemMenu[]> = {
     { id: "encomendas", rotulo: "Encomendas", icone: Package },
     { id: "autorizacoes", rotulo: "Autorizações", icone: DoorOpen },
     { id: "ocorrencias", rotulo: "Ocorrências", icone: AlertTriangle },
+    { id: "documentos", rotulo: "Documentos", icone: FileText },
     { id: "duvidas", rotulo: "Perguntas frequentes", icone: HelpCircle },
   ],
   PLATAFORMA: [
@@ -638,6 +639,59 @@ export default function AppShell({
           </aside>
         </div>
       )}
+
+      {/* Barra inferior de navegação (celular) — os quatro primeiros
+          destinos do menu + botão Menu que abre a lista completa no
+          drawer. Usa os MESMOS ícones/rótulos da barra lateral, para
+          que os dois lugares sempre digam a mesma coisa. */}
+      <nav
+        aria-label="Navegação principal"
+        className="fixed inset-x-0 bottom-0 z-40 border-t border-[var(--cor-neutra)] bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden"
+      >
+        <div className="mx-auto flex max-w-lg items-stretch">
+          {itens.slice(0, 4).map((item) => {
+            const ativo = item.id === modulo;
+            const Icone = item.icone;
+            return (
+              <button
+                key={item.id}
+                onClick={() => trocar(item.id)}
+                aria-current={ativo ? "page" : undefined}
+                className="flex flex-1 flex-col items-center gap-0.5 px-1 pb-1.5 pt-2"
+              >
+                <Icone
+                  className={`h-5 w-5 ${ativo ? "text-[var(--cor-tema)]" : "text-stone-400"}`}
+                />
+                <span
+                  className={`max-w-full truncate text-[10px] font-medium leading-none ${
+                    ativo ? "text-[var(--cor-tema)]" : "text-stone-500"
+                  }`}
+                >
+                  {item.rotulo}
+                </span>
+                <span
+                  aria-hidden
+                  className={`mt-0.5 h-0.5 w-6 rounded-full transition-colors ${
+                    ativo ? "bg-[var(--cor-tema)]" : "bg-transparent"
+                  }`}
+                />
+              </button>
+            );
+          })}
+          <button
+            onClick={() => setMenuAberto(true)}
+            aria-label="Abrir menu completo"
+            data-tour="botao-menu"
+            className="flex flex-1 flex-col items-center gap-0.5 px-1 pb-1.5 pt-2"
+          >
+            <Menu className="h-5 w-5 text-stone-400" />
+            <span className="max-w-full truncate text-[10px] font-medium leading-none text-stone-500">
+              Menu
+            </span>
+            <span aria-hidden className="mt-0.5 h-0.5 w-6 rounded-full bg-transparent" />
+          </button>
+        </div>
+      </nav>
     </>
   );
 
@@ -658,14 +712,6 @@ export default function AppShell({
       {/* Conteúdo */}
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="flex items-center gap-3 border-b border-[var(--cor-neutra)] bg-white px-4 py-2.5 md:hidden">
-          <button
-            aria-label="Abrir menu"
-            data-tour="botao-menu"
-            onClick={() => setMenuAberto(true)}
-            className="rounded-md p-1.5 text-[var(--cor-fg-suave)] hover:bg-[var(--cor-neutra)]"
-          >
-            <Menu className="h-5 w-5" />
-          </button>
           <div className="flex min-w-0 flex-1 items-center gap-2.5">
             <Image
               src={condominio.logoCabecalho || condominio.logoMenu || condominio.logo}
@@ -697,7 +743,8 @@ export default function AppShell({
           </div>
         )}
         <main className="flex-1 overflow-y-auto">
-          <div className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 lg:px-8">{children}</div>
+          {/* pb-24 no celular: espaço para a barra inferior de navegação */}
+          <div className="mx-auto w-full max-w-5xl px-4 pb-24 pt-6 sm:px-6 md:pb-6 lg:px-8">{children}</div>
         </main>
       </div>
     </div>

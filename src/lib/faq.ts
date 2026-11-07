@@ -205,6 +205,11 @@ const CATEGORIAS: CategoriaFaq[] = [
           "Na tela de login, toque em “Esqueci minha senha” e informe seu e-mail. Você recebe um link para criar uma nova senha. O link expira em poucas horas — se não chegar, confira o spam ou fale com a administração.",
       },
       {
+        pergunta: "Onde encontro o regimento interno e a convenção?",
+        resposta:
+          "No menu Documentos. Lá ficam o regimento interno, a convenção do condomínio, as atas das assembleias e outros arquivos oficiais publicados pela administração — é só tocar em “Abrir” para ler ou salvar. Em caso de conflito entre este resumo e o regimento, vale sempre o texto oficial.",
+      },
+      {
         pergunta: "Onde vejo os avisos do síndico?",
         resposta:
           "No menu Comunicados, com categoria e data de publicação, e em destaque na tela Início. Ative as notificações do navegador para receber avisos importantes em tempo real.",
