@@ -13,6 +13,7 @@ import {
   Eye,
   FileText,
   GraduationCap,
+  HelpCircle,
   History,
   Home,
   KeyRound,
@@ -39,6 +40,7 @@ export type ModuloId =
   | "encomendas"
   | "autorizacoes"
   | "ocorrencias"
+  | "duvidas"
   | "manutencao"
   | "documentos"
   | "assembleias"
@@ -94,6 +96,7 @@ const MENUS: Record<Perfil, ItemMenu[]> = {
     { id: "encomendas", rotulo: "Encomendas", icone: Package },
     { id: "autorizacoes", rotulo: "Autorizações", icone: DoorOpen },
     { id: "ocorrencias", rotulo: "Ocorrências", icone: AlertTriangle },
+    { id: "duvidas", rotulo: "Perguntas frequentes", icone: HelpCircle },
   ],
   PLATAFORMA: [
     { id: "inicio", rotulo: "Início", icone: Home },
