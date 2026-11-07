@@ -33,6 +33,9 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: "#4D403A",
+  // Tema sempre claro: navegadores em modo escuro não devem inverter a UI
+  // (sem isso, os seletores do login aparecem escurecidos no celular).
+  colorScheme: "light",
 };
 
 export default function RootLayout({

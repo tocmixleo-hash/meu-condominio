@@ -44,6 +44,7 @@
 }
 
 :root {
+  color-scheme: light; /* impede o auto-dark do navegador de escurecer a interface */
   --radius: 0.375rem;
   /* Identidade visual Meu Condomínio — tons quentes de pedra e marrom */
   --background: #f7f6f3;

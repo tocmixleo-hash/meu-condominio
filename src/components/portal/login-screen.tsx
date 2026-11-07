@@ -341,7 +341,7 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
               visual (logo, foto, tema) e os acessos rápidos de cada parque.
               Em produção o vínculo real do usuário continua sendo resolvido
               no backend após o login — a escolha nunca bloqueia ninguém. */}
-          <div className="mt-4 grid grid-cols-2 gap-3">
+          <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
             {condominios.map((c) => {
               const ativo = c.id === condo.id;
               return (
@@ -399,7 +399,7 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
                           setErro("");
                           setAvisoTipo("");
                         }}
-                        className="flex items-start gap-3.5 rounded-xl border border-stone-200 px-4 py-3.5 text-left transition hover:border-[var(--cor-tema)] hover:bg-[var(--cor-tema-suave,#faf9f7)]"
+                        className="flex items-start gap-3.5 rounded-xl border border-stone-200 bg-white px-4 py-3.5 text-left transition hover:border-[var(--cor-tema)] hover:bg-stone-50"
                       >
                         <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-stone-100 text-stone-600">
                           <Icone className="h-[18px] w-[18px]" />
@@ -581,7 +581,7 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
                       type="button"
                       disabled={enviando}
                       onClick={() => submeter({ email: r.email, senha: r.senha, tipo: r.tipo })}
-                      className="whitespace-nowrap rounded-full bg-white px-4 py-3 text-left text-sm text-stone-800 transition hover:bg-stone-50 disabled:opacity-50"
+                      className="whitespace-nowrap rounded-full border border-stone-200 bg-white px-4 py-3 text-left text-sm text-stone-800 transition hover:bg-stone-50 disabled:opacity-50"
                     >
                       {r.etiqueta}
                     </button>
