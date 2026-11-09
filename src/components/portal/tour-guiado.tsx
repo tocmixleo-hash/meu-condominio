@@ -150,7 +150,7 @@ export default function TourGuiado({
       {/* Cartão explicativo */}
       <div
         style={cartao}
-        className="rounded-2xl bg-white p-5 shadow-2xl transition-all duration-300"
+        className="rounded-xl bg-white p-5 shadow-2xl transition-all duration-300"
       >
         <div className="flex items-center justify-between gap-3">
           <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-400">

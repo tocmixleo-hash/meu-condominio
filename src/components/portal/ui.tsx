@@ -1,12 +1,12 @@
 "use client";
 
 // ─────────────────────────────────────────────────────────────
-// Identidade visual "Meu Condomínio" (padrão sofisticado, ares de
-// construtora premium)
-// • Seções em cartões brancos arredondados com sombra difusa
-// • Título de seção em caixa alta com filete vertical do tema
-// • Indicadores em faixa de KPI com numerais serifados
+// Identidade visual "Meu Condomínio" (padrão moderno e limpo)
+// • Seções abertas: título caixa alta + filete do tema + divisória fina —
+//   sem caixas arredondadas, sem sombras (apenas onde a imagem exige)
+// • Indicadores em linha plana com divisórias verticais finas
 // • Listas com separadores horizontais + hover suave
+// • Cartões só para imagens e modais — raio único (rounded-xl)
 // • Cores via variáveis de tema (--cor-*) definidas por condomínio
 // • Verde/vermelho apenas p/ status
 // ─────────────────────────────────────────────────────────────
@@ -38,7 +38,7 @@ export {
   dataHoraCurta,
 };
 
-// ── Seção em cartão ──────────────────────────────────────────
+// ── Seção aberta (sem caixa): título + divisória fina + conteúdo ──
 
 export function Secao({
   titulo,
@@ -54,11 +54,8 @@ export function Secao({
   tour?: string;
 }) {
   return (
-    <section
-      data-tour={tour}
-      className={`rounded-2xl border border-[var(--cor-neutra)] bg-white shadow-[var(--sombra-suave)] ${className}`}
-    >
-      <div className="flex items-center justify-between gap-3 px-5 pt-4 sm:px-6">
+    <section data-tour={tour} className={className}>
+      <div className="flex items-center justify-between gap-3 border-b border-[var(--cor-neutra)] pb-2.5">
         <h2 className="flex items-center gap-2.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-500">
           <span
             aria-hidden
@@ -68,12 +65,12 @@ export function Secao({
         </h2>
         {acao}
       </div>
-      <div className="px-5 pb-5 pt-2 sm:px-6 sm:pb-6">{children}</div>
+      <div className="pt-3">{children}</div>
     </section>
   );
 }
 
-// ── Indicadores com divisórias verticais (sem caixa) ─────────
+// ── Indicadores em linha plana, com divisórias finas ─────────
 
 export function LinhaIndicadores({
   itens,
@@ -83,17 +80,15 @@ export function LinhaIndicadores({
   className?: string;
 }) {
   return (
-    <div
-      className={`flex flex-col rounded-2xl border border-[var(--cor-neutra)] bg-white shadow-[var(--sombra-suave)] sm:flex-row sm:divide-x sm:divide-[var(--cor-neutra-2)] ${className}`}
-    >
+    <div className={`flex flex-col sm:flex-row ${className}`}>
       {itens.map((item, i) => (
         <div
           key={item.rotulo}
-          className={`py-3 sm:flex-1 sm:py-4 ${i === 0 ? "sm:pl-6" : "sm:px-6"} ${
-            i === itens.length - 1 ? "sm:pr-6" : ""
+          className={`py-3 sm:flex-1 sm:py-1 ${i > 0 ? "border-t border-[var(--cor-neutra)] sm:border-l sm:border-t-0" : ""} ${
+            i === 0 ? "sm:pr-6" : i === itens.length - 1 ? "sm:pl-6" : "sm:px-6"
           }`}
         >
-          <p className="font-display text-[27px] font-semibold leading-none tabular-nums text-stone-900">
+          <p className="text-[27px] font-bold leading-none tabular-nums text-stone-900">
             {item.valor}
           </p>
           <p className="mt-1.5 text-[11px] font-medium uppercase tracking-[0.12em] text-stone-500">

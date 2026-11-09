@@ -114,7 +114,7 @@ export default function Assembleias({ perfil }: { perfil: Perfil }) {
         ) : lista.length === 0 ? (
           <EstadoVazio mensagem="Nenhuma assembleia convocada." />
         ) : (
-          <Lista className="border-t border-[var(--cor-neutra)]">
+          <Lista>
             {lista.map((a) => (
               <div key={a.id} className="py-4">
                 <div className="flex items-start justify-between gap-3">

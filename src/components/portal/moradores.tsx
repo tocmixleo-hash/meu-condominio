@@ -138,7 +138,7 @@ export default function Moradores() {
         ) : lista.length === 0 ? (
           <EstadoVazio mensagem="Nenhum morador cadastrado." />
         ) : (
-          <Lista className="border-t border-[var(--cor-neutra)]">
+          <Lista>
             {lista.map((m) => (
               <LinhaLista
                 key={m.id}
@@ -176,7 +176,7 @@ export default function Moradores() {
         ) : equipe.length === 0 ? (
           <EstadoVazio mensagem="Nenhum membro de equipe com função personalizada." />
         ) : (
-          <Lista className="border-t border-[var(--cor-neutra)]">
+          <Lista>
             {equipe.map((m) => {
               const nomeFuncao = m.vinculos?.[0]?.funcao?.nome ?? m.funcao?.nome ?? "—";
               return (

@@ -145,7 +145,7 @@ export default function Encomendas({ perfil }: { perfil: Perfil }) {
             }
           />
         ) : (
-          <Lista className="border-t border-[var(--cor-neutra)]">
+          <Lista>
             {lista.map((e) => (
               <LinhaLista
                 key={e.id}

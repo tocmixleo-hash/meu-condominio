@@ -148,7 +148,7 @@ export default function Funcoes() {
         ) : lista.length === 0 ? (
           <EstadoVazio mensagem="Nenhuma função personalizada ainda. Crie a primeira para a equipe." />
         ) : (
-          <Lista className="border-t border-[var(--cor-neutra)]">
+          <Lista>
             {lista.map((f) => {
               let mods: string[] = [];
               try {

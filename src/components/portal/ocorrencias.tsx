@@ -123,7 +123,7 @@ export default function Ocorrencias({ perfil }: { perfil: Perfil }) {
         ) : lista.length === 0 ? (
           <EstadoVazio mensagem="Nenhuma ocorrência registrada. Tudo em ordem!" />
         ) : (
-          <Lista className="border-t border-[var(--cor-neutra)]">
+          <Lista>
             {lista.map((o) => (
               <LinhaLista
                 key={o.id}

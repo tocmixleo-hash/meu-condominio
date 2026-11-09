@@ -105,7 +105,7 @@ export default function Documentos({ perfil }: { perfil: Perfil }) {
         ) : lista.length === 0 ? (
           <EstadoVazio mensagem="Nenhum documento disponível." />
         ) : (
-          <Lista className="border-t border-[var(--cor-neutra)]">
+          <Lista>
             {lista.map((d) => (
               <LinhaLista
                 key={d.id}

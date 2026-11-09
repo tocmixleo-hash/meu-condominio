@@ -273,7 +273,7 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
 
         <div className="relative z-10 flex h-full flex-col p-10 text-white lg:px-14 lg:py-12">
           {/* Marca — logo criada pelo usuário (versão horizontal legível) */}
-          <span className="animar-aparecer inline-flex items-center self-start rounded-2xl bg-white px-4 py-3 shadow-sm">
+          <span className="animar-aparecer inline-flex items-center self-start rounded-xl bg-white px-4 py-3 shadow-sm">
             <img
               src="/fotos/logo-meu-condominio-horizontal.png"
               alt="Meu Condomínio"
@@ -283,7 +283,7 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
 
           {/* Mensagem */}
           <div className="animar-entrada mt-12 lg:mt-14">
-            <h1 className="font-display text-[34px] font-medium leading-[1.16] tracking-tight xl:text-[42px]">
+            <h1 className="text-[34px] font-bold leading-[1.16] tracking-tight xl:text-[42px]">
               Tudo do seu condomínio,
               <br />
               <em className="font-light italic">na palma da mão.</em>
@@ -303,7 +303,7 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
           </div>
 
           {/* QR do portal no celular */}
-          <div className="animar-entrada animar-atraso-3 mt-10 flex max-w-[400px] items-start gap-4 rounded-2xl border border-white/15 bg-white/10 p-4 backdrop-blur-md">
+          <div className="animar-entrada animar-atraso-3 mt-10 flex max-w-[400px] items-start gap-4 rounded-xl border border-white/15 bg-white/10 p-4 backdrop-blur-md">
             <img
               src="/fotos/qr-portal.png"
               alt="QR Code do portal"
@@ -377,11 +377,11 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
           </div>
 
           {/* Cartão de acesso */}
-          <div className="animar-entrada mt-4 rounded-2xl border border-[var(--cor-neutra)] bg-white p-6 shadow-[var(--sombra-cartao)] sm:p-7">
+          <div className="animar-entrada mt-4 rounded-xl border border-[var(--cor-neutra)] bg-white p-6 shadow-[var(--sombra-cartao)] sm:p-7">
             {!tipo ? (
               /* ── Etapa 1: pergunta o tipo de usuário ─────────────── */
               <>
-                <h2 className="font-display text-[24px] font-medium tracking-tight text-stone-900">
+                <h2 className="text-[24px] font-semibold tracking-tight text-stone-900">
                   Que tipo de usuário é você?
                 </h2>
                 <p className="mt-1.5 text-[15px] text-stone-500">
@@ -421,7 +421,7 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
               /* ── Etapa 2: e-mail e senha (com o tipo escolhido) ──── */
               <>
                 <div className="flex items-center justify-between gap-3">
-                  <h2 className="font-display text-[24px] font-medium tracking-tight text-stone-900">
+                  <h2 className="text-[24px] font-semibold tracking-tight text-stone-900">
                     Entrar na plataforma
                   </h2>
                   <button

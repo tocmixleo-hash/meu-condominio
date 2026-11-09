@@ -95,7 +95,7 @@ export default function Auditoria() {
         {!lista ? (
           <Carregando />
         ) : (
-          <Lista className="border-t border-[var(--cor-neutra)]">
+          <Lista>
             {lista.length === 0 ? (
               <EstadoVazio mensagem="Nenhum registro encontrado." />
             ) : (

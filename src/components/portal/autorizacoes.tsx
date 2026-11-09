@@ -203,7 +203,7 @@ export default function Autorizacoes({ perfil }: { perfil: Perfil }) {
             }
           />
         ) : (
-          <Lista className="border-t border-[var(--cor-neutra)]">
+          <Lista>
             {lista.map((a) => (
               <LinhaLista
                 key={a.id}

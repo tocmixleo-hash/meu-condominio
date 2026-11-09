@@ -99,7 +99,7 @@ export default function Manutencao() {
         ) : lista.length === 0 ? (
           <EstadoVazio mensagem="Nenhuma manutenção preventiva agendada." />
         ) : (
-          <Lista className="border-t border-[var(--cor-neutra)]">
+          <Lista>
             {lista.map((m) => (
               <LinhaLista
                 key={m.id}

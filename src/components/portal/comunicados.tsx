@@ -85,7 +85,7 @@ export default function Comunicados({ perfil }: { perfil: Perfil }) {
         ) : lista.length === 0 ? (
           <EstadoVazio mensagem="Nenhum comunicado publicado ainda." />
         ) : (
-          <Lista className="border-t border-[var(--cor-neutra)]">
+          <Lista>
             {lista.map((c) => (
               <div key={c.id} className="py-4">
                 <div className="flex items-start justify-between gap-3">

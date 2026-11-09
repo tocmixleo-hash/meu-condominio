@@ -65,13 +65,15 @@ if (MODO !== "mobile") {
 
   // Fontes carregadas? (next/font gera famílias com hash: __Manrope_xxx,
   // __Fraunces_xxx — conferimos o fontFamily computado, não o nome comercial)
+  // Manrope é a única tipografia do portal (sem serifas): títulos e corpo
+  // usam a mesma família, com hierarquia por peso.
   const fontes = await pagina.evaluate(() => ({
     display: getComputedStyle(document.querySelector("h1") || document.body).fontFamily,
     corpo: getComputedStyle(document.body).fontFamily,
   }));
   registrar(
-    "fontes Fraunces+Manrope aplicadas",
-    /Fraunces/i.test(fontes.display) && /Manrope/i.test(fontes.corpo),
+    "fontes Manrope aplicadas (sem serifas)",
+    /Manrope/i.test(fontes.display) && /Manrope/i.test(fontes.corpo) && !/Fraunces|Georgia|Times/i.test(fontes.display),
     JSON.stringify(fontes),
   );
 

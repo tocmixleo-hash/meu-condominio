@@ -192,7 +192,7 @@ export default function Dashboard({
         <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-b from-transparent to-[var(--cor-fundo)]" />
       </div>
 
-      {/* Cabeçalho — saudação em serifada + ações rápidas à direita */}
+      {/* Cabeçalho — saudação em Manrope bold + ações rápidas à direita */}
       <header className="-mt-4 flex items-end justify-between gap-6">
         <div className="min-w-0 space-y-1.5">
           <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-500">
@@ -207,7 +207,7 @@ export default function Dashboard({
               className="h-12 w-12 shrink-0 rounded-xl border border-[var(--cor-neutra)] bg-white object-contain p-1 shadow-sm"
             />
             <div>
-              <h1 className="font-display text-[26px] font-medium leading-tight text-stone-900 sm:text-3xl">
+              <h1 className="text-[26px] font-bold leading-tight tracking-tight text-stone-900 sm:text-3xl">
                 {saudacao()}, {nome.split(" ")[0]}
               </h1>
               {perfil === "MORADOR" && unidade && (
@@ -252,7 +252,7 @@ export default function Dashboard({
           {dados.perfil === "MORADOR" && (
             <>
               <Secao titulo="Comunicados recentes" tour="dash-comunicados">
-                <Lista className="border-t border-[var(--cor-neutra)]">
+                <Lista>
                   {dados.comunicadosRecentes?.length ? (
                     dados.comunicadosRecentes.slice(0, 3).map((c) => (
                       <LinhaLista
@@ -269,7 +269,7 @@ export default function Dashboard({
               </Secao>
 
               <Secao titulo="Minhas reservas próximas" tour="dash-reservas">
-                <Lista className="border-t border-[var(--cor-neutra)]">
+                <Lista>
                   {dados.reservasProximas?.length ? (
                     dados.reservasProximas.slice(0, 3).map((r) => (
                       <LinhaLista
@@ -288,7 +288,7 @@ export default function Dashboard({
               </Secao>
 
               <Secao titulo="Encomendas aguardando retirada">
-                <Lista className="border-t border-[var(--cor-neutra)]">
+                <Lista>
                   {dados.encomendasRecentes?.length ? (
                     dados.encomendasRecentes.slice(0, 3).map((e) => (
                       <LinhaLista
@@ -307,7 +307,7 @@ export default function Dashboard({
               </Secao>
 
               <Secao titulo="Autorizações ativas">
-                <Lista className="border-t border-[var(--cor-neutra)]">
+                <Lista>
                   {dados.autorizacoesAtivas?.length ? (
                     dados.autorizacoesAtivas.slice(0, 3).map((a) => (
                       <LinhaLista
@@ -328,7 +328,7 @@ export default function Dashboard({
               </Secao>
 
               <Secao titulo="Minhas ocorrências">
-                <Lista className="border-t border-[var(--cor-neutra)]">
+                <Lista>
                   {dados.ocorrenciasRecentes?.length ? (
                     dados.ocorrenciasRecentes.slice(0, 3).map((o) => (
                       <LinhaLista
@@ -352,7 +352,7 @@ export default function Dashboard({
           {(dados.perfil === "SINDICO" || dados.perfil === "ADMINISTRATIVO") && (
             <>
               <Secao titulo="Reservas aguardando aprovação" tour="dash-reservas-pendentes">
-                <Lista className="border-t border-[var(--cor-neutra)]">
+                <Lista>
                   {dados.reservasLista?.length ? (
                     dados.reservasLista.slice(0, 3).map((r) => (
                       <LinhaLista
@@ -379,7 +379,7 @@ export default function Dashboard({
               </Secao>
 
               <Secao titulo="Próximas assembleias">
-                <Lista className="border-t border-[var(--cor-neutra)]">
+                <Lista>
                   {dados.assembleiasProximas?.length ? (
                     dados.assembleiasProximas.slice(0, 3).map((a) => (
                       <LinhaLista
@@ -400,7 +400,7 @@ export default function Dashboard({
               </Secao>
 
               <Secao titulo="Comunicados recentes">
-                <Lista className="border-t border-[var(--cor-neutra)]">
+                <Lista>
                   {dados.comunicadosRecentes?.length ? (
                     dados.comunicadosRecentes.slice(0, 3).map((c) => (
                       <LinhaLista
@@ -417,7 +417,7 @@ export default function Dashboard({
               </Secao>
 
               <Secao titulo="Ocorrências em andamento" tour="dash-ocorrencias">
-                <Lista className="border-t border-[var(--cor-neutra)]">
+                <Lista>
                   {dados.ocorrenciasRecentes?.length ? (
                     dados.ocorrenciasRecentes.slice(0, 4).map((o) => (
                       <LinhaLista
@@ -454,7 +454,7 @@ export default function Dashboard({
           {dados.perfil === "PORTARIA" && (
             <>
               <Secao titulo="Encomendas na portaria" tour="dash-encomendas">
-                <Lista className="border-t border-[var(--cor-neutra)]">
+                <Lista>
                   {dados.encomendasRecentes?.length ? (
                     dados.encomendasRecentes.slice(0, 3).map((e) => (
                       <LinhaLista
@@ -476,7 +476,7 @@ export default function Dashboard({
               </Secao>
 
               <Secao titulo="Autorizações de acesso válidas" tour="dash-autorizacoes">
-                <Lista className="border-t border-[var(--cor-neutra)]">
+                <Lista>
                   {dados.autorizacoesRecentes?.length ? (
                     dados.autorizacoesRecentes.slice(0, 3).map((a) => (
                       <LinhaLista
@@ -496,7 +496,7 @@ export default function Dashboard({
               </Secao>
 
               <Secao titulo="Ocorrências abertas">
-                <Lista className="border-t border-[var(--cor-neutra)]">
+                <Lista>
                   {dados.ocorrenciasRecentes?.length ? (
                     dados.ocorrenciasRecentes.slice(0, 3).map((o) => (
                       <LinhaLista
