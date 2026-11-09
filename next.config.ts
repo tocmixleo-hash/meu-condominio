@@ -6,6 +6,11 @@ const nextConfig: NextConfig = {
   outputFileTracingIncludes: {
     "/**": ["./db/custom.db"],
   },
+  // Fotografias enviadas pela Identidade visual vão para o Vercel Blob
+  // (URL remota) — autorizamos o host do Blob para o next/image otimizar.
+  images: {
+    remotePatterns: [{ protocol: "https", hostname: "**.public.blob.vercel-storage.com" }],
+  },
   typescript: {
     ignoreBuildErrors: true,
   },

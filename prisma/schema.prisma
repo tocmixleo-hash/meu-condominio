@@ -54,6 +54,7 @@ model Condominio {
   ocorrencias  Ocorrencia[]
   manutencoes  Manutencao[]
   regrasReserva RegraReserva[]
+  espacoFotos  EspacoFoto[]
 }
 
 // Galeria de fotografias do condomínio (áreas comuns e institucionais)
@@ -68,6 +69,19 @@ model CondominioFoto {
   criadoEm     DateTime   @default(now())
 
   @@index([condominioId, tipo, ordem])
+}
+
+// Fotografia individual por espaço comum (Reservas) — configurável pela
+// identidade visual do condomínio; ausência = imagem padrão da plataforma.
+model EspacoFoto {
+  id           String     @id @default(cuid())
+  condominioId String
+  condominio   Condominio @relation(fields: [condominioId], references: [id], onDelete: Cascade)
+  espaco       String     // SALAO_FESTAS | CHURRASQUEIRA | QUADRA | PISCINA
+  url          String
+  criadoEm     DateTime   @default(now())
+
+  @@unique([condominioId, espaco])
 }
 
 // Função (cargo) personalizada criada pelo Administrador da Plataforma —

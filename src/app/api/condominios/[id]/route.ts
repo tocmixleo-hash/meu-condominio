@@ -37,7 +37,11 @@ export async function GET(_req: Request, { params }: Ctx) {
 
   const condominio = await db.condominio.findUnique({
     where: { id },
-    select: { ...SELECT_ID, fotos: { orderBy: [{ tipo: "asc" }, { ordem: "asc" }] } },
+    select: {
+      ...SELECT_ID,
+      fotos: { orderBy: [{ tipo: "asc" }, { ordem: "asc" }] },
+      espacoFotos: { select: { espaco: true, url: true } },
+    },
   });
   if (!condominio) return Response.json({ erro: "Condomínio não encontrado." }, { status: 404 });
   return Response.json({ condominio });

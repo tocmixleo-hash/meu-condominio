@@ -37,6 +37,7 @@ type Regra = {
   antecedenciaMaxDias: number;
   limiteMensalUnidade: number;
   regrasTexto: string;
+  foto: string | null; // fotografia configurada pela identidade visual
   padrao: boolean;
 };
 
@@ -57,8 +58,8 @@ const HORARIOS = [
 
 const DIAS_SEMANA = ["D", "S", "T", "Q", "Q", "S", "S"];
 
-// Fotos ilustrativas dos espaços comuns — apresentação com ares de
-// construtora (piscina, salão, churrasqueira e quadra).
+// Fotos padrão dos espaços comuns (usadas quando o condomínio não configurou
+// fotografia própria na Identidade visual).
 const FOTO_ESPACO: Record<string, string> = {
   SALAO_FESTAS: "/fotos/espaco-salao-festas.jpg",
   CHURRASQUEIRA: "/fotos/espaco-churrasqueira.jpg",
@@ -67,12 +68,12 @@ const FOTO_ESPACO: Record<string, string> = {
 };
 
 // Miniatura usada nas linhas de reserva e de regras.
-function MiniaturaEspaco({ espaco, tamanho = "h-11 w-11" }: { espaco: string; tamanho?: string }) {
-  const foto = FOTO_ESPACO[espaco];
-  if (!foto) return null;
+function MiniaturaEspaco({ espaco, foto, tamanho = "h-11 w-11" }: { espaco: string; foto?: string | null; tamanho?: string }) {
+  const url = foto ?? FOTO_ESPACO[espaco];
+  if (!url) return null;
   return (
     <div className={`relative shrink-0 overflow-hidden rounded-lg border border-[var(--cor-neutra)] ${tamanho}`}>
-      <Image src={foto} alt="" fill sizes="44px" className="object-cover" />
+      <Image src={url} alt="" fill sizes="44px" className="object-cover" />
     </div>
   );
 }
@@ -106,7 +107,7 @@ function CartaoEspaco({
           className="object-cover transition-transform duration-500 group-hover:scale-105"
         />
         <div className="absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-black/50 to-transparent" />
-        <p className="font-display absolute bottom-2 left-3.5 text-[17px] font-medium leading-tight text-white drop-shadow">
+        <p className="absolute bottom-2 left-3.5 text-[17px] font-semibold leading-tight text-white drop-shadow">
           {rotulo}
         </p>
       </div>
@@ -156,6 +157,7 @@ export default function Reservas({ perfil }: { perfil: Perfil }) {
   useEffect(carregar, [carregar]);
 
   const regraDoEspaco = (espaco: string) => regras.find((r) => r.espaco === espaco);
+  const fotoDoEspaco = (espaco: string) => regraDoEspaco(espaco)?.foto ?? FOTO_ESPACO[espaco];
 
   async function criar() {
     setErro("");
@@ -256,7 +258,7 @@ export default function Reservas({ perfil }: { perfil: Perfil }) {
                 <CartaoEspaco
                   key={k}
                   rotulo={v}
-                  foto={FOTO_ESPACO[k]}
+                  foto={fotoDoEspaco(k)!}
                   meta={
                     rg
                       ? `Antecedência de até ${rg.antecedenciaMaxDias} dia(s) · ${rg.limiteMensalUnidade}/mês`
@@ -385,11 +387,11 @@ export default function Reservas({ perfil }: { perfil: Perfil }) {
               }
             />
           ) : (
-            <Lista className="border-t border-[var(--cor-neutra)]">
+            <Lista>
               {lista.map((r) => (
                 <LinhaLista
                   key={r.id}
-                  midia={<MiniaturaEspaco espaco={r.espaco} />}
+                  midia={<MiniaturaEspaco espaco={r.espaco} foto={regraDoEspaco(r.espaco)?.foto} />}
                   principal={`${ROTULO_ESPACO[r.espaco] ?? r.espaco} · ${formatarData(r.data)}`}
                   secundaria={
                     ehGestao
@@ -431,11 +433,11 @@ export default function Reservas({ perfil }: { perfil: Perfil }) {
       {/* Regras dos espaços — exibidas a todos; editáveis pela gestão */}
       {regras.length > 0 && (
         <Secao titulo="Regras dos espaços" acao={ehGestao ? <span className="text-xs text-stone-400">Toque em “Editar” para ajustar</span> : undefined}>
-          <Lista className="border-t border-[var(--cor-neutra)]">
+          <Lista>
             {regras.map((r) => (
               <LinhaLista
                 key={r.espaco}
-                midia={<MiniaturaEspaco espaco={r.espaco} />}
+                midia={<MiniaturaEspaco espaco={r.espaco} foto={r.foto} />}
                 principal={r.rotulo}
                 secundaria={`Até ${r.antecedenciaMaxDias} dia(s) de antecedência · ${r.limiteMensalUnidade} reserva(s)/mês por unidade`}
                 detalhe={r.regrasTexto || undefined}
@@ -469,18 +471,18 @@ export default function Reservas({ perfil }: { perfil: Perfil }) {
             className="absolute inset-0 bg-black/40"
             onClick={() => setAberto(false)}
           />
-          <div className="relative w-full max-w-md overflow-hidden rounded-2xl border border-[var(--cor-neutra)] bg-white shadow-[var(--sombra-cartao)]">
+          <div className="relative w-full max-w-md overflow-hidden rounded-xl border border-[var(--cor-neutra)] bg-white shadow-[var(--sombra-cartao)]">
             {/* Foto do espaço escolhido — confirmação visual imediata */}
             <div className="relative h-28 w-full overflow-hidden">
               <Image
-                src={FOTO_ESPACO[form.espaco] ?? "/fotos/espaco-salao-festas.jpg"}
+                src={fotoDoEspaco(form.espaco) ?? "/fotos/espaco-salao-festas.jpg"}
                 alt={ROTULO_ESPACO[form.espaco] ?? form.espaco}
                 fill
                 sizes="480px"
                 className="object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent" />
-              <p className="font-display absolute bottom-2.5 left-4 text-lg font-medium text-white drop-shadow">
+              <p className="absolute bottom-2.5 left-4 text-lg font-semibold text-white drop-shadow">
                 {ROTULO_ESPACO[form.espaco] ?? form.espaco}
               </p>
             </div>
@@ -561,7 +563,7 @@ export default function Reservas({ perfil }: { perfil: Perfil }) {
             className="absolute inset-0 bg-black/40"
             onClick={() => setEditandoRegra(null)}
           />
-          <div className="relative w-full max-w-md rounded-2xl border border-[var(--cor-neutra)] bg-white p-6 shadow-[var(--sombra-cartao)]">
+          <div className="relative w-full max-w-md rounded-xl border border-[var(--cor-neutra)] bg-white p-6 shadow-[var(--sombra-cartao)]">
             <h3 className="text-base font-semibold text-stone-900">
               Regras — {editandoRegra.rotulo}
             </h3>

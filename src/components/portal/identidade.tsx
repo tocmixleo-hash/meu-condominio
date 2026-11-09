@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { LoaderCircle, Trash2, Upload } from "lucide-react";
+import { LoaderCircle, RotateCcw, Trash2, Upload } from "lucide-react";
 import { cssVarsDoTema, resolverTema } from "@/lib/tema";
 import { Carregando, Secao } from "@/components/portal/ui";
 import { mensagemDeErro } from "@/lib/api-cliente";
@@ -17,6 +17,7 @@ type FotoGaleria = {
 
 type IdentidadeCompleta = CondominioUI & {
   fotos?: FotoGaleria[];
+  espacoFotos?: { espaco: string; url: string }[];
 };
 
 const CORES: { campo: string; rotulo: string; ajuda: string }[] = [
@@ -37,6 +38,14 @@ const CAMPOS_TEXTO = [
   { campo: "cnpj", rotulo: "CNPJ (opcional)", placeholder: "00.000.000/0000-00" },
 ];
 
+// Espaços comuns que recebem fotografia própria (Reservas)
+const ESPACOS_EDITAVEIS = [
+  { id: "SALAO_FESTAS", rotulo: "Salão de festas", padrao: "/fotos/espaco-salao-festas.jpg" },
+  { id: "CHURRASQUEIRA", rotulo: "Churrasqueira", padrao: "/fotos/espaco-churrasqueira.jpg" },
+  { id: "QUADRA", rotulo: "Quadra", padrao: "/fotos/espaco-quadra.jpg" },
+  { id: "PISCINA", rotulo: "Piscina", padrao: "/fotos/espaco-piscina.jpg" },
+];
+
 export default function Identidade({
   condominio,
   podeEditar,
@@ -52,7 +61,10 @@ export default function Identidade({
   const [enviando, setEnviando] = useState<string | null>(null);
   const [mensagem, setMensagem] = useState<{ tipo: "ok" | "erro"; texto: string } | null>(null);
   const inputLogo = useRef<HTMLInputElement | null>(null);
+  // Alvo do próximo upload: "logo_principal" ou "foto_espaco:PISCINA" etc.
   const tipoUpload = useRef<string>("");
+  // Fotografias configuradas por espaço comum (Reservas)
+  const [espacoFotos, setEspacoFotos] = useState<Record<string, string>>({});
 
   useEffect(() => {
     let vivo = true;
@@ -64,6 +76,7 @@ export default function Identidade({
         const c = d.condominio as IdentidadeCompleta;
         setDados(c);
         setForm(formularioInicial(c));
+        setEspacoFotos(Object.fromEntries((c.espacoFotos ?? []).map((f) => [f.espaco, f.url])));
       })
       .catch(() => null);
     return () => {
@@ -145,7 +158,10 @@ export default function Identidade({
     setMensagem(null);
     try {
       const formDados = new FormData();
-      formDados.set("tipo", tipo);
+      // tipo pode carregar o espaço junto ("foto_espaco:PISCINA")
+      const [tipoPuro, espacoAlvo] = tipo.split(":");
+      formDados.set("tipo", tipoPuro);
+      if (espacoAlvo) formDados.set("espaco", espacoAlvo);
       formDados.set("arquivo", arquivo);
       const r = await fetch(`/api/condominios/${dados.id}/arquivo`, {
         method: "POST",
@@ -154,7 +170,9 @@ export default function Identidade({
       const d = await corpoSeguro(r);
       if (!r.ok) throw new Error(d?.erro || "Não foi possível enviar o arquivo.");
       // atualiza estado local
-      if (d.foto) {
+      if (d.campo === "espacoFoto" && d.espaco) {
+        setEspacoFotos((atual) => ({ ...atual, [d.espaco!]: d.url! }));
+      } else if (d.foto) {
         setDados((atual) =>
           atual ? { ...atual, fotos: [...(atual.fotos ?? []), d.foto] } : atual,
         );
@@ -177,14 +195,21 @@ export default function Identidade({
     setEnviando(tipo);
     setMensagem(null);
     try {
+      const [tipoPuro, espacoAlvo] = tipo.split(":");
       const r = await fetch(`/api/condominios/${dados.id}/arquivo`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tipo, id: fotoId }),
+        body: JSON.stringify({ tipo: tipoPuro, id: fotoId, espaco: espacoAlvo }),
       });
       const d = await corpoSeguro(r);
       if (!r.ok) throw new Error(d?.erro || "Não foi possível remover o arquivo.");
-      if (tipo === "foto_area" || tipo === "foto_institucional") {
+      if (tipoPuro === "foto_espaco" && espacoAlvo) {
+        setEspacoFotos((atual) => {
+          const copia = { ...atual };
+          delete copia[espacoAlvo];
+          return copia;
+        });
+      } else if (tipoPuro === "foto_area" || tipoPuro === "foto_institucional") {
         setDados((atual) =>
           atual ? { ...atual, fotos: (atual.fotos ?? []).filter((f) => f.id !== fotoId) } : atual,
         );
@@ -401,6 +426,52 @@ export default function Identidade({
         </div>
       </Secao>
 
+      {/* ── Fotos dos espaços comuns (Reservas) ───────────────────── */}
+      <Secao titulo="Fotos dos espaços comuns" acao={<span className="text-xs text-stone-400">Aparecem nos cartões de reserva</span>}>
+        <div className="mt-1 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {ESPACOS_EDITAVEIS.map(({ id, rotulo, padrao }) => {
+            const configurada = espacoFotos[id];
+            const url = configurada ?? padrao;
+            const alvo = `foto_espaco:${id}`;
+            return (
+              <div key={id} className="rounded-xl border border-[var(--cor-neutra)] bg-white p-2.5">
+                <div className="relative h-24 overflow-hidden rounded-lg bg-stone-100">
+                  <img src={url} alt={rotulo} className="h-full w-full object-cover" />
+                </div>
+                <p className="mt-2 text-sm font-medium text-stone-800">{rotulo}</p>
+                <p className="text-[11px] text-stone-500">
+                  {configurada ? "Fotografia personalizada" : "Imagem padrão da plataforma"}
+                </p>
+                <div className="mt-2 flex items-center gap-2">
+                  <button
+                    onClick={() => abrirSeletor(alvo)}
+                    disabled={!!enviando}
+                    className="flex items-center gap-1.5 rounded-lg bg-[var(--cor-tema)] px-2.5 py-1.5 text-xs font-semibold text-white transition hover:bg-[var(--cor-tema-botao-hover)] disabled:opacity-60"
+                  >
+                    {enviando === alvo ? (
+                      <LoaderCircle className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <Upload className="h-3.5 w-3.5" />
+                    )}
+                    Substituir
+                  </button>
+                  {configurada && (
+                    <button
+                      onClick={() => removerArquivo(alvo)}
+                      disabled={!!enviando}
+                      className="flex items-center gap-1.5 rounded-lg border border-stone-200 px-2.5 py-1.5 text-xs font-medium text-stone-600 transition hover:bg-stone-50 disabled:opacity-60"
+                    >
+                      <RotateCcw className="h-3.5 w-3.5" /> Padrão
+                    </button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        <p className="mt-2 text-[11px] text-stone-400">PNG, JPG ou WEBP até 8 MB</p>
+      </Secao>
+
       {/* ── Informações do condomínio ─────────────────────────────── */}
       <Secao titulo="Informações do condomínio">
         <div className="mt-1 grid gap-3 sm:grid-cols-2">
@@ -506,7 +577,7 @@ function Galeria({
   );
 }
 
-async function corpoSeguro(r: Response): Promise<{ erro?: string; condominio?: unknown; url?: string; campo?: string; foto?: FotoGaleria } | null> {
+async function corpoSeguro(r: Response): Promise<{ erro?: string; condominio?: unknown; url?: string; campo?: string; espaco?: string; foto?: FotoGaleria } | null> {
   try {
     return await r.json();
   } catch {

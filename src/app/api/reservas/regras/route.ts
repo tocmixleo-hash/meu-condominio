@@ -16,6 +16,11 @@ export async function GET() {
     where: { condominioId: eu.condominio.id },
   });
   const porEspaco = Object.fromEntries(gravadas.map((r) => [r.espaco, r]));
+  const fotos = await db.espacoFoto.findMany({
+    where: { condominioId: eu.condominio.id },
+    select: { espaco: true, url: true },
+  });
+  const fotoPorEspaco = Object.fromEntries(fotos.map((f) => [f.espaco, f.url]));
   const lista = ESPACOS.map((espaco) => {
     const r = porEspaco[espaco];
     return {
@@ -24,6 +29,7 @@ export async function GET() {
       antecedenciaMaxDias: r?.antecedenciaMaxDias ?? PADRAO.antecedenciaMaxDias,
       limiteMensalUnidade: r?.limiteMensalUnidade ?? PADRAO.limiteMensalUnidade,
       regrasTexto: r?.regrasTexto ?? "",
+      foto: fotoPorEspaco[espaco] ?? null,
       padrao: !r,
     };
   });

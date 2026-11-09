@@ -28,6 +28,8 @@ const MAX_FOTO = 8 * 1024 * 1024; // 8 MB
 
 const TIPOS_LOGO = ["logo_principal", "logo_menu", "logo_cabecalho"] as const;
 const TIPOS_FOTO = ["foto_principal", "foto_area", "foto_institucional"] as const;
+// Fotografia por espaço comum (Reservas): vem acompanhada do campo "espaco"
+const ESPACOS_FOTO = ["SALAO_FESTAS", "CHURRASQUEIRA", "QUADRA", "PISCINA"] as const;
 const EXT_LOGO = ["png", "jpg", "jpeg", "webp", "svg"];
 const EXT_FOTO = ["png", "jpg", "jpeg", "webp"];
 
@@ -75,7 +77,11 @@ async function salvarArquivo(slug: string, nomeBase: string, conteudo: Buffer, e
   await mkdir(pasta, { recursive: true });
   const nomeLocal = `${nomeBase}-${Date.now()}.${ext}`;
   await writeFile(path.join(pasta, nomeLocal), conteudo);
-  return { url: `/uploads/condominios/${slug}/${nomeLocal}`, chave: null };
+  // Servido pela rota de API (/api/uploads/...) — arquivos gravados em
+  // `public/` depois do start não são servidos pelo Next em produção, e na
+  // Vercel `public/` é somente leitura. A rota lê do mesmo `base` calculado
+  // aqui (PASTA_UPLOADS > /tmp/uploads > public/uploads).
+  return { url: `/api/uploads/condominios/${slug}/${nomeLocal}`, chave: null };
 }
 
 async function removerArquivoRemoto(url: string | null | undefined) {
@@ -99,9 +105,13 @@ export async function POST(req: Request, { params }: Ctx) {
   const form = await req.formData().catch(() => null);
   if (!form) return Response.json({ erro: "Envio inválido." }, { status: 400 });
   const tipo = String(form.get("tipo") ?? "");
+  const espaco = String(form.get("espaco") ?? "");
   const arquivo = form.get("arquivo") as File | null;
-  if (![...TIPOS_LOGO, ...TIPOS_FOTO].includes(tipo as never)) {
+  if (![...TIPOS_LOGO, ...TIPOS_FOTO, "foto_espaco"].includes(tipo as never)) {
     return Response.json({ erro: "Tipo de arquivo inválido." }, { status: 400 });
+  }
+  if (tipo === "foto_espaco" && !(ESPACOS_FOTO as readonly string[]).includes(espaco)) {
+    return Response.json({ erro: "Espaço inválido." }, { status: 400 });
   }
   if (!arquivo || typeof arquivo.arrayBuffer !== "function") {
     return Response.json({ erro: "Selecione um arquivo para enviar." }, { status: 400 });
@@ -127,7 +137,8 @@ export async function POST(req: Request, { params }: Ctx) {
     conteudo = Buffer.from(sanitizarSvg(conteudo.toString("utf8")), "utf8");
   }
 
-  const { url } = await salvarArquivo(condominio.slug, tipo, conteudo, ext);
+  const nomeBase = tipo === "foto_espaco" ? `foto_espaco-${espaco.toLowerCase()}` : tipo;
+  const { url } = await salvarArquivo(condominio.slug, nomeBase, conteudo, ext);
 
   // Aplica o arquivo no campo correspondente
   if (tipo === "logo_principal") {
@@ -155,6 +166,26 @@ export async function POST(req: Request, { params }: Ctx) {
     return Response.json({ url, campo: "foto" });
   }
 
+  // foto_espaco — fotografia do espaço comum (galeria de Reservas)
+  if (tipo === "foto_espaco") {
+    const anterior = await db.espacoFoto.findUnique({
+      where: { condominioId_espaco: { condominioId: id, espaco } },
+    });
+    await db.espacoFoto.upsert({
+      where: { condominioId_espaco: { condominioId: id, espaco } },
+      create: { condominioId: id, espaco, url },
+      update: { url },
+    });
+    await removerArquivoRemoto(anterior?.url);
+    await registrarAcao({
+      condominioId: id,
+      usuarioId: eu!.id,
+      acao: "IDENTIDADE_ARQUIVO",
+      detalhe: `Fotografia do espaço ${espaco} atualizada`,
+    });
+    return Response.json({ url, campo: "espacoFoto", espaco });
+  }
+
   // foto_area | foto_institucional — galeria com ordem automática
   const quantos = await db.condominioFoto.count({ where: { condominioId: id, tipo: tipo === "foto_area" ? "AREA_COMUM" : "INSTITUCIONAL" } });
   const foto = await db.condominioFoto.create({
@@ -174,8 +205,29 @@ export async function DELETE(req: Request, { params }: Ctx) {
   const { erro, eu } = await garantirGestao(id);
   if (erro) return erro;
 
-  const { tipo, id: fotoId, restaurarPadrao } = await req.json().catch(() => ({}) as never);
+  const { tipo, id: fotoId, espaco, restaurarPadrao } = await req.json().catch(() => ({}) as never);
   const tipoStr = String(tipo ?? "");
+
+  // Fotografia de espaço comum: apagar o registro volta à imagem padrão
+  if (tipoStr === "foto_espaco") {
+    if (!(ESPACOS_FOTO as readonly string[]).includes(String(espaco ?? ""))) {
+      return Response.json({ erro: "Espaço inválido." }, { status: 400 });
+    }
+    const anterior = await db.espacoFoto.findUnique({
+      where: { condominioId_espaco: { condominioId: id, espaco: String(espaco) } },
+    });
+    if (anterior) {
+      await db.espacoFoto.delete({ where: { id: anterior.id } });
+      await removerArquivoRemoto(anterior.url);
+    }
+    await registrarAcao({
+      condominioId: id,
+      usuarioId: eu!.id,
+      acao: "IDENTIDADE_ARQUIVO",
+      detalhe: `Fotografia do espaço ${String(espaco)} restaurada ao padrão`,
+    });
+    return Response.json({ ok: true });
+  }
 
   if (TIPOS_FOTO.includes(tipoStr as never) && tipoStr !== "foto_principal") {
     const foto = await db.condominioFoto.findFirst({ where: { id: String(fotoId ?? ""), condominioId: id } });
