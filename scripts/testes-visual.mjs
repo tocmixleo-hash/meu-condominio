@@ -63,12 +63,17 @@ if (MODO !== "mobile") {
   await pagina.waitForSelector("text=Que tipo de usuário é você?", { timeout: 15000 });
   await pagina.screenshot({ path: "/tmp/render/visual-01-login.png" });
 
-  // Fontes carregadas?
+  // Fontes carregadas? (next/font gera famílias com hash: __Manrope_xxx,
+  // __Fraunces_xxx — conferimos o fontFamily computado, não o nome comercial)
   const fontes = await pagina.evaluate(() => ({
-    display: document.fonts.check('16px Fraunces'),
-    corpo: document.fonts.check('16px Manrope'),
+    display: getComputedStyle(document.querySelector("h1") || document.body).fontFamily,
+    corpo: getComputedStyle(document.body).fontFamily,
   }));
-  registrar("fontes Fraunces+Manrope carregadas", fontes.display && fontes.corpo, JSON.stringify(fontes));
+  registrar(
+    "fontes Fraunces+Manrope aplicadas",
+    /Fraunces/i.test(fontes.display) && /Manrope/i.test(fontes.corpo),
+    JSON.stringify(fontes),
+  );
 
   // 2. Login morador
   await pagina.click('button:has-text("Morador")');

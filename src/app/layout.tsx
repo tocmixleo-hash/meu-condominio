@@ -54,7 +54,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" suppressHydrationWarning>
       <body
-        className={`${manrope.variable} ${fraunces.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
+        className={`${manrope.variable} ${fraunces.variable} ${geistMono.variable} font-sans antialiased bg-background text-foreground`}
       >
         {children}
         <Toaster />
