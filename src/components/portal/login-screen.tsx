@@ -268,12 +268,12 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
           alt={condo.nome}
           className="absolute inset-0 h-full w-full origin-bottom-right scale-[1.3] object-cover"
         />
-        <div className="absolute inset-0 bg-[var(--cor-tema-a75)]" />
+        <div className="absolute inset-0 bg-[var(--cor-tema-a55)]" />
         <div className="absolute inset-0 bg-gradient-to-t from-[var(--cor-tema-escura-a70)] via-[var(--cor-tema-a20)] to-[var(--cor-tema-escura2-a50)]" />
 
         <div className="relative z-10 flex h-full flex-col p-10 text-white lg:px-14 lg:py-12">
           {/* Marca — logo criada pelo usuário (versão horizontal legível) */}
-          <span className="inline-flex items-center self-start rounded-2xl bg-white px-4 py-3 shadow-sm">
+          <span className="animar-aparecer inline-flex items-center self-start rounded-2xl bg-white px-4 py-3 shadow-sm">
             <img
               src="/fotos/logo-meu-condominio-horizontal.png"
               alt="Meu Condomínio"
@@ -282,20 +282,20 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
           </span>
 
           {/* Mensagem */}
-          <div className="mt-12 lg:mt-14">
-            <h1 className="text-[34px] font-bold leading-[1.18] tracking-tight xl:text-[40px]">
+          <div className="animar-entrada mt-12 lg:mt-14">
+            <h1 className="font-display text-[34px] font-medium leading-[1.16] tracking-tight xl:text-[42px]">
               Tudo do seu condomínio,
               <br />
-              na palma da mão.
+              <em className="font-light italic">na palma da mão.</em>
             </h1>
-            <p className="mt-5 max-w-[27rem] text-[15px] leading-relaxed text-white/80">
+            <p className="animar-entrada animar-atraso-1 mt-5 max-w-[27rem] text-[15px] leading-relaxed text-white/80">
               Reservas de espaços comuns, encomendas, documentos, assembleias e comunicados — em um
               só lugar, com a segurança que a sua família merece.
             </p>
-            <ul className="mt-7 space-y-3.5">
+            <ul className="animar-entrada animar-atraso-2 mt-7 space-y-3.5">
               {DESTAQUES.map((item) => (
                 <li key={item} className="flex items-center gap-3">
-                  <span className="h-2 w-2 shrink-0 rounded-full bg-emerald-400" />
+                  <span className="h-2 w-2 shrink-0 rounded-full bg-emerald-300" />
                   <span className="text-[15px] text-white/90">{item}</span>
                 </li>
               ))}
@@ -303,7 +303,7 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
           </div>
 
           {/* QR do portal no celular */}
-          <div className="mt-10 flex max-w-[400px] items-start gap-4 rounded-2xl border border-white/15 bg-white/10 p-4 backdrop-blur-md">
+          <div className="animar-entrada animar-atraso-3 mt-10 flex max-w-[400px] items-start gap-4 rounded-2xl border border-white/15 bg-white/10 p-4 backdrop-blur-md">
             <img
               src="/fotos/qr-portal.png"
               alt="QR Code do portal"
@@ -321,7 +321,7 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
             </div>
           </div>
 
-          <p className="mt-auto pt-8 text-xs text-white/55">
+          <p className="animar-aparecer mt-auto pt-8 text-xs text-white/55">
             {MODO_DEMO ? `Ambiente de demonstração com dados fictícios — ${condo.nome}.` : condo.descricao || ""}
           </p>
         </div>
@@ -349,7 +349,7 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
                   key={c.id}
                   type="button"
                   onClick={() => setCondo(c)}
-                  className={`flex items-center gap-3 rounded-xl border bg-white px-4 py-3 text-left transition ${
+                  className={`flex items-center gap-3 rounded-xl border bg-white px-4 py-3 text-left transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md ${
                     ativo
                       ? "border-[var(--cor-tema)] ring-2 ring-[var(--cor-tema)]/25"
                       : "border-stone-200 hover:border-stone-300"
@@ -377,11 +377,11 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
           </div>
 
           {/* Cartão de acesso */}
-          <div className="mt-4 rounded-2xl bg-white p-6 shadow-[var(--sombra-cartao)] sm:p-7">
+          <div className="animar-entrada mt-4 rounded-2xl border border-[var(--cor-neutra)] bg-white p-6 shadow-[var(--sombra-cartao)] sm:p-7">
             {!tipo ? (
               /* ── Etapa 1: pergunta o tipo de usuário ─────────────── */
               <>
-                <h2 className="text-[22px] font-bold tracking-tight text-stone-900">
+                <h2 className="font-display text-[24px] font-medium tracking-tight text-stone-900">
                   Que tipo de usuário é você?
                 </h2>
                 <p className="mt-1.5 text-[15px] text-stone-500">
@@ -399,9 +399,9 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
                           setErro("");
                           setAvisoTipo("");
                         }}
-                        className="flex items-start gap-3.5 rounded-xl border border-stone-200 bg-white px-4 py-3.5 text-left transition hover:border-[var(--cor-tema)] hover:bg-stone-50"
+                        className="flex items-start gap-3.5 rounded-xl border border-stone-200 bg-white px-4 py-3.5 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-[var(--cor-tema)] hover:bg-stone-50 hover:shadow-md"
                       >
-                        <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-stone-100 text-stone-600">
+                        <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[var(--cor-tema-a10)] text-[var(--cor-tema)]">
                           <Icone className="h-[18px] w-[18px]" />
                         </span>
                         <span className="min-w-0">
@@ -421,7 +421,7 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
               /* ── Etapa 2: e-mail e senha (com o tipo escolhido) ──── */
               <>
                 <div className="flex items-center justify-between gap-3">
-                  <h2 className="text-[22px] font-bold tracking-tight text-stone-900">
+                  <h2 className="font-display text-[24px] font-medium tracking-tight text-stone-900">
                     Entrar na plataforma
                   </h2>
                   <button
@@ -508,7 +508,7 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
                   <button
                     type="submit"
                     disabled={enviando}
-                    className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-[var(--cor-tema)] text-[15px] font-semibold text-white transition hover:bg-[var(--cor-tema-botao-hover)] disabled:opacity-60"
+                    className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-[var(--cor-tema)] text-[15px] font-semibold text-white shadow-sm transition-all duration-200 hover:bg-[var(--cor-tema-botao-hover)] hover:shadow-md active:scale-[0.98] disabled:opacity-60"
                   >
                     {enviando ? (
                       <>

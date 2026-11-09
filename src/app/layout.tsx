@@ -1,11 +1,19 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Fraunces, Geist_Mono, Manrope } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import RegistroSW from "@/components/registro-sw";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+// Manrope: geométrica moderna e macia para o corpo da interface.
+// Fraunces: serifada sofisticada (estilo construtora de alto padrão) para
+// títulos e saudações. Geist Mono permanece para códigos/números técnicos.
+const manrope = Manrope({
+  variable: "--font-manrope",
+  subsets: ["latin"],
+});
+
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
   subsets: ["latin"],
 });
 
@@ -46,7 +54,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
+        className={`${manrope.variable} ${fraunces.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
       >
         {children}
         <Toaster />

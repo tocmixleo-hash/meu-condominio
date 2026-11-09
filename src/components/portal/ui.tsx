@@ -1,13 +1,14 @@
 "use client";
 
 // ─────────────────────────────────────────────────────────────
-// Identidade visual "Meu Condomínio" (padrão da tela de início)
-// • Seções SEM caixa: título em caixa alta + filete
-// • Indicadores em linha com divisórias verticais
-// • Listas com separadores horizontais
+// Identidade visual "Meu Condomínio" (padrão sofisticado, ares de
+// construtora premium)
+// • Seções em cartões brancos arredondados com sombra difusa
+// • Título de seção em caixa alta com filete vertical do tema
+// • Indicadores em faixa de KPI com numerais serifados
+// • Listas com separadores horizontais + hover suave
 // • Cores via variáveis de tema (--cor-*) definidas por condomínio
 // • Verde/vermelho apenas p/ status
-// • Sem sombras, sem caixas coloridas, sem cards de dimensões exageradas
 // ─────────────────────────────────────────────────────────────
 
 import type { ReactNode } from "react";
@@ -37,7 +38,7 @@ export {
   dataHoraCurta,
 };
 
-// ── Seção sem caixa ──────────────────────────────────────────
+// ── Seção em cartão ──────────────────────────────────────────
 
 export function Secao({
   titulo,
@@ -53,14 +54,21 @@ export function Secao({
   tour?: string;
 }) {
   return (
-    <section data-tour={tour} className={className}>
-      <div className="mb-1 flex items-center justify-between gap-3">
-        <h2 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-500">
+    <section
+      data-tour={tour}
+      className={`rounded-2xl border border-[var(--cor-neutra)] bg-white shadow-[var(--sombra-suave)] ${className}`}
+    >
+      <div className="flex items-center justify-between gap-3 px-5 pt-4 sm:px-6">
+        <h2 className="flex items-center gap-2.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-500">
+          <span
+            aria-hidden
+            className="h-3.5 w-[3px] shrink-0 rounded-full bg-[var(--cor-tema)]"
+          />
           {titulo}
         </h2>
         {acao}
       </div>
-      {children}
+      <div className="px-5 pb-5 pt-2 sm:px-6 sm:pb-6">{children}</div>
     </section>
   );
 }
@@ -75,16 +83,20 @@ export function LinhaIndicadores({
   className?: string;
 }) {
   return (
-    <div className={`flex flex-col sm:flex-row sm:divide-x sm:divide-[var(--cor-neutra-2)] ${className}`}>
+    <div
+      className={`flex flex-col rounded-2xl border border-[var(--cor-neutra)] bg-white shadow-[var(--sombra-suave)] sm:flex-row sm:divide-x sm:divide-[var(--cor-neutra-2)] ${className}`}
+    >
       {itens.map((item, i) => (
         <div
           key={item.rotulo}
-          className={`py-2.5 sm:flex-1 sm:py-1 ${i === 0 ? "sm:pl-0" : "sm:px-5"} ${
-            i === itens.length - 1 ? "sm:pr-0" : ""
+          className={`py-3 sm:flex-1 sm:py-4 ${i === 0 ? "sm:pl-6" : "sm:px-6"} ${
+            i === itens.length - 1 ? "sm:pr-6" : ""
           }`}
         >
-          <p className="text-2xl font-semibold tabular-nums text-stone-900">{item.valor}</p>
-          <p className="mt-0.5 text-[11px] font-medium uppercase tracking-[0.12em] text-stone-500">
+          <p className="font-display text-[27px] font-semibold leading-none tabular-nums text-stone-900">
+            {item.valor}
+          </p>
+          <p className="mt-1.5 text-[11px] font-medium uppercase tracking-[0.12em] text-stone-500">
             {item.rotulo}
           </p>
         </div>
@@ -104,16 +116,21 @@ export function LinhaLista({
   secundaria,
   detalhe,
   direita,
+  midia,
   className = "",
 }: {
   principal: ReactNode;
   secundaria?: ReactNode;
   detalhe?: ReactNode;
   direita?: ReactNode;
+  midia?: ReactNode; // miniatura opcional à esquerda (ex.: foto do espaço)
   className?: string;
 }) {
   return (
-    <div className={`flex items-center gap-4 py-3 ${className}`}>
+    <div
+      className={`-mx-2 flex items-center gap-3.5 rounded-xl px-2 py-3 transition-colors duration-200 hover:bg-[var(--cor-tema-a06)] sm:-mx-3 sm:px-3 ${className}`}
+    >
+      {midia && <div className="shrink-0">{midia}</div>}
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-medium text-stone-900">{principal}</p>
         {secundaria && <p className="mt-0.5 truncate text-sm text-stone-500">{secundaria}</p>}
@@ -127,7 +144,7 @@ export function LinhaLista({
 // ── Estados ──────────────────────────────────────────────────
 
 export function EstadoVazio({ mensagem }: { mensagem: string }) {
-  return <p className="py-6 text-sm text-stone-400">{mensagem}</p>;
+  return <p className="py-7 text-center text-sm text-stone-400">{mensagem}</p>;
 }
 
 export function Carregando() {
@@ -249,7 +266,7 @@ export function BotaoPrimario({
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={`inline-flex h-9 items-center justify-center gap-2 rounded-md bg-[var(--cor-tema)] px-4 text-sm font-medium text-[var(--cor-fundo)] transition-colors hover:bg-[var(--cor-tema-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cor-tema-suave)] disabled:pointer-events-none disabled:opacity-50 ${className}`}
+      className={`inline-flex h-9 items-center justify-center gap-2 rounded-full bg-[var(--cor-tema)] px-5 text-sm font-semibold text-[var(--cor-fundo)] shadow-sm transition-all duration-200 hover:bg-[var(--cor-tema-hover)] hover:shadow-md active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cor-tema-suave)] disabled:pointer-events-none disabled:opacity-50 ${className}`}
     >
       {children}
     </button>
@@ -271,7 +288,7 @@ export function BotaoSecundario({
   className?: string;
   href?: string;
 }) {
-  const classes = `inline-flex h-9 items-center justify-center gap-2 rounded-md border border-[var(--cor-neutra-2)] bg-white px-4 text-sm font-medium text-stone-700 transition-colors hover:bg-[var(--cor-neutra)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cor-tema-suave)] disabled:pointer-events-none disabled:opacity-50 ${className}`;
+  const classes = `inline-flex h-9 items-center justify-center gap-2 rounded-full border border-[var(--cor-neutra-2)] bg-white px-4 text-sm font-semibold text-stone-700 transition-all duration-200 hover:border-[var(--cor-tema-suave)] hover:bg-[var(--cor-tema-a06)] hover:text-[var(--cor-tema)] active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cor-tema-suave)] disabled:pointer-events-none disabled:opacity-50 ${className}`;
   if (href) {
     return (
       <a href={href} className={classes}>

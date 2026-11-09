@@ -518,13 +518,13 @@ export default function AppShell({
             key={item.id}
             onClick={() => trocar(item.id)}
             aria-current={ativo ? "page" : undefined}
-            className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors ${
+            className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all duration-200 ${
               ativo
-                ? "bg-[var(--cor-tema-hover)] font-medium text-[var(--cor-fundo)]"
+                ? "bg-[var(--cor-tema-hover)] font-medium text-[var(--cor-fundo)] shadow-sm"
                 : "text-[var(--cor-clara-a85)] hover:bg-[var(--cor-tema-hover-a60)] hover:text-[var(--cor-fundo)]"
             }`}
           >
-            <Icone className="h-4 w-4 shrink-0" />
+            <Icone className={`h-4 w-4 shrink-0 transition-transform duration-200 ${ativo ? "scale-110" : ""}`} />
             {item.rotulo}
           </button>
         );
@@ -536,7 +536,7 @@ export default function AppShell({
     <div className="border-b border-[var(--cor-tema-hover)] px-4 py-4">
       {/* Logotipo do condomínio (versão de menu quando existir) — identidade
           independente refletida em todos os ambientes */}
-      <div className="flex h-14 items-center justify-center rounded-xl bg-white px-3 shadow-sm">
+      <div className="flex h-16 items-center justify-center rounded-xl bg-white px-3 shadow-sm">
         <Image
           src={condominio.logoMenu || condominio.logo}
           alt={condominio.nome}
@@ -625,7 +625,7 @@ export default function AppShell({
             className="absolute inset-0 bg-black/40"
             onClick={() => setMenuAberto(false)}
           />
-          <aside className="absolute inset-y-0 left-0 flex w-64 flex-col bg-[var(--cor-sidebar)] shadow-xl">
+          <aside className="animar-deslizar-direita absolute inset-y-0 left-0 flex w-64 flex-col bg-[var(--cor-sidebar)] shadow-xl">
             <button
               aria-label="Fechar"
               className="absolute right-3 top-3 text-[var(--cor-clara-a80)] hover:text-[var(--cor-fundo)]"

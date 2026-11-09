@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 import { ChevronLeft, ChevronRight, LoaderCircle } from "lucide-react";
 import {
   Badge,
@@ -55,6 +56,70 @@ const HORARIOS = [
 ];
 
 const DIAS_SEMANA = ["D", "S", "T", "Q", "Q", "S", "S"];
+
+// Fotos ilustrativas dos espaços comuns — apresentação com ares de
+// construtora (piscina, salão, churrasqueira e quadra).
+const FOTO_ESPACO: Record<string, string> = {
+  SALAO_FESTAS: "/fotos/espaco-salao-festas.jpg",
+  CHURRASQUEIRA: "/fotos/espaco-churrasqueira.jpg",
+  QUADRA: "/fotos/espaco-quadra.jpg",
+  PISCINA: "/fotos/espaco-piscina.jpg",
+};
+
+// Miniatura usada nas linhas de reserva e de regras.
+function MiniaturaEspaco({ espaco, tamanho = "h-11 w-11" }: { espaco: string; tamanho?: string }) {
+  const foto = FOTO_ESPACO[espaco];
+  if (!foto) return null;
+  return (
+    <div className={`relative shrink-0 overflow-hidden rounded-lg border border-[var(--cor-neutra)] ${tamanho}`}>
+      <Image src={foto} alt="" fill sizes="44px" className="object-cover" />
+    </div>
+  );
+}
+
+// Cartão com foto para a galeria de espaços.
+function CartaoEspaco({
+  rotulo,
+  foto,
+  meta,
+  acaoRotulo,
+  aoClicar,
+}: {
+  rotulo: string;
+  foto: string;
+  meta: string;
+  acaoRotulo: string;
+  aoClicar: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={aoClicar}
+      className="group overflow-hidden rounded-xl border border-[var(--cor-neutra)] bg-white text-left shadow-[var(--sombra-suave)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[var(--sombra-cartao)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cor-tema-suave)]"
+    >
+      <div className="relative aspect-[16/10] overflow-hidden">
+        <Image
+          src={foto}
+          alt={rotulo}
+          fill
+          sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, calc(100vw - 3rem)"
+          className="object-cover transition-transform duration-500 group-hover:scale-105"
+        />
+        <div className="absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-black/50 to-transparent" />
+        <p className="font-display absolute bottom-2 left-3.5 text-[17px] font-medium leading-tight text-white drop-shadow">
+          {rotulo}
+        </p>
+      </div>
+      <div className="flex items-center justify-between gap-2 px-3.5 py-2.5">
+        <p className="min-w-0 truncate text-xs text-stone-500">{meta}</p>
+        <span className="flex shrink-0 items-center gap-1 text-xs font-semibold text-[var(--cor-tema)]">
+          {acaoRotulo}
+          <ChevronRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-0.5" />
+        </span>
+      </div>
+    </button>
+  );
+}
 
 function mesISO(offset = 0) {
   const d = new Date();
@@ -173,15 +238,61 @@ export default function Reservas({ perfil }: { perfil: Perfil }) {
 
   return (
     <div className="space-y-6">
+      {/* Galeria dos espaços comuns — fotos + atalho direto para a ação */}
+      <Secao
+        titulo="Espaços do condomínio"
+        acao={
+          <span className="text-xs text-stone-400">
+            {perfil === "MORADOR" ? "Toque para reservar" : "Toque para ajustar as regras"}
+          </span>
+        }
+      >
+        <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
+          {Object.entries(ROTULO_ESPACO)
+            .filter(([k]) => k !== "VIRTUAL" && FOTO_ESPACO[k])
+            .map(([k, v]) => {
+              const rg = regraDoEspaco(k);
+              return (
+                <CartaoEspaco
+                  key={k}
+                  rotulo={v}
+                  foto={FOTO_ESPACO[k]}
+                  meta={
+                    rg
+                      ? `Antecedência de até ${rg.antecedenciaMaxDias} dia(s) · ${rg.limiteMensalUnidade}/mês`
+                      : "Veja as regras abaixo"
+                  }
+                  acaoRotulo={perfil === "MORADOR" ? "Reservar" : "Regras"}
+                  aoClicar={() => {
+                    if (perfil === "MORADOR") {
+                      setForm({ ...VAZIO, espaco: k });
+                      setErro("");
+                      setAberto(true);
+                    } else if (rg) {
+                      setEditandoRegra(rg);
+                      setRegraForm({
+                        antecedenciaMaxDias: rg.antecedenciaMaxDias,
+                        limiteMensalUnidade: rg.limiteMensalUnidade,
+                        regrasTexto: rg.regrasTexto,
+                      });
+                      setErro("");
+                    }
+                  }}
+                />
+              );
+            })}
+        </div>
+      </Secao>
+
       <div className="flex items-center justify-between gap-3">
-        <div className="inline-flex rounded-md border border-[var(--cor-neutra-2)] bg-white p-0.5">
+        <div className="inline-flex rounded-full border border-[var(--cor-neutra-2)] bg-white p-1 shadow-sm">
           {(["lista", "calendario"] as const).map((v) => (
             <button
               key={v}
               onClick={() => setVisao(v)}
-              className={`h-8 rounded px-3 text-sm font-medium transition ${
+              className={`h-8 rounded-full px-4 text-sm font-medium transition-all duration-200 ${
                 visao === v
-                  ? "bg-[var(--cor-tema)] text-[var(--cor-fundo)]"
+                  ? "bg-[var(--cor-tema)] text-[var(--cor-fundo)] shadow-sm"
                   : "text-stone-600 hover:bg-[var(--cor-neutra)]"
               }`}
             >
@@ -278,6 +389,7 @@ export default function Reservas({ perfil }: { perfil: Perfil }) {
               {lista.map((r) => (
                 <LinhaLista
                   key={r.id}
+                  midia={<MiniaturaEspaco espaco={r.espaco} />}
                   principal={`${ROTULO_ESPACO[r.espaco] ?? r.espaco} · ${formatarData(r.data)}`}
                   secundaria={
                     ehGestao
@@ -323,6 +435,7 @@ export default function Reservas({ perfil }: { perfil: Perfil }) {
             {regras.map((r) => (
               <LinhaLista
                 key={r.espaco}
+                midia={<MiniaturaEspaco espaco={r.espaco} />}
                 principal={r.rotulo}
                 secundaria={`Até ${r.antecedenciaMaxDias} dia(s) de antecedência · ${r.limiteMensalUnidade} reserva(s)/mês por unidade`}
                 detalhe={r.regrasTexto || undefined}
@@ -356,18 +469,32 @@ export default function Reservas({ perfil }: { perfil: Perfil }) {
             className="absolute inset-0 bg-black/40"
             onClick={() => setAberto(false)}
           />
-          <div className="relative w-full max-w-md rounded-lg border border-[var(--cor-neutra)] bg-white p-6 shadow-xl">
-            <h3 className="text-base font-semibold text-stone-900">Nova reserva</h3>
-            <p className="mt-0.5 text-sm text-stone-500">
-              A reserva fica pendente até a aprovação da administração.
-              {(() => {
-                const rg = regraDoEspaco(form.espaco);
-                return rg
-                  ? ` ${ROTULO_ESPACO[form.espaco] ?? form.espaco}: até ${rg.antecedenciaMaxDias} dia(s) de antecedência e ${rg.limiteMensalUnidade} reserva(s) por mês.${rg.regrasTexto ? ` ${rg.regrasTexto}` : ""}`
-                  : "";
-              })()}
-            </p>
-            <div className="mt-4 space-y-3">
+          <div className="relative w-full max-w-md overflow-hidden rounded-2xl border border-[var(--cor-neutra)] bg-white shadow-[var(--sombra-cartao)]">
+            {/* Foto do espaço escolhido — confirmação visual imediata */}
+            <div className="relative h-28 w-full overflow-hidden">
+              <Image
+                src={FOTO_ESPACO[form.espaco] ?? "/fotos/espaco-salao-festas.jpg"}
+                alt={ROTULO_ESPACO[form.espaco] ?? form.espaco}
+                fill
+                sizes="480px"
+                className="object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent" />
+              <p className="font-display absolute bottom-2.5 left-4 text-lg font-medium text-white drop-shadow">
+                {ROTULO_ESPACO[form.espaco] ?? form.espaco}
+              </p>
+            </div>
+            <div className="p-5 pt-4">
+              <p className="text-sm text-stone-500">
+                A reserva fica pendente até a aprovação da administração.
+                {(() => {
+                  const rg = regraDoEspaco(form.espaco);
+                  return rg
+                    ? ` ${ROTULO_ESPACO[form.espaco] ?? form.espaco}: até ${rg.antecedenciaMaxDias} dia(s) de antecedência e ${rg.limiteMensalUnidade} reserva(s) por mês.${rg.regrasTexto ? ` ${rg.regrasTexto}` : ""}`
+                    : "";
+                })()}
+              </p>
+              <div className="mt-4 space-y-3">
               <select
                 value={form.espaco}
                 onChange={(e) => setForm({ ...form, espaco: e.target.value })}
@@ -422,6 +549,7 @@ export default function Reservas({ perfil }: { perfil: Perfil }) {
                 {enviando && <LoaderCircle className="h-4 w-4 animate-spin" />} Solicitar
               </BotaoPrimario>
             </div>
+            </div>
           </div>
         </div>
       )}
@@ -433,7 +561,7 @@ export default function Reservas({ perfil }: { perfil: Perfil }) {
             className="absolute inset-0 bg-black/40"
             onClick={() => setEditandoRegra(null)}
           />
-          <div className="relative w-full max-w-md rounded-lg border border-[var(--cor-neutra)] bg-white p-6 shadow-xl">
+          <div className="relative w-full max-w-md rounded-2xl border border-[var(--cor-neutra)] bg-white p-6 shadow-[var(--sombra-cartao)]">
             <h3 className="text-base font-semibold text-stone-900">
               Regras — {editandoRegra.rotulo}
             </h3>

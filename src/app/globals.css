@@ -6,7 +6,8 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-manrope);
+  --font-display: var(--font-fraunces);
   --font-mono: var(--font-geist-mono);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -45,25 +46,25 @@
 
 :root {
   color-scheme: light; /* impede o auto-dark do navegador de escurecer a interface */
-  --radius: 0.375rem;
-  /* Identidade visual Meu Condomínio — tons quentes de pedra e marrom */
-  --background: #f7f6f3;
+  --radius: 0.625rem;
+  /* Identidade visual Meu Condomínio — tons quentes de areia e pedra */
+  --background: #faf9f7;
   --foreground: #292524;
   --card: #ffffff;
   --card-foreground: #292524;
   --popover: #ffffff;
   --popover-foreground: #292524;
   --primary: #4d403a;
-  --primary-foreground: #f7f6f3;
-  --secondary: #efe9e1;
+  --primary-foreground: #faf9f7;
+  --secondary: #f1ece5;
   --secondary-foreground: #4d403a;
-  --muted: #efe9e1;
+  --muted: #f1ece5;
   --muted-foreground: #78716c;
-  --accent: #efe9e1;
+  --accent: #f1ece5;
   --accent-foreground: #4d403a;
   --destructive: #b91c1c;
-  --border: #efe9e1;
-  --input: #dfdacf;
+  --border: #eae4db;
+  --input: #e3dccf;
   --ring: #a3968d;
   --chart-1: #4d403a;
   --chart-2: #78716c;
@@ -120,7 +121,97 @@
   }
   body {
     @apply bg-background text-foreground;
+    -webkit-font-smoothing: antialiased;
   }
+  ::selection {
+    background: rgba(77, 64, 58, 0.14);
+  }
+}
+
+/* ── Movimento: entradas suaves estilo construtora premium ─────
+   Animações leves (apenas opacity + transform) para não pesar no
+   celular. Preferências do usuário são respeitadas. */
+@keyframes mc-entrada {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes mc-aparecer {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes mc-deslizar-direita {
+  from {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@layer utilities {
+  .animar-entrada {
+    animation: mc-entrada 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .animar-aparecer {
+    animation: mc-aparecer 0.4s ease-out both;
+  }
+  .animar-deslizar-direita {
+    animation: mc-deslizar-direita 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .animar-atraso-1 {
+    animation-delay: 0.06s;
+  }
+  .animar-atraso-2 {
+    animation-delay: 0.12s;
+  }
+  .animar-atraso-3 {
+    animation-delay: 0.18s;
+  }
+  .animar-atraso-4 {
+    animation-delay: 0.24s;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animar-entrada,
+  .animar-aparecer,
+  .animar-deslizar-direita {
+    animation: none !important;
+  }
+}
+
+/* Rolagem refinada nas áreas com scroll do portal */
+main::-webkit-scrollbar,
+nav::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+main::-webkit-scrollbar-thumb,
+nav::-webkit-scrollbar-thumb {
+  background: rgba(120, 113, 108, 0.25);
+  border-radius: 999px;
+}
+main::-webkit-scrollbar-thumb:hover,
+nav::-webkit-scrollbar-thumb:hover {
+  background: rgba(120, 113, 108, 0.4);
+}
+main::-webkit-scrollbar-track,
+nav::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 /* Campo de busca do FAQ: esconde o botão nativo de limpar do WebKit

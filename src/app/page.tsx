@@ -218,39 +218,42 @@ export default function Inicio() {
           {aviso}
         </p>
       )}
-      {modulo === "inicio" && (
-        <Dashboard
-          nome={usuario.nome}
-          perfil={perfilModulos}
-          unidade={usuario.unidade}
-          condominio={condominio}
-          aoTrocar={setModulo}
-        />
-      )}
-      {modulo === "comunicados" && <Comunicados perfil={perfilModulos} />}
-      {modulo === "reservas" && <Reservas perfil={perfilModulos} />}
-      {modulo === "encomendas" && <Encomendas perfil={perfilModulos} />}
-      {modulo === "autorizacoes" && <Autorizacoes perfil={perfilModulos} />}
-      {modulo === "ocorrencias" && <Ocorrencias perfil={perfilModulos} />}
-      {modulo === "duvidas" && (
-        <Faq condominio={condominio} aoTrocar={setModulo} />
-      )}
-      {modulo === "manutencao" && <Manutencao />}
-      {modulo === "documentos" && <Documentos perfil={perfilModulos} />}
-      {modulo === "assembleias" && <Assembleias perfil={perfilModulos} />}
-      {modulo === "moradores" && <Moradores />}
-      {modulo === "auditoria" && <Auditoria />}
-      {modulo === "funcoes" && <Funcoes />}
-      {modulo === "identidade" && (
-        <Identidade
-          condominio={condominio}
-          podeEditar={podeEditarIdentidade}
-          aoAtualizar={verificar}
-        />
-      )}
-      {modulo === "condominios" && (
-        <Condominios ativoId={condominio.id} aoOperar={trocarCondominio} />
-      )}
+      {/* Cada troca de módulo entra com fade + deslize suave (CSS, leve no celular) */}
+      <div key={modulo} className="animar-entrada">
+        {modulo === "inicio" && (
+          <Dashboard
+            nome={usuario.nome}
+            perfil={perfilModulos}
+            unidade={usuario.unidade}
+            condominio={condominio}
+            aoTrocar={setModulo}
+          />
+        )}
+        {modulo === "comunicados" && <Comunicados perfil={perfilModulos} />}
+        {modulo === "reservas" && <Reservas perfil={perfilModulos} />}
+        {modulo === "encomendas" && <Encomendas perfil={perfilModulos} />}
+        {modulo === "autorizacoes" && <Autorizacoes perfil={perfilModulos} />}
+        {modulo === "ocorrencias" && <Ocorrencias perfil={perfilModulos} />}
+        {modulo === "duvidas" && (
+          <Faq condominio={condominio} aoTrocar={setModulo} />
+        )}
+        {modulo === "manutencao" && <Manutencao />}
+        {modulo === "documentos" && <Documentos perfil={perfilModulos} />}
+        {modulo === "assembleias" && <Assembleias perfil={perfilModulos} />}
+        {modulo === "moradores" && <Moradores />}
+        {modulo === "auditoria" && <Auditoria />}
+        {modulo === "funcoes" && <Funcoes />}
+        {modulo === "identidade" && (
+          <Identidade
+            condominio={condominio}
+            podeEditar={podeEditarIdentidade}
+            aoAtualizar={verificar}
+          />
+        )}
+        {modulo === "condominios" && (
+          <Condominios ativoId={condominio.id} aoOperar={trocarCondominio} />
+        )}
+      </div>
 
       {/* Mini tutorial do primeiro acesso (e "Rever tutorial") */}
       {tour && usuario && (

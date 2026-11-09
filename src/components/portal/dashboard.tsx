@@ -179,8 +179,8 @@ export default function Dashboard({
 
   return (
     <div className="space-y-5">
-      {/* Faixa panorâmica — largura total, cantos retos, degradê para o fundo */}
-      <div className="relative -mx-4 h-[72px] overflow-hidden sm:-mx-6 sm:h-[76px] lg:-mx-8 lg:h-[92px]">
+      {/* Faixa panorâmica — largura total, degradê suave para o fundo */}
+      <div className="animar-aparecer relative -mx-4 h-[110px] overflow-hidden sm:-mx-6 sm:h-[130px] lg:-mx-8 lg:h-[150px]">
         <Image
           src={condominio.foto}
           alt={`Área comum do ${condominio.nome}`}
@@ -189,11 +189,11 @@ export default function Dashboard({
           className="object-cover object-[50%_42%]"
           sizes="100vw"
         />
-        <div className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-b from-transparent to-[var(--cor-fundo)]" />
+        <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-b from-transparent to-[var(--cor-fundo)]" />
       </div>
 
-      {/* Cabeçalho — texto direto no fundo + ações rápidas à direita */}
-      <header className="-mt-3 flex items-end justify-between gap-6">
+      {/* Cabeçalho — saudação em serifada + ações rápidas à direita */}
+      <header className="-mt-4 flex items-end justify-between gap-6">
         <div className="min-w-0 space-y-1.5">
           <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-500">
             {condominio.nome.toUpperCase()} · {dataLonga()}
@@ -202,12 +202,12 @@ export default function Dashboard({
             <Image
               src={condominio.logo}
               alt={`Logo do ${condominio.nome}`}
-              width={44}
-              height={44}
-              className="h-11 w-11 shrink-0 rounded-md border border-[var(--cor-neutra)] bg-white object-contain p-0.5"
+              width={48}
+              height={48}
+              className="h-12 w-12 shrink-0 rounded-xl border border-[var(--cor-neutra)] bg-white object-contain p-1 shadow-sm"
             />
             <div>
-              <h1 className="text-2xl font-semibold leading-tight text-stone-900">
+              <h1 className="font-display text-[26px] font-medium leading-tight text-stone-900 sm:text-3xl">
                 {saudacao()}, {nome.split(" ")[0]}
               </h1>
               {perfil === "MORADOR" && unidade && (
