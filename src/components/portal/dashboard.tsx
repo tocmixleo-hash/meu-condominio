@@ -27,6 +27,8 @@ import {
 } from "@/components/portal/ui";
 import type { ModuloId, Perfil } from "@/components/portal/app-shell";
 
+import CampanhaDestaque from "@/components/portal/campanha-destaque";
+
 type Encomenda = {
   id: string;
   descricao: string;
@@ -238,6 +240,9 @@ export default function Dashboard({
           </BotaoSecundario>
         ))}
       </div>
+
+      {/* Campanhas em destaque — conscientização e boas práticas */}
+      <CampanhaDestaque />
 
       {/* Indicadores */}
       {!dados ? (

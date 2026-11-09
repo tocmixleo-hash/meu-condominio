@@ -256,7 +256,7 @@ export default function Autorizacoes({ perfil }: { perfil: Perfil }) {
             className="absolute inset-0 bg-black/40"
             onClick={() => setAberto(false)}
           />
-          <div className="relative w-full max-w-md rounded-lg border border-[var(--cor-neutra)] bg-white p-6 shadow-xl">
+          <div className="relative max-h-[88dvh] w-full max-w-md overflow-y-auto rounded-lg border border-[var(--cor-neutra)] bg-white p-6 shadow-xl">
             <h3 className="text-base font-semibold text-stone-900">Autorizar acesso</h3>
             <p className="mt-0.5 text-sm text-stone-500">
               A portaria recebe a autorização imediatamente.
@@ -335,7 +335,7 @@ export default function Autorizacoes({ perfil }: { perfil: Perfil }) {
             className="absolute inset-0 bg-black/40"
             onClick={() => setQr(null)}
           />
-          <div className="relative w-full max-w-xs rounded-lg border border-[var(--cor-neutra)] bg-white p-6 text-center shadow-xl">
+          <div className="relative max-h-[88dvh] w-full max-w-xs overflow-y-auto rounded-lg border border-[var(--cor-neutra)] bg-white p-6 text-center shadow-xl">
             <h3 className="text-base font-semibold text-stone-900">{qr.nome}</h3>
             <p className="mt-0.5 text-xs text-stone-500">
               Mostre este QR na portaria — a entrada é registrada na hora.

@@ -307,7 +307,7 @@ function DialogoSenha({ aoFechar }: { aoFechar: () => void }) {
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
       <button aria-label="Fechar" className="absolute inset-0 bg-black/40" onClick={aoFechar} />
-      <div className="relative w-full max-w-sm rounded-xl bg-white p-6 shadow-2xl">
+      <div className="relative max-h-[88dvh] w-full max-w-sm overflow-y-auto rounded-xl bg-white p-6 shadow-2xl">
         <h2 className="text-lg font-semibold text-stone-900">Alterar senha</h2>
         <div className="mt-4 space-y-3">
           <input type="password" autoComplete="current-password" placeholder="Senha atual" value={atual} onChange={(e) => setAtual(e.target.value)} className={campo} />

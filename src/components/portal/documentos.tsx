@@ -145,7 +145,7 @@ export default function Documentos({ perfil }: { perfil: Perfil }) {
             className="absolute inset-0 bg-black/40"
             onClick={() => setAberto(false)}
           />
-          <div className="relative w-full max-w-md rounded-lg border border-[var(--cor-neutra)] bg-white p-6 shadow-xl">
+          <div className="relative max-h-[88dvh] w-full max-w-md overflow-y-auto rounded-lg border border-[var(--cor-neutra)] bg-white p-6 shadow-xl">
             <h3 className="text-base font-semibold text-stone-900">Enviar documento</h3>
             <p className="mt-0.5 text-sm text-stone-500">PDF ou imagem, até 8 MB.</p>
             <div className="mt-4 space-y-3">

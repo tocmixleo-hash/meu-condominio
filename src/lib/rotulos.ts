@@ -24,6 +24,21 @@ export const ROTULO_CATEGORIA_ENCOMENDA: Record<string, string> = {
   OUTRO: "Outro",
 };
 
+// Categorias de campanha de conscientização (destaque do painel inicial)
+export const ROTULO_CATEGORIA_CAMPANHA: Record<string, string> = {
+  CONVIVENCIA: "Convivência",
+  PET: "Pet",
+  SUSTENTABILIDADE: "Sustentabilidade",
+  SEGURANCA: "Segurança",
+  SAUDE: "Saúde",
+  GERAL: "Geral",
+};
+
+// Emojis sugeridos no cadastro de campanha (identidade visual da campanha)
+export const EMOJIS_CAMPANHA = [
+  "🐾", "♻️", "🏡", "🤝", "🔇", "🗑️", "🚯", "💧", "🚲", "💚", "📢", "🦺",
+] as const;
+
 export const ROTULO_CATEGORIA_DOCUMENTO: Record<string, string> = {
   ATA: "Ata",
   CONVENCAO: "Convenção",

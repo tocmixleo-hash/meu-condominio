@@ -203,7 +203,7 @@ export default function Encomendas({ perfil }: { perfil: Perfil }) {
             className="absolute inset-0 bg-black/40"
             onClick={() => setRegistrar(false)}
           />
-          <div className="relative w-full max-w-md rounded-lg border border-[var(--cor-neutra)] bg-white p-6 shadow-xl">
+          <div className="relative max-h-[88dvh] w-full max-w-md overflow-y-auto rounded-lg border border-[var(--cor-neutra)] bg-white p-6 shadow-xl">
             <h3 className="text-base font-semibold text-stone-900">Registrar encomenda</h3>
             <p className="mt-0.5 text-sm text-stone-500">
               Um código de retirada é gerado automaticamente para o morador.
@@ -268,7 +268,7 @@ export default function Encomendas({ perfil }: { perfil: Perfil }) {
             className="absolute inset-0 bg-black/40"
             onClick={() => setQr(null)}
           />
-          <div className="relative w-full max-w-xs rounded-lg border border-[var(--cor-neutra)] bg-white p-6 text-center shadow-xl">
+          <div className="relative max-h-[88dvh] w-full max-w-xs overflow-y-auto rounded-lg border border-[var(--cor-neutra)] bg-white p-6 text-center shadow-xl">
             <h3 className="text-base font-semibold text-stone-900">{qr.descricao}</h3>
             <p className="mt-0.5 text-xs text-stone-500">
               Mostre este QR na portaria para liberar a retirada.
@@ -295,7 +295,7 @@ export default function Encomendas({ perfil }: { perfil: Perfil }) {
             className="absolute inset-0 bg-black/40"
             onClick={() => setLiberar(null)}
           />
-          <div className="relative w-full max-w-sm rounded-lg border border-[var(--cor-neutra)] bg-white p-6 shadow-xl">
+          <div className="relative max-h-[88dvh] w-full max-w-sm overflow-y-auto rounded-lg border border-[var(--cor-neutra)] bg-white p-6 shadow-xl">
             <h3 className="text-base font-semibold text-stone-900">Liberar retirada</h3>
             <p className="mt-0.5 text-sm text-stone-500">
               Confirme o código informado pelo morador de{" "}

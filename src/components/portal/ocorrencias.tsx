@@ -173,7 +173,7 @@ export default function Ocorrencias({ perfil }: { perfil: Perfil }) {
       {aberto && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <button aria-label="Fechar" className="absolute inset-0 bg-black/40" onClick={() => setAberto(false)} />
-          <div className="relative w-full max-w-md rounded-lg border border-[var(--cor-neutra)] bg-white p-6 shadow-xl">
+          <div className="relative max-h-[88dvh] w-full max-w-md overflow-y-auto rounded-lg border border-[var(--cor-neutra)] bg-white p-6 shadow-xl">
             <h3 className="text-base font-semibold text-stone-900">Registrar ocorrência</h3>
             <p className="mt-0.5 text-sm text-stone-500">
               Descreva o problema — quanto mais claro, mais rápido o atendimento.
@@ -241,7 +241,7 @@ export default function Ocorrencias({ perfil }: { perfil: Perfil }) {
             className="absolute inset-0 bg-black/40"
             onClick={() => setAtendimento(null)}
           />
-          <div className="relative w-full max-w-md rounded-lg border border-[var(--cor-neutra)] bg-white p-6 shadow-xl">
+          <div className="relative max-h-[88dvh] w-full max-w-md overflow-y-auto rounded-lg border border-[var(--cor-neutra)] bg-white p-6 shadow-xl">
             <h3 className="text-base font-semibold text-stone-900">{atendimento.titulo}</h3>
             <p className="mt-1 text-sm text-stone-600">{atendimento.descricao}</p>
             <p className="mt-1 text-xs text-stone-400">

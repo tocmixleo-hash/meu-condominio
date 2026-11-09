@@ -222,3 +222,15 @@ input[type="search"]::-webkit-search-decoration {
   -webkit-appearance: none;
   appearance: none;
 }
+
+/* Evita o auto-zoom do iOS ao focar campos (fonte < 16px): no celular,
+   o zoom da página "cortava" a parte superior dos modais de reserva.
+   Mantém 16px apenas nos controles de formulário do mobile — desktop
+   permanece inalterado. */
+@media (max-width: 640px) {
+  input:not([type="checkbox"]):not([type="radio"]),
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}

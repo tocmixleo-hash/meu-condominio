@@ -173,6 +173,40 @@ async function main() {
     inseridos++;
   }
 
+  // 8. REGRAS DE RESERVA — chave natural: (condomínio, espaço)
+  for (const r of await sqlD("SELECT * FROM RegraReserva")) {
+    const condoId = condos[condoDemo[r.condominioId]];
+    if (!condoId) continue;
+    const existe = await sqlP(
+      "SELECT id FROM RegraReserva WHERE condominioId = ? AND espaco = ? LIMIT 1",
+      [condoId, r.espaco],
+    );
+    if (existe.length > 0) continue;
+    await prod.execute({
+      sql: "INSERT INTO RegraReserva (id, condominioId, espaco, antecedenciaMaxDias, limiteMensalUnidade, regrasTexto, ativo, criadoEm) VALUES (?, ?, ?, ?, ?, ?, 1, ?)",
+      args: [cuid(), condoId, r.espaco, r.antecedenciaMaxDias, r.limiteMensalUnidade, r.regrasTexto, Date.now()],
+    });
+    console.log(`  + Regra de reserva [${condoDemo[r.condominioId]}]: ${r.espaco}`);
+    inseridos++;
+  }
+
+  // 9. CAMPANHAS EM DESTAQUE — chave natural: (condomínio, título)
+  for (const r of await sqlD("SELECT * FROM Campanha")) {
+    const condoId = condos[condoDemo[r.condominioId]];
+    if (!condoId) continue;
+    const existe = await sqlP(
+      "SELECT id FROM Campanha WHERE condominioId = ? AND titulo = ? LIMIT 1",
+      [condoId, r.titulo],
+    );
+    if (existe.length > 0) continue;
+    await prod.execute({
+      sql: "INSERT INTO Campanha (id, condominioId, titulo, mensagem, descricao, categoria, emoji, ativa, ordem, inicioEm, fimEm, autorId, criadoEm) VALUES (?, ?, ?, ?, ?, ?, ?, 1, ?, NULL, NULL, NULL, ?)",
+      args: [cuid(), condoId, r.titulo, r.mensagem, r.descricao, r.categoria, r.emoji, r.ordem, Date.now()],
+    });
+    console.log(`  + Campanha [${condoDemo[r.condominioId]}]: ${r.titulo}`);
+    inseridos++;
+  }
+
   console.log(`\nConcluído: ${inseridos} registro(s) de demonstração inserido(s).`);
   console.log("Linhas já existentes NÃO foram alteradas; administrador e dados reais intactos.");
 }

@@ -471,9 +471,9 @@ export default function Reservas({ perfil }: { perfil: Perfil }) {
             className="absolute inset-0 bg-black/40"
             onClick={() => setAberto(false)}
           />
-          <div className="relative w-full max-w-md overflow-hidden rounded-xl border border-[var(--cor-neutra)] bg-white shadow-[var(--sombra-cartao)]">
+          <div className="relative flex max-h-[88dvh] w-full max-w-md flex-col overflow-hidden rounded-xl border border-[var(--cor-neutra)] bg-white shadow-[var(--sombra-cartao)]">
             {/* Foto do espaço escolhido — confirmação visual imediata */}
-            <div className="relative h-28 w-full overflow-hidden">
+            <div className="relative h-28 w-full shrink-0 overflow-hidden">
               <Image
                 src={fotoDoEspaco(form.espaco) ?? "/fotos/espaco-salao-festas.jpg"}
                 alt={ROTULO_ESPACO[form.espaco] ?? form.espaco}
@@ -486,7 +486,7 @@ export default function Reservas({ perfil }: { perfil: Perfil }) {
                 {ROTULO_ESPACO[form.espaco] ?? form.espaco}
               </p>
             </div>
-            <div className="p-5 pt-4">
+            <div className="overflow-y-auto p-5 pt-4">
               <p className="text-sm text-stone-500">
                 A reserva fica pendente até a aprovação da administração.
                 {(() => {
@@ -563,7 +563,7 @@ export default function Reservas({ perfil }: { perfil: Perfil }) {
             className="absolute inset-0 bg-black/40"
             onClick={() => setEditandoRegra(null)}
           />
-          <div className="relative w-full max-w-md rounded-xl border border-[var(--cor-neutra)] bg-white p-6 shadow-[var(--sombra-cartao)]">
+          <div className="relative max-h-[88dvh] w-full max-w-md overflow-y-auto rounded-xl border border-[var(--cor-neutra)] bg-white p-6 shadow-[var(--sombra-cartao)]">
             <h3 className="text-base font-semibold text-stone-900">
               Regras — {editandoRegra.rotulo}
             </h3>

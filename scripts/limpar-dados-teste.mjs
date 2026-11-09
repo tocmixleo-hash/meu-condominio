@@ -39,6 +39,7 @@ const DETALHES_TESTE = [
   "%(teste%",
   "%Equipe Teste%",
   "%Teste filtro%",
+  "%Não deveria%", // comunicados de sonda dos testes antigos (pré-CORTE também)
 ];
 
 let total = 0;

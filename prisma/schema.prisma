@@ -55,6 +55,7 @@ model Condominio {
   manutencoes  Manutencao[]
   regrasReserva RegraReserva[]
   espacoFotos  EspacoFoto[]
+  campanhas    Campanha[]
 }
 
 // Galeria de fotografias do condomínio (áreas comuns e institucionais)
@@ -140,6 +141,7 @@ model Usuario {
   vinculos     UsuarioCondominio[]
 
   comunicados  Comunicado[]
+  campanhas    Campanha[]
   reservas     Reserva[]
   encomendas   Encomenda[]
   autorizacoes Autorizacao[]
@@ -179,6 +181,31 @@ model Comunicado {
   criadoEm     DateTime   @default(now())
 
   @@index([condominioId, criadoEm])
+}
+
+// ── Campanhas de conscientização (destaque no portal) ────────────
+
+// Campanha divulgada pela administração com destaque no painel inicial
+// (banner rotativo). Conteúdo institucional real — ex.: recolher as fezes
+// do pet, boas práticas de convivência — nunca dados de teste.
+model Campanha {
+  id           String     @id @default(cuid())
+  condominioId String
+  condominio   Condominio @relation(fields: [condominioId], references: [id], onDelete: Cascade)
+  titulo       String
+  mensagem     String // texto curto de impacto exibido no banner
+  descricao    String? // texto complementar exibido em "Saiba mais"
+  categoria    String     @default("CONVIVENCIA") // CONVIVENCIA | PET | SUSTENTABILIDADE | SEGURANCA | SAUDE | GERAL
+  emoji        String     @default("📣") // ícone de identidade da campanha
+  ativa        Boolean    @default(true) // pausada = some do destaque sem ser excluída
+  ordem        Int        @default(0)
+  inicioEm     DateTime? // período de veiculação opcional
+  fimEm        DateTime?
+  autorId      String?
+  autor        Usuario?   @relation(fields: [autorId], references: [id], onDelete: SetNull)
+  criadoEm     DateTime   @default(now())
+
+  @@index([condominioId, ativa, ordem])
 }
 
 // ── Reservas de espaços comuns ───────────────────────────────────
