@@ -534,17 +534,17 @@ export default function AppShell({
 
   const marca = (
     <div className="border-b border-[var(--cor-tema-hover)] px-4 py-4">
-      {/* Logotipo do condomínio (versão de menu quando existir) — identidade
-          independente refletida em todos os ambientes */}
+      {/* Marca da plataforma Meu Condomínio — a identidade do condomínio
+          selecionado fica no seletor logo abaixo (logo + nome), sem repetir
+          a mesma logo duas vezes no painel esquerdo */}
       <div className="flex h-16 items-center justify-center rounded-xl bg-white px-3 shadow-sm">
         <Image
-          src={condominio.logoMenu || condominio.logo}
-          alt={condominio.nome}
+          src="/fotos/logo-meu-condominio-horizontal.png"
+          alt="Meu Condomínio"
           width={605}
           height={158}
           className="h-10 w-auto object-contain"
           priority
-          unoptimized={!!condominio.logoMenu}
         />
       </div>
       {/* Condomínio ativo + seletor para múltiplos vínculos */}

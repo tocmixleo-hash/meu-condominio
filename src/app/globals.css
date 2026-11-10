@@ -215,6 +215,26 @@ nav::-webkit-scrollbar-track {
   background: transparent;
 }
 
+/* Barra de rolagem visível e discreta para áreas de conteúdo destacado
+   (benefícios na tela de login): clara sobre a foto, fina no Firefox. */
+.rolagem-fina {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.35) transparent;
+}
+.rolagem-fina::-webkit-scrollbar {
+  width: 8px;
+}
+.rolagem-fina::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.35);
+  border-radius: 999px;
+}
+.rolagem-fina::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.55);
+}
+.rolagem-fina::-webkit-scrollbar-track {
+  background: transparent;
+}
+
 /* Campo de busca do FAQ: esconde o botão nativo de limpar do WebKit
    (o componente já tem seu próprio botão de limpar). */
 input[type="search"]::-webkit-search-cancel-button,
