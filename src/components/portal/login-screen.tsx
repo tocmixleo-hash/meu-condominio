@@ -331,7 +331,7 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
   }
 
   return (
-    <div style={temaVars} className="flex min-h-dvh flex-col bg-[var(--cor-fundo)]">
+    <div style={temaVars} className="flex min-h-dvh flex-col bg-[var(--cor-fundo)] md:h-dvh">
       {/* ── Barra superior: marca à esquerda, Entrar / Fazer cadastro à
           direita (padrão dos grandes sites) ─────────────────────────── */}
       <header className="z-20 flex items-center justify-between gap-3 border-b border-[var(--cor-neutra)] bg-white px-4 py-3 sm:px-8 sm:py-3.5">
@@ -368,7 +368,11 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
         </div>
       </header>
 
-      <div className="flex flex-1 items-stretch">
+      {/* md:min-h-0: deixa a linha ocupar exatamente o restante da viewport
+          no desktop — o painel de benefícios rola por dentro (como planejado)
+          em vez de empurrar a página inteira 74px além da tela. No celular o
+          fluxo normal da página é preservado. */}
+      <div className="flex flex-1 items-stretch md:min-h-0">
         {/* ── Painel esquerdo: foto do condomínio + benefícios ────────── */}
         <div className="relative hidden w-1/2 md:block">
           <img
@@ -452,21 +456,24 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
         </div>
 
       {/* ── Painel direito: acesso — compacto, sem rolagem (a rolagem
-          fica apenas na área de benefícios, à esquerda) ─────────────── */}
-      <div className="flex w-full flex-col overflow-y-auto px-5 py-6 md:w-1/2 md:px-8">
-        <div className="mx-auto my-auto w-full max-w-[490px]">
+          fica apenas na área de benefícios, à esquerda). No celular o
+          conteúdo encosta no topo (sem my-auto, que abria um vão e
+          empurrava o cartão «Portaria» para fora da tela); no desktop
+          continua centralizado verticalmente. ─────────────────────────── */}
+      <div className="flex w-full flex-col overflow-y-auto px-5 py-4 md:w-1/2 md:px-8 md:py-6">
+        <div className="mx-auto w-full max-w-[490px] md:my-auto">
           {/* Logo do condomínio selecionado */}
           <img
             src={condo.logo}
             alt={condo.nome}
-            className="mx-auto h-14 w-auto mix-blend-multiply"
+            className="mx-auto h-12 w-auto mix-blend-multiply md:h-14"
           />
 
           {/* Seletor de condomínio — sempre visível: escolhe a identidade
               visual (logo, foto, tema) e os acessos rápidos de cada parque.
               Em produção o vínculo real do usuário continua sendo resolvido
               no backend após o login — a escolha nunca bloqueia ninguém. */}
-          <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div className="mt-3 grid grid-cols-2 gap-3">
             {condominios.map((c) => {
               const ativo = c.id === condo.id;
               return (
@@ -486,7 +493,7 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
                     className="h-10 w-10 shrink-0 rounded-lg bg-white object-contain p-0.5"
                   />
                   <span className="min-w-0">
-                    <span className="block truncate text-sm font-semibold text-stone-900">{c.nome}</span>
+                    <span className="block text-sm font-semibold leading-tight text-stone-900">{c.nome}</span>
                     <span className="flex items-center gap-1.5 text-xs text-stone-500">
                       <span
                         aria-hidden
@@ -504,7 +511,7 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
           {/* Cartão de acesso — três telas: tipos (clique = entra na hora,
                   demonstração), entrar (e-mail e senha, pelo botão do topo)
                   e cadastrar */}
-          <div className="animar-entrada mt-3 rounded-xl border border-[var(--cor-neutra)] bg-white p-5 shadow-[var(--sombra-cartao)] sm:p-6">
+          <div className="animar-entrada mt-3 rounded-xl border border-[var(--cor-neutra)] bg-white p-4 shadow-[var(--sombra-cartao)] sm:p-6">
             {tela === "tipos" && (
               /* ── Tipos de usuário: na demonstração, o clique já entra
                   logado com uma conta daquele perfil — sem campos de login
@@ -516,7 +523,7 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
                 <p className="mt-1 text-[14px] text-stone-500">
                   Toque no seu perfil para entrar agora — estamos em demonstração.
                 </p>
-                <div className="mt-4 grid gap-2">
+                <div className="mt-3 grid gap-2 sm:mt-4">
                   {TIPOS.map((t) => {
                     const Icone = t.icone;
                     const logando = entrandoTipo === t.id;
@@ -526,7 +533,7 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
                         type="button"
                         disabled={enviando}
                         onClick={() => entrarDemonstracao(t.id)}
-                        className="flex items-start gap-3 rounded-xl border border-stone-200 bg-white px-3.5 py-2.5 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-[var(--cor-tema)] hover:bg-stone-50 hover:shadow-md disabled:opacity-60"
+                        className="flex items-start gap-3 rounded-xl border border-stone-200 bg-white px-3.5 py-2 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-[var(--cor-tema)] hover:bg-stone-50 hover:shadow-md disabled:opacity-60 sm:py-2.5"
                       >
                         <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--cor-tema-a10)] text-[var(--cor-tema)]">
                           {logando ? (
