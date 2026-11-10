@@ -139,7 +139,10 @@
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    /* «none» (e não translateY(0)): com fill-mode both o valor final fica
+       aplicado para sempre — qualquer transform em ancestral vira containing
+       block dos modais position:fixed dentro do módulo e corta o topo deles. */
+    transform: none;
   }
 }
 
@@ -159,19 +162,25 @@
   }
   to {
     opacity: 1;
-    transform: translateX(0);
+    /* «none» pelo mesmo motivo do mc-entrada. */
+    transform: none;
   }
 }
 
 @layer utilities {
+  /* fill-mode «backwards» (e não «both»): com «both» o transform final fica
+     aplicado para sempre e qualquer ancestral animado vira containing block
+     dos modais position:fixed dentro dele, cortando o topo. Com «backwards»
+     o pré-preenchimento durante o animation-delay é mantido, mas ao terminar
+     o transform volta para o valor base (none). */
   .animar-entrada {
-    animation: mc-entrada 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation: mc-entrada 0.55s cubic-bezier(0.22, 1, 0.36, 1) backwards;
   }
   .animar-aparecer {
     animation: mc-aparecer 0.4s ease-out both;
   }
   .animar-deslizar-direita {
-    animation: mc-deslizar-direita 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation: mc-deslizar-direita 0.45s cubic-bezier(0.22, 1, 0.36, 1) backwards;
   }
   .animar-atraso-1 {
     animation-delay: 0.06s;
