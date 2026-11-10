@@ -90,6 +90,12 @@ login mantém o seletor de condomínios e os acessos rápidos de demonstração 
 o link testa livremente; o administrador da plataforma nunca aparece nos atalhos e entra
 apenas pelo e-mail e senha próprios.
 
+> **Nota (módulos novos):** tabelas de recursos acrescentados depois do schema do Turso
+> (ex.: **Campanhas**, do painel inicial) passam a ser garantidas em runtime — a primeira
+> consulta aplica `CREATE TABLE/INDEX IF NOT EXISTS` e o módulo entra no ar sem passo
+> manual de migração. O conteúdo ainda é semeado quando quiser (`semear-campanhas.mjs`,
+> com `--producao` ou pela própria gestão do portal em *Comunicados → Nova campanha*).
+
 ## 5. Limitações do modo demonstração (SQLite em `/tmp`)
 
 - A cada *cold start* a instância volta ao banco de demonstração — cadastros podem desaparecer após inatividade.

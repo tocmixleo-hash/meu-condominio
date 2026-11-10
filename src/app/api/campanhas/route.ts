@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { json401, json403, pode, usuarioAtual } from "@/lib/auth";
+import { garantirTabelaCampanha } from "@/lib/esquema-campanha";
 import { notificarCondominio } from "@/lib/notificacoes";
 import { registrarAcao } from "@/lib/auditoria";
 
@@ -20,6 +21,9 @@ export async function GET(req: Request) {
   const url = new URL(req.url);
   const querTodas = url.searchParams.get("todas") === "1";
   const agora = new Date();
+
+  // Produção (Turso) pode ainda não ter a tabela — garante antes de consultar
+  await garantirTabelaCampanha();
 
   const lista = await db.campanha.findMany({
     where: {
@@ -65,6 +69,8 @@ export async function POST(req: Request) {
   }
 
   // Período de veiculação opcional
+  await garantirTabelaCampanha();
+
   let inicioEm: Date | null = null;
   let fimEm: Date | null = null;
   if (corpo.inicioEm) {

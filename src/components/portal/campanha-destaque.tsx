@@ -1,13 +1,15 @@
 "use client";
 
-// ── Campanhas em destaque (banner rotativo do painel inicial) ─────
+// ── Campanhas em destaque (seção aberta do painel inicial) ────────
 // Conteúdo institucional divulgado pela administração do condomínio:
 // conscientização, boas práticas e campanhas de convivência. Aparece
-// para todos os perfis, com rotação automática e navegação por pontos.
+// para todos os perfis, com rotação automática e navegação por setas.
+// Visual propositalmente sem cartão: título, texto e metadados soltos
+// sobre o fundo do painel, como as demais seções abertas do portal.
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
-import { ROTULO_CATEGORIA_CAMPANHA, formatarData } from "@/components/portal/ui";
+import { Secao, ROTULO_CATEGORIA_CAMPANHA, formatarData } from "@/components/portal/ui";
 
 type Campanha = {
   id: string;
@@ -44,7 +46,7 @@ export default function CampanhaDestaque() {
     [total],
   );
 
-  // Rotação automática (pausa com o ponteiro sobre o banner ou detalhe aberto)
+  // Rotação automática (pausa com o ponteiro sobre a seção ou detalhe aberto)
   useEffect(() => {
     if (!total || pausado || detalhe || total < 2) return;
     const t = setInterval(avancar, INTERVALO_MS);
@@ -62,64 +64,25 @@ export default function CampanhaDestaque() {
 
   return (
     <>
-      <section
-        data-tour="campanhas"
-        aria-roledescription="carrossel"
-        aria-label="Campanhas em destaque"
-        className="animar-aparecer relative overflow-hidden rounded-xl border border-[var(--cor-neutra)] bg-gradient-to-r from-[var(--cor-tema-a10)] via-[var(--cor-tema-a06)] to-white"
-        onMouseEnter={() => setPausado(true)}
-        onMouseLeave={() => setPausado(false)}
-        onTouchStart={(e) => {
-          toqueInicio.current = e.touches[0]?.clientX ?? null;
-        }}
-        onTouchEnd={(e) => {
-          const x0 = toqueInicio.current;
-          if (x0 === null) return;
-          const dx = (e.changedTouches[0]?.clientX ?? x0) - x0;
-          if (Math.abs(dx) > 40) (dx < 0 ? avancar : voltar)();
-          toqueInicio.current = null;
-        }}
-      >
-        <div key={campanha.id} className="animar-entrada flex items-center gap-4 px-4 py-4 sm:gap-5 sm:px-6 sm:py-5">
-          {/* Emblema da campanha */}
-          <span
-            aria-hidden
-            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white text-2xl shadow-sm sm:h-14 sm:w-14 sm:text-3xl"
-          >
-            {campanha.emoji}
-          </span>
-
-          {/* Texto */}
-          <button
-            type="button"
-            onClick={() => setDetalhe(campanha)}
-            className="min-w-0 flex-1 text-left focus-visible:outline-none"
-            aria-label={`Campanha: ${campanha.titulo} — abrir detalhes`}
-          >
-            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--cor-tema)] sm:text-[11px]">
-              Campanha · {ROTULO_CATEGORIA_CAMPANHA[campanha.categoria] ?? campanha.categoria}
-            </p>
-            <p className="mt-0.5 truncate text-[15px] font-bold leading-tight text-stone-900 sm:text-lg">
-              {campanha.titulo}
-            </p>
-            <p className="mt-0.5 line-clamp-2 text-xs leading-relaxed text-stone-600 sm:text-sm">
-              {campanha.mensagem}
-            </p>
-            {campanha.fimEm && (
-              <p className="mt-1 text-[11px] font-medium text-stone-400">
-                Até {formatarData(campanha.fimEm)}
-              </p>
-            )}
-          </button>
-
-          {/* Navegação (desktop) */}
-          {total > 1 && (
-            <div className="hidden shrink-0 items-center gap-1 sm:flex">
+      <Secao
+        titulo="Campanhas em destaque"
+        tour="campanhas"
+        className="animar-aparecer"
+        acao={
+          total > 1 ? (
+            <div
+              className="flex shrink-0 items-center gap-0.5"
+              onMouseEnter={() => setPausado(true)}
+              onMouseLeave={() => setPausado(false)}
+            >
+              <span className="mr-1.5 text-xs tabular-nums text-stone-400" aria-hidden>
+                {indice + 1} de {total}
+              </span>
               <button
                 type="button"
                 onClick={voltar}
                 aria-label="Campanha anterior"
-                className="flex h-8 w-8 items-center justify-center rounded-full border border-[var(--cor-neutra-2)] bg-white text-stone-500 transition hover:border-[var(--cor-tema-suave)] hover:text-[var(--cor-tema)]"
+                className="flex h-7 w-7 items-center justify-center rounded-lg text-stone-400 transition hover:bg-[var(--cor-tema-a06)] hover:text-[var(--cor-tema)]"
               >
                 <ChevronLeft className="h-4 w-4" />
               </button>
@@ -127,34 +90,59 @@ export default function CampanhaDestaque() {
                 type="button"
                 onClick={avancar}
                 aria-label="Próxima campanha"
-                className="flex h-8 w-8 items-center justify-center rounded-full border border-[var(--cor-neutra-2)] bg-white text-stone-500 transition hover:border-[var(--cor-tema-suave)] hover:text-[var(--cor-tema)]"
+                className="flex h-7 w-7 items-center justify-center rounded-lg text-stone-400 transition hover:bg-[var(--cor-tema-a06)] hover:text-[var(--cor-tema)]"
               >
                 <ChevronRight className="h-4 w-4" />
               </button>
             </div>
-          )}
-        </div>
+          ) : undefined
+        }
+      >
+        <div
+          key={campanha.id}
+          className="animar-entrada"
+          onMouseEnter={() => setPausado(true)}
+          onMouseLeave={() => setPausado(false)}
+          onTouchStart={(e) => {
+            toqueInicio.current = e.touches[0]?.clientX ?? null;
+          }}
+          onTouchEnd={(e) => {
+            const x0 = toqueInicio.current;
+            if (x0 === null) return;
+            const dx = (e.changedTouches[0]?.clientX ?? x0) - x0;
+            if (Math.abs(dx) > 40) (dx < 0 ? avancar : voltar)();
+            toqueInicio.current = null;
+          }}
+        >
+          <button
+            type="button"
+            onClick={() => setDetalhe(campanha)}
+            className="group -mx-2 flex w-full items-start gap-3.5 rounded-lg px-2 py-1.5 text-left transition-colors hover:bg-[var(--cor-tema-a06)] focus-visible:outline-none sm:-mx-3 sm:px-3"
+            aria-label={`Campanha: ${campanha.titulo} — abrir detalhes`}
+          >
+            <span aria-hidden className="mt-0.5 shrink-0 text-2xl leading-none">
+              {campanha.emoji}
+            </span>
 
-        {/* Pontos de navegação */}
-        {total > 1 && (
-          <div className="absolute bottom-2.5 right-4 flex items-center gap-1.5 sm:right-6">
-            {lista.map((c, i) => (
-              <button
-                key={c.id}
-                type="button"
-                onClick={() => setIndice(i)}
-                aria-label={`Ver campanha ${i + 1}: ${c.titulo}`}
-                aria-current={i === indice}
-                className={`h-1.5 rounded-full transition-all duration-300 ${
-                  i === indice
-                    ? "w-5 bg-[var(--cor-tema)]"
-                    : "w-1.5 bg-[var(--cor-tema-a20)] hover:bg-[var(--cor-tema-a55)]"
-                }`}
-              />
-            ))}
-          </div>
-        )}
-      </section>
+            <span className="min-w-0 flex-1">
+              <span className="block text-[15px] font-bold leading-snug text-stone-900 sm:text-base">
+                {campanha.titulo}
+              </span>
+              <span className="mt-0.5 line-clamp-2 block text-sm leading-relaxed text-stone-600">
+                {campanha.mensagem}
+              </span>
+              <span className="mt-1.5 block text-xs text-stone-400">
+                {ROTULO_CATEGORIA_CAMPANHA[campanha.categoria] ?? campanha.categoria}
+                {campanha.fimEm ? ` · Até ${formatarData(campanha.fimEm)}` : ""}
+                <span className="font-medium text-[var(--cor-tema)] opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
+                  {" "}
+                  · Ler na íntegra
+                </span>
+              </span>
+            </span>
+          </button>
+        </div>
+      </Secao>
 
       {/* Detalhe da campanha */}
       {detalhe && (
@@ -172,15 +160,15 @@ export default function CampanhaDestaque() {
             >
               <X className="h-5 w-5" />
             </button>
-            <div className="flex items-center gap-3">
-              <span aria-hidden className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[var(--cor-tema-a06)] text-2xl">
+            <div className="flex items-start gap-3">
+              <span aria-hidden className="mt-0.5 shrink-0 text-3xl leading-none">
                 {detalhe.emoji}
               </span>
-              <div className="min-w-0">
+              <div className="min-w-0 pr-6">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--cor-tema)]">
                   Campanha · {ROTULO_CATEGORIA_CAMPANHA[detalhe.categoria] ?? detalhe.categoria}
                 </p>
-                <h3 className="truncate text-base font-bold text-stone-900">{detalhe.titulo}</h3>
+                <h3 className="text-base font-bold leading-snug text-stone-900">{detalhe.titulo}</h3>
               </div>
             </div>
             <p className="mt-4 text-sm leading-relaxed text-stone-700">{detalhe.mensagem}</p>
@@ -190,7 +178,7 @@ export default function CampanhaDestaque() {
               </p>
             )}
             {(detalhe.inicioEm || detalhe.fimEm) && (
-              <p className="mt-4 rounded-lg bg-[var(--cor-tema-a06)] px-3 py-2 text-xs font-medium text-stone-600">
+              <p className="mt-4 text-xs font-medium text-stone-400">
                 {detalhe.inicioEm ? `Veiculação a partir de ${formatarData(detalhe.inicioEm)}` : "Em veiculação"}
                 {detalhe.fimEm ? ` até ${formatarData(detalhe.fimEm)}.` : "."}
               </p>

@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { json401, json403, pode, usuarioAtual } from "@/lib/auth";
+import { garantirTabelaCampanha } from "@/lib/esquema-campanha";
 import { notificarCondominio } from "@/lib/notificacoes";
 import { registrarAcao } from "@/lib/auditoria";
 
@@ -24,6 +25,7 @@ export async function PATCH(req: Request, ctx: { params: Promise<{ id: string }>
   if (!podeGerenciar(eu)) return json403();
 
   const { id } = await ctx.params;
+  await garantirTabelaCampanha();
   const campanha = await campanhaDoCondominio(id, eu.condominio.id);
   if (!campanha) return Response.json({ erro: "Campanha não encontrada." }, { status: 404 });
 
@@ -116,6 +118,7 @@ export async function DELETE(_req: Request, ctx: { params: Promise<{ id: string 
   if (!podeGerenciar(eu)) return json403();
 
   const { id } = await ctx.params;
+  await garantirTabelaCampanha();
   const campanha = await campanhaDoCondominio(id, eu.condominio.id);
   if (!campanha) return Response.json({ erro: "Campanha não encontrada." }, { status: 404 });
 
