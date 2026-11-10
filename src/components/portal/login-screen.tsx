@@ -397,13 +397,13 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
               </p>
             </div>
 
-            {/* Benefícios da plataforma — área com rolagem maior e mais
-                conteúdo, conforme solicitado */}
+            {/* Benefícios da plataforma — lista inteira no scroll único do
+                painel esquerdo (uma só barra, sem rolagem interna) */}
             <div className="animar-entrada animar-atraso-2 mt-8">
               <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-white/60">
                 Benefícios da plataforma
               </p>
-              <div className="rolagem-fina mt-3 max-h-[290px] space-y-2.5 overflow-y-auto pr-2 lg:max-h-[330px]">
+              <div className="mt-3 space-y-2.5">
                 {BENEFICIOS.map((b) => {
                   const Icone = b.icone;
                   return (
@@ -426,7 +426,7 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
               </div>
               <p className="mt-2.5 flex items-center gap-1.5 text-[11px] text-white/55">
                 <ChevronDown className="h-3.5 w-3.5 animate-bounce" />
-                Role para ver todos os benefícios
+                Role o painel para ver todos os benefícios
               </p>
             </div>
 
