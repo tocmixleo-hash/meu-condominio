@@ -10,7 +10,7 @@ export function passosDoTutorial(perfil: Perfil, nome: string): PassoTour[] {
   const primeiro = {
     titulo: `Bem-vindo(a), ${nome.split(" ")[0]}!`,
     texto:
-      "Este passeio rápido mostra o essencial em menos de um minuto — e você pode revê-lo quando quiser, no rodapé do menu.",
+      "Este passeio rápido mostra o essencial em menos de um minuto — e você pode revê-lo quando quiser, no menu da conta (canto superior direito).",
   };
 
   const passos: Record<string, PassoTour[]> = {
@@ -42,7 +42,7 @@ export function passosDoTutorial(perfil: Perfil, nome: string): PassoTour[] {
         alvos: ["usuario"],
         titulo: "Sua conta",
         texto:
-          "No rodapé do menu você altera a senha, revê este tutorial e sai da conta com segurança.",
+          "No menu da conta, no canto superior direito, você altera a senha, revê este tutorial e sai da conta com segurança.",
       },
     ],
     SINDICO: [
@@ -72,7 +72,7 @@ export function passosDoTutorial(perfil: Perfil, nome: string): PassoTour[] {
         alvos: ["usuario"],
         titulo: "Sua conta",
         texto:
-          "No rodapé do menu você altera a senha, revê este tutorial e sai da conta com segurança.",
+          "No menu da conta, no canto superior direito, você altera a senha, revê este tutorial e sai da conta com segurança.",
       },
     ],
     ADMINISTRATIVO: [
@@ -102,7 +102,7 @@ export function passosDoTutorial(perfil: Perfil, nome: string): PassoTour[] {
         alvos: ["usuario"],
         titulo: "Sua conta",
         texto:
-          "No rodapé do menu você altera a senha, revê este tutorial e sai da conta com segurança.",
+          "No menu da conta, no canto superior direito, você altera a senha, revê este tutorial e sai da conta com segurança.",
       },
     ],
     PORTARIA: [
@@ -132,7 +132,7 @@ export function passosDoTutorial(perfil: Perfil, nome: string): PassoTour[] {
         alvos: ["usuario"],
         titulo: "Sua conta",
         texto:
-          "No rodapé do menu você altera a senha, revê este tutorial e sai da conta com segurança.",
+          "No menu da conta, no canto superior direito, você altera a senha, revê este tutorial e sai da conta com segurança.",
       },
     ],
     PLATAFORMA: [
@@ -152,13 +152,13 @@ export function passosDoTutorial(perfil: Perfil, nome: string): PassoTour[] {
         alvos: ["menu", "botao-menu"],
         titulo: "Console completo",
         texto:
-          "Condomínios, funções personalizadas, moradores, identidade visual e auditoria. No rodapé fica o Simular perfis.",
+          "Condomínios, funções personalizadas, moradores, identidade visual e auditoria. No canto superior direito fica o Simular perfis.",
       },
       {
         alvos: ["usuario"],
         titulo: "Sua conta",
         texto:
-          "No rodapé: alterar senha, simular perfis (testar a visão de cada um), rever o tutorial e sair.",
+          "No menu da conta (canto superior direito): alterar senha, simular perfis (testar a visão de cada um), rever o tutorial e sair.",
       },
     ],
     FUNCAO: [
@@ -177,7 +177,7 @@ export function passosDoTutorial(perfil: Perfil, nome: string): PassoTour[] {
         alvos: ["usuario"],
         titulo: "Sua conta",
         texto:
-          "No rodapé do menu você altera a senha, revê este tutorial e sai da conta com segurança.",
+          "No menu da conta, no canto superior direito, você altera a senha, revê este tutorial e sai da conta com segurança.",
       },
     ],
   };

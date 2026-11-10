@@ -488,6 +488,7 @@ export default function AppShell({
   const [menuAberto, setMenuAberto] = useState(false);
   const [dialogoSenha, setDialogoSenha] = useState(false);
   const [dialogoSimulacao, setDialogoSimulacao] = useState(false);
+  const [contaAberta, setContaAberta] = useState(false);
   // Menu da função personalizada: módulos concedidos, sempre na ordem do catálogo
   const itens: ItemMenu[] =
     perfil === "FUNCAO"
@@ -556,65 +557,124 @@ export default function AppShell({
     </div>
   );
 
-  const rodape = (
-    <div data-tour="usuario" className="border-t border-[var(--cor-tema-hover)] px-5 py-4">
-      <div className="flex items-center gap-3">
+  // ── Menu da conta: canto superior direito (barra do topo) ─────────
+  // Sai do rodapé do painel lateral (que ficava muito cheio) e ocupa o
+  // espaço vazio do topo, padrão dos grandes sites. Um único bloco serve
+  // desktop e celular — o cabeçalho é compartilhado.
+  const itemConta =
+    "flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-stone-700 transition-colors hover:bg-stone-100";
+  const conta = (
+    <div data-tour="usuario" className="relative">
+      <button
+        onClick={() => setContaAberta((v) => !v)}
+        aria-expanded={contaAberta}
+        aria-haspopup="menu"
+        className={`flex items-center gap-2 rounded-full border py-1 pl-1 pr-2.5 transition-all duration-200 hover:shadow-sm ${
+          contaAberta
+            ? "border-[var(--cor-tema)] ring-2 ring-[var(--cor-tema)]/20"
+            : "border-[var(--cor-neutra)] hover:border-[var(--cor-tema)]"
+        }`}
+      >
         <span
           aria-hidden
-          className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-[var(--cor-fundo)] ${
+          className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[var(--cor-fundo)] ${
             simulando ? "bg-amber-400" : "bg-[var(--cor-tema-hover)]"
           }`}
         >
-          <IconePerfil className="h-[18px] w-[18px]" />
+          <IconePerfil className="h-4 w-4" />
         </span>
-        <div className="min-w-0">
-          <p className="truncate text-sm font-medium text-[var(--cor-fundo)]">{nome}</p>
-          <p className="truncate text-xs text-[var(--cor-clara-a70)]">
-            {perfil === "FUNCAO" && funcaoNome ? funcaoNome : ROTULO_PERFIL[perfil] ?? perfil}
-            {simulando ? " · simulado" : ""}
-            {unidade ? ` · Unidade ${unidade.bloco}-${unidade.numero}` : ""}
-          </p>
-        </div>
-      </div>
-      <div className="mt-3 flex flex-wrap items-center gap-1">
-        <button
-          onClick={() => setDialogoSenha(true)}
-          className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-[var(--cor-clara-a85)] transition-colors hover:bg-[var(--cor-tema-hover-a60)] hover:text-[var(--cor-fundo)]"
-        >
-          <KeyRound className="h-4 w-4" /> Alterar senha
-        </button>
-        <button
-          onClick={aoReverTutorial}
-          title="Rever o tutorial do portal"
-          className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-[var(--cor-clara-a85)] transition-colors hover:bg-[var(--cor-tema-hover-a60)] hover:text-[var(--cor-fundo)]"
-        >
-          <GraduationCap className="h-4 w-4" /> Rever tutorial
-        </button>
-        {perfil === "PLATAFORMA" && !simulando && aoSimular && (
-          <button
-            onClick={() => setDialogoSimulacao(true)}
-            className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-[var(--cor-clara-a85)] transition-colors hover:bg-[var(--cor-tema-hover-a60)] hover:text-[var(--cor-fundo)]"
-          >
-            <Eye className="h-4 w-4" /> Simular perfis
-          </button>
-        )}
-      </div>
-      <button
-        onClick={aoSair}
-        className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-[var(--cor-clara-a85)] transition-colors hover:bg-[var(--cor-tema-hover-a60)] hover:text-[var(--cor-fundo)]"
-      >
-        <LogOut className="h-4 w-4" /> Sair da conta
+        <span className="hidden max-w-[10rem] truncate text-sm font-medium text-stone-700 sm:block">
+          {nome}
+        </span>
+        <ChevronDown
+          className={`h-4 w-4 text-stone-400 transition-transform duration-200 ${
+            contaAberta ? "rotate-180" : ""
+          }`}
+        />
       </button>
+      {contaAberta && (
+        <>
+          <button
+            aria-label="Fechar menu da conta"
+            className="fixed inset-0 z-40 cursor-default"
+            onClick={() => setContaAberta(false)}
+          />
+          <div
+            role="menu"
+            className="animar-aparecer absolute right-0 top-full z-50 mt-2 w-64 overflow-hidden rounded-xl border border-[var(--cor-neutra)] bg-white shadow-xl"
+          >
+            <div className="flex items-center gap-3 border-b border-stone-100 bg-stone-50/70 px-4 py-3">
+              <span
+                aria-hidden
+                className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-[var(--cor-fundo)] ${
+                  simulando ? "bg-amber-400" : "bg-[var(--cor-tema-hover)]"
+                }`}
+              >
+                <IconePerfil className="h-[18px] w-[18px]" />
+              </span>
+              <div className="min-w-0">
+                <p className="truncate text-sm font-medium text-stone-900">{nome}</p>
+                <p className="truncate text-xs text-stone-500">
+                  {perfil === "FUNCAO" && funcaoNome ? funcaoNome : ROTULO_PERFIL[perfil] ?? perfil}
+                  {simulando ? " · simulado" : ""}
+                  {unidade ? ` · Unidade ${unidade.bloco}-${unidade.numero}` : ""}
+                </p>
+              </div>
+            </div>
+            <div className="p-1.5">
+              <button
+                role="menuitem"
+                onClick={() => {
+                  setContaAberta(false);
+                  setDialogoSenha(true);
+                }}
+                className={itemConta}
+              >
+                <KeyRound className="h-4 w-4 text-stone-400" /> Alterar senha
+              </button>
+              <button
+                role="menuitem"
+                onClick={() => {
+                  setContaAberta(false);
+                  aoReverTutorial?.();
+                }}
+                className={itemConta}
+              >
+                <GraduationCap className="h-4 w-4 text-stone-400" /> Rever tutorial
+              </button>
+              {perfil === "PLATAFORMA" && !simulando && aoSimular && (
+                <button
+                  role="menuitem"
+                  onClick={() => {
+                    setContaAberta(false);
+                    setDialogoSimulacao(true);
+                  }}
+                  className={itemConta}
+                >
+                  <Eye className="h-4 w-4 text-stone-400" /> Simular perfis
+                </button>
+              )}
+              <button
+                role="menuitem"
+                onClick={aoSair}
+                className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-red-600 transition-colors hover:bg-red-50 hover:text-red-700"
+              >
+                <LogOut className="h-4 w-4" /> Sair da conta
+              </button>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 
   const corpo = (
     <>
-      {/* Sidebar desktop */}
+      {/* Sidebar desktop — sem o rodapé da conta: o menu da conta foi
+          para a barra superior, deixando o painel mais leve */}
       <aside className="hidden w-60 shrink-0 flex-col bg-[var(--cor-sidebar)] md:flex">
         {marca}
         {nav}
-        {rodape}
       </aside>
 
       {/* Sidebar mobile */}
@@ -635,7 +695,6 @@ export default function AppShell({
             </button>
             {marca}
             {nav}
-            {rodape}
           </aside>
         </div>
       )}
@@ -711,8 +770,11 @@ export default function AppShell({
 
       {/* Conteúdo */}
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex items-center gap-3 border-b border-[var(--cor-neutra)] bg-white px-4 py-2.5 md:hidden">
-          <div className="flex min-w-0 flex-1 items-center gap-2.5">
+        {/* Barra superior única: no celular mostra a marca do condomínio;
+            no desktop fica vazia à esquerda (a marca está na sidebar) e
+            recebe o menu da conta no canto superior direito */}
+        <header className="relative z-30 flex items-center gap-3 border-b border-[var(--cor-neutra)] bg-white px-4 py-2.5 sm:px-6">
+          <div className="flex min-w-0 flex-1 items-center gap-2.5 md:hidden">
             <Image
               src={condominio.logoCabecalho || condominio.logoMenu || condominio.logo}
               alt={condominio.nome}
@@ -723,6 +785,8 @@ export default function AppShell({
             />
             <span className="truncate text-xs text-stone-500">{condominio.nome}</span>
           </div>
+          <div aria-hidden className="hidden flex-1 md:block" />
+          {conta}
         </header>
         {/* Banner da simulação — sempre visível enquanto durar */}
         {simulando && (
