@@ -234,6 +234,8 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
   const [erro, setErro] = useState("");
   const [avisoTipo, setAvisoTipo] = useState("");
   const [enviando, setEnviando] = useState(false);
+  // Tipo cujo acesso rápido está logando agora (feedback no botão)
+  const [entrandoTipo, setEntrandoTipo] = useState<TipoUsuario | null>(null);
   const [MODO_DEMO, setModoDemo] = useState(false);
   // Recuperação de senha
   const [recuperando, setRecuperando] = useState(false);
@@ -308,7 +310,25 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
   }
 
   const temaVars = cssVarsDoTema(resolverTema(condo.slug, condo.corTema)) as React.CSSProperties;
-  const rapidos = tipo ? acessosRapidos(condo.slug).filter((r) => r.tipo === tipo) : [];
+
+  // Fase de demonstração: clicar no tipo de acesso entra direto com uma
+  // conta real daquele perfil no condomínio selecionado — sem fricção.
+  async function entrarDemonstracao(t: TipoUsuario) {
+    const acesso = acessosRapidos(condo.slug).find((r) => r.tipo === t);
+    if (!acesso) {
+      // Perfis sem atalho (administrador da plataforma): orienta o caminho
+      setAvisoTipo(
+        "O acesso da plataforma é exclusivo por e-mail e senha do administrador — use o botão Entrar no topo.",
+      );
+      setErro("");
+      return;
+    }
+    setErro("");
+    setAvisoTipo("");
+    setEntrandoTipo(t);
+    await submeter({ email: acesso.email, senha: acesso.senha, tipo: acesso.tipo });
+    setEntrandoTipo(null);
+  }
 
   return (
     <div style={temaVars} className="flex min-h-dvh flex-col bg-[var(--cor-fundo)]">
@@ -431,14 +451,15 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
           </div>
         </div>
 
-      {/* ── Painel direito: acesso ───────────────────────────────────── */}
-      <div className="flex w-full flex-col overflow-y-auto px-5 py-8 md:w-1/2 md:px-8">
+      {/* ── Painel direito: acesso — compacto, sem rolagem (a rolagem
+          fica apenas na área de benefícios, à esquerda) ─────────────── */}
+      <div className="flex w-full flex-col overflow-y-auto px-5 py-6 md:w-1/2 md:px-8">
         <div className="mx-auto my-auto w-full max-w-[490px]">
           {/* Logo do condomínio selecionado */}
           <img
             src={condo.logo}
             alt={condo.nome}
-            className="mx-auto h-20 w-auto mix-blend-multiply"
+            className="mx-auto h-14 w-auto mix-blend-multiply"
           />
 
           {/* Seletor de condomínio — sempre visível: escolhe a identidade
@@ -480,60 +501,60 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
             })}
           </div>
 
-          {/* Cartão de acesso — três telas: tipos (demonstração), entrar
-              (e-mail e senha, pelo botão do topo) e cadastrar */}
-          <div className="animar-entrada mt-4 rounded-xl border border-[var(--cor-neutra)] bg-white p-6 shadow-[var(--sombra-cartao)] sm:p-7">
+          {/* Cartão de acesso — três telas: tipos (clique = entra na hora,
+                  demonstração), entrar (e-mail e senha, pelo botão do topo)
+                  e cadastrar */}
+          <div className="animar-entrada mt-3 rounded-xl border border-[var(--cor-neutra)] bg-white p-5 shadow-[var(--sombra-cartao)] sm:p-6">
             {tela === "tipos" && (
-              /* ── Tipos de usuário (demonstração) — sem campos de login:
-                  o acesso por e-mail/senha fica no botão «Entrar» do topo ── */
+              /* ── Tipos de usuário: na demonstração, o clique já entra
+                  logado com uma conta daquele perfil — sem campos de login
+                  (que ficam no botão «Entrar» do topo) ── */
               <>
-                <h2 className="text-[24px] font-semibold tracking-tight text-stone-900">
+                <h2 className="text-[21px] font-semibold tracking-tight text-stone-900">
                   Que tipo de usuário é você?
                 </h2>
-                <p className="mt-1.5 text-[15px] text-stone-500">
-                  Escolha o seu perfil para personalizarmos o seu acesso.
+                <p className="mt-1 text-[14px] text-stone-500">
+                  Toque no seu perfil para entrar agora — estamos em demonstração.
                 </p>
-                <div className="mt-5 grid gap-2.5">
+                <div className="mt-4 grid gap-2">
                   {TIPOS.map((t) => {
                     const Icone = t.icone;
-                    const selecionado = tipo === t.id;
+                    const logando = entrandoTipo === t.id;
                     return (
                       <button
                         key={t.id}
                         type="button"
-                        onClick={() => {
-                          setTipo(selecionado ? null : t.id);
-                          setErro("");
-                          setAvisoTipo("");
-                        }}
-                        className={`flex items-start gap-3.5 rounded-xl border bg-white px-4 py-3.5 text-left transition-all duration-200 hover:-translate-y-0.5 hover:bg-stone-50 hover:shadow-md ${
-                          selecionado
-                            ? "border-[var(--cor-tema)] ring-2 ring-[var(--cor-tema)]/25"
-                            : "border-stone-200 hover:border-[var(--cor-tema)]"
-                        }`}
+                        disabled={enviando}
+                        onClick={() => entrarDemonstracao(t.id)}
+                        className="flex items-start gap-3 rounded-xl border border-stone-200 bg-white px-3.5 py-2.5 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-[var(--cor-tema)] hover:bg-stone-50 hover:shadow-md disabled:opacity-60"
                       >
-                        <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[var(--cor-tema-a10)] text-[var(--cor-tema)]">
-                          <Icone className="h-[18px] w-[18px]" />
+                        <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--cor-tema-a10)] text-[var(--cor-tema)]">
+                          {logando ? (
+                            <LoaderCircle className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Icone className="h-4 w-4" />
+                          )}
                         </span>
                         <span className="min-w-0">
-                          <span className="block text-[15px] font-semibold text-stone-900">
+                          <span className="block text-[14px] font-semibold text-stone-900">
                             {t.rotulo}
                           </span>
-                          <span className="mt-0.5 block text-[13px] leading-relaxed text-stone-500">
-                            {t.descricao}
+                          <span className="mt-0.5 block text-[12.5px] leading-snug text-stone-500">
+                            {logando ? "Entrando…" : t.descricao}
                           </span>
                         </span>
                       </button>
                     );
                   })}
                 </div>
-                {tipo && (
-                  <p role="status" className="mt-4 rounded-xl bg-[var(--cor-tema-a06)] px-3.5 py-2.5 text-sm leading-relaxed text-stone-700">
-                    {tipo === "PLATAFORMA" ? (
-                      <>Acesso da plataforma pelo botão <strong>Entrar</strong> no topo, com o e-mail e a senha do administrador.</>
-                    ) : (
-                      <>Perfil selecionado: <strong>{ROTULO_TIPO[tipo]}</strong>. Escolha um acesso rápido abaixo para entrar na hora — ou use o botão <strong>Entrar</strong> no topo.</>
-                    )}
+                {avisoTipo && (
+                  <p role="status" className="mt-4 rounded-xl bg-amber-50 px-3.5 py-2.5 text-sm leading-relaxed text-amber-800">
+                    {avisoTipo}
+                  </p>
+                )}
+                {erro && (
+                  <p role="alert" className="mt-4 rounded-xl bg-red-50 px-3.5 py-2.5 text-sm text-red-700">
+                    {erro}
                   </p>
                 )}
               </>
@@ -543,7 +564,7 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
               /* ── Entrar: e-mail e senha (aberto pelo botão do topo) ── */
               <>
                 <div className="flex items-center justify-between gap-3">
-                  <h2 className="text-[24px] font-semibold tracking-tight text-stone-900">
+                  <h2 className="text-[21px] font-semibold tracking-tight text-stone-900">
                     Entrar na plataforma
                   </h2>
                   {tipo && (
@@ -703,7 +724,7 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
               /* ── Cadastrar: contas são criadas pela administração; o
                   cadastro aberto pela internet está em demonstração ── */
               <>
-                <h2 className="text-[24px] font-semibold tracking-tight text-stone-900">
+                <h2 className="text-[21px] font-semibold tracking-tight text-stone-900">
                   Fazer cadastro
                 </h2>
                 <p className="mt-1.5 text-[15px] leading-relaxed text-stone-500">
@@ -738,37 +759,6 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
             )}
           </div>
 
-          {/* Acesso rápido para demonstração — visível também em produção,
-              para que novas pessoas possam experimentar o portal livremente.
-              Aparece na tela de tipos, filtrado pelo tipo escolhido. O
-              administrador da plataforma NUNCA aparece aqui: o acesso de
-              gestão é exclusivo do login pessoal dele. */}
-          {tela === "tipos" && tipo && tipo !== "PLATAFORMA" && (
-            <div className="mt-6">
-              <p className="text-[13px] font-medium uppercase tracking-[0.06em] text-stone-400">
-                Acesso rápido para demonstração
-              </p>
-              {rapidos.length > 0 ? (
-                <div className="mt-3 grid grid-cols-1 gap-2.5 lg:grid-cols-2">
-                  {rapidos.map((r) => (
-                    <button
-                      key={r.email}
-                      type="button"
-                      disabled={enviando}
-                      onClick={() => submeter({ email: r.email, senha: r.senha, tipo: r.tipo })}
-                      className="whitespace-nowrap rounded-full border border-stone-200 bg-white px-4 py-3 text-left text-sm text-stone-800 transition hover:bg-stone-50 disabled:opacity-50"
-                    >
-                      {r.etiqueta}
-                    </button>
-                  ))}
-                </div>
-              ) : (
-                <p className="mt-3 text-sm text-stone-500">
-                  Nenhum acesso de demonstração deste tipo no {condo.nome}.
-                </p>
-              )}
-            </div>
-          )}
         </div>
       </div>
       </div>

@@ -71,7 +71,7 @@ async function pularTour(pagina) {
   const temSenha = await pagina.locator("#senha").count();
   registrar("tipos de usuário sem campos de e-mail/senha", temEmail === 0 && temSenha === 0, `email=${temEmail} senha=${temSenha}`);
 
-  // 3. Benefícios com rolagem no painel esquerdo
+  // 3. Benefícios com rolagem no painel esquerdo; painel direito SEM rolagem
   const rotulo = pagina.locator("text=Benefícios da plataforma");
   registrar("painel esquerdo destaca os benefícios", await rotulo.isVisible());
   const area = pagina.locator("div.rolagem-fina.max-h-\\[290px\\]");
@@ -84,14 +84,27 @@ async function pularTour(pagina) {
 
   await pagina.screenshot({ path: "/tmp/render/login-novo-01-desktop.png" });
 
-  // 4. Escolher Morador → chips de demonstração (sem formulário)
-  await pagina.click('button:has-text("Morador")');
-  await pagina.waitForSelector('button:has-text("Maria — Morador (A-101)")', { timeout: 8000 });
-  const aindaSemForm = (await pagina.locator("#email").count()) === 0;
-  registrar("tipo escolhido mostra acessos rápidos, sem pedir senha", aindaSemForm);
-  await pagina.screenshot({ path: "/tmp/render/login-novo-02-tipos.png" });
+  const semRolagemDireita = await pagina.evaluate(() => {
+    const paineis = document.querySelectorAll("main, body > div > div > div");
+    const direito = Array.from(paineis).find((p) => p.className?.includes?.("md:w-1/2"));
+    return direito ? direito.scrollHeight <= direito.clientHeight + 10 : null;
+  });
+  registrar(
+    "painel direito cabe sem rolagem (desktop 900px)",
+    semRolagemDireita === true,
+    `semRolagem=${semRolagemDireita}`,
+  );
 
-  // 5. Botão Entrar do topo abre o formulário e loga de ponta a ponta
+  // 4. Clique no tipo entra logado direto (fase de demonstração)
+  await pagina.click('button:has-text("Morador")');
+  await pagina.waitForSelector("text=/Bom dia|Boa tarde|Boa noite/", { timeout: 15000 });
+  await pularTour(pagina);
+  await pagina.waitForTimeout(600);
+  registrar("clique no tipo de acesso entra logado direto", true);
+
+  // 5. Sair e testar o caminho real: Entrar do topo → e-mail/senha
+  await pagina.click('aside button:has-text("Sair da conta")');
+  await pagina.waitForSelector("text=Que tipo de usuário é você?", { timeout: 10000 });
   await botaoEntrar.click();
   await pagina.waitForSelector("#email", { timeout: 5000 });
   registrar("botão Entrar do topo abre e-mail/senha", true);
@@ -138,17 +151,13 @@ async function pularTour(pagina) {
   registrar("mobile: tela de cadastro explica o fluxo", await pagina.locator("text=Cadastro aberto em breve").isVisible());
   await pagina.screenshot({ path: "/tmp/render/login-novo-05-mobile-cadastro.png" });
 
-  // Fluxo completo: tipos → chip → portal
-  await pagina.click('header button:has-text("Entrar")').catch(() => {});
-  const voltarTipos = pagina.locator('button:has-text("Ver os tipos de usuário")');
-  if (await voltarTipos.isVisible().catch(() => false)) await voltarTipos.click();
+  // Fluxo completo: voltar aos tipos → clique no tipo → logado
+  await pagina.click('button:has-text("Explorar os tipos de acesso")');
   await pagina.waitForSelector("text=Que tipo de usuário é você?", { timeout: 8000 });
   await pagina.click('button:has-text("Morador")');
-  await pagina.waitForSelector('button:has-text("Maria — Morador (A-101)")', { timeout: 8000 });
-  await pagina.click('button:has-text("Maria — Morador (A-101)")');
   await pagina.waitForSelector("text=/Bom dia|Boa tarde|Boa noite/", { timeout: 15000 });
   await pularTour(pagina);
-  registrar("mobile: login completo pelo fluxo novo", true);
+  registrar("mobile: login direto pelo tipo de acesso", true);
   await pagina.screenshot({ path: "/tmp/render/login-novo-06-mobile-painel.png" });
 
   registrar("mobile sem erros de console", errosConsole.length === 0, errosConsole.join(" | ").slice(0, 140));

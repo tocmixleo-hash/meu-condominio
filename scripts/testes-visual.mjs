@@ -44,12 +44,11 @@ async function pularTour(pagina) {
   }
 }
 
-async function entrar(pagina, tipoTexto, etiqueta) {
+async function entrar(pagina, tipoTexto, _etiqueta) {
   await pagina.goto(BASE, { waitUntil: "networkidle" });
   await pagina.waitForSelector("text=Que tipo de usuário é você?", { timeout: 15000 });
+  // Demonstração: o clique no tipo já entra logado
   await pagina.click(`button:has-text("${tipoTexto}")`);
-  await pagina.waitForSelector(`button:has-text("${etiqueta}")`, { timeout: 8000 });
-  await pagina.click(`button:has-text("${etiqueta}")`);
   await pagina.waitForSelector("text=/Bom dia|Boa tarde|Boa noite/", { timeout: 15000 });
   await pularTour(pagina);
 }
@@ -77,10 +76,8 @@ if (MODO !== "mobile") {
     JSON.stringify(fontes),
   );
 
-  // 2. Login morador
+  // 2. Login morador — o clique no tipo entra direto (demonstração)
   await pagina.click('button:has-text("Morador")');
-  await pagina.waitForSelector('button:has-text("Maria — Morador (A-101)")', { timeout: 8000 });
-  await pagina.click('button:has-text("Maria — Morador (A-101)")');
   await pagina.waitForSelector("text=/Bom dia|Boa tarde|Boa noite/", { timeout: 15000 });
   await pularTour(pagina);
   await pagina.waitForTimeout(900);
@@ -127,8 +124,6 @@ if (MODO !== "mobile") {
   await pagina.waitForTimeout(600);
   await pagina.waitForSelector("text=Que tipo de usuário é você?", { timeout: 10000 });
   await pagina.click('button:has-text("Síndico ou administração")');
-  await pagina.waitForSelector('button:has-text("Carlos — Síndico (Gestão)")', { timeout: 8000 });
-  await pagina.click('button:has-text("Carlos — Síndico (Gestão)")');
   await pagina.waitForSelector("text=/Bom dia|Boa tarde|Boa noite/", { timeout: 15000 });
   await pularTour(pagina);
   await pagina.click('aside button:has-text("Reservas")');
@@ -148,8 +143,6 @@ if (MODO !== "desktop") {
   await pagina.screenshot({ path: "/tmp/render/visual-09-login-mobile.png" });
 
   await pagina.click('button:has-text("Morador")');
-  await pagina.waitForSelector('button:has-text("Maria — Morador (A-101)")', { timeout: 8000 });
-  await pagina.click('button:has-text("Maria — Morador (A-101)")');
   await pagina.waitForSelector("text=/Bom dia|Boa tarde|Boa noite/", { timeout: 15000 });
   await pularTour(pagina);
   await pagina.waitForTimeout(800);

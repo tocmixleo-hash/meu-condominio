@@ -42,9 +42,8 @@ async function pularTour(pagina) {
 async function entrarMorador(pagina) {
   await pagina.goto(BASE, { waitUntil: "networkidle" });
   await pagina.waitForSelector("text=Que tipo de usuário é você?", { timeout: 15000 });
+  // Demonstração: o clique no tipo já entra logado
   await pagina.click('button:has-text("Morador")');
-  await pagina.waitForSelector('button:has-text("Maria — Morador (A-101)")', { timeout: 8000 });
-  await pagina.click('button:has-text("Maria — Morador (A-101)")');
   await pagina.waitForSelector("text=/Bom dia|Boa tarde|Boa noite/", { timeout: 15000 });
   await pularTour(pagina);
   await pagina.waitForTimeout(600);
