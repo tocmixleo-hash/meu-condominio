@@ -4,6 +4,7 @@ import { mkdir, writeFile, unlink } from "fs/promises";
 import path from "path";
 import { registrarAcao } from "@/lib/auditoria";
 import { notificarCondominio } from "@/lib/notificacoes";
+import { otimizarPdf } from "@/lib/pdf-otimizador";
 
 // No Vercel o filesystem é somente leitura (exceto /tmp); local usa public/uploads.
 // Com BLOB_READ_WRITE_TOKEN configurado, arquivos vão para o Vercel Blob
@@ -74,7 +75,10 @@ export async function POST(req: Request) {
     where: { id: eu.condominio.id },
     select: { slug: true },
   });
-  const url = await salvarArquivo(condominio?.slug ?? "geral", nomeSeguro, Buffer.from(await arquivo.arrayBuffer()));
+  // PDFs passam por otimização estrutural (sem perda de qualidade); outros
+  // tipos e PDFs que não encolhem seguem com os bytes originais.
+  const otimizacao = await otimizarPdf(Buffer.from(await arquivo.arrayBuffer()));
+  const url = await salvarArquivo(condominio?.slug ?? "geral", nomeSeguro, otimizacao.bytes);
 
   const documento = await db.documento.create({
     data: {
@@ -83,7 +87,7 @@ export async function POST(req: Request) {
       categoria,
       nomeArquivo: nomeSeguro,
       url,
-      tamanhoBytes: arquivo.size,
+      tamanhoBytes: otimizacao.final,
       enviadoPorId: eu.id,
     },
     include: { enviadoPor: { select: { nome: true } } },
@@ -101,7 +105,12 @@ export async function POST(req: Request) {
     excetoUsuarioId: eu.id,
   });
 
-  return Response.json({ documento });
+  return Response.json({
+    documento,
+    otimizacao: otimizacao.otimizado
+      ? { original: otimizacao.original, final: otimizacao.final }
+      : null,
+  });
 }
 
 export async function DELETE(req: Request) {

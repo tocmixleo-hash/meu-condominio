@@ -43,6 +43,7 @@ export default function Documentos({ perfil }: { perfil: Perfil }) {
   const [categoria, setCategoria] = useState("OUTRO");
   const [arquivo, setArquivo] = useState<File | null>(null);
   const [erro, setErro] = useState("");
+  const [aviso, setAviso] = useState("");
   const inputArquivo = useRef<HTMLInputElement>(null);
   const podeGerenciar = perfil === "SINDICO" || perfil === "ADMINISTRATIVO";
 
@@ -55,6 +56,7 @@ export default function Documentos({ perfil }: { perfil: Perfil }) {
 
   async function enviar() {
     setErro("");
+    setAviso("");
     if (!titulo.trim() || !arquivo) {
       setErro("Informe o título e selecione o arquivo.");
       return;
@@ -69,6 +71,11 @@ export default function Documentos({ perfil }: { perfil: Perfil }) {
       const corpo = await corpoJson(r);
       if (!corpo) throw new Error(mensagemRede(r.status));
       if (!r.ok) throw new Error(corpo.erro || "Falha ao enviar.");
+      setAviso(
+        corpo.otimizacao
+          ? `PDF otimizado no envio: ${tamanhoLegivel(corpo.otimizacao.original)} → ${tamanhoLegivel(corpo.otimizacao.final)}.`
+          : ""
+      );
       setAberto(false);
       setTitulo("");
       setCategoria("OUTRO");
@@ -93,6 +100,9 @@ export default function Documentos({ perfil }: { perfil: Perfil }) {
 
   return (
     <div className="space-y-6">
+      {aviso && (
+        <p className="rounded-md bg-emerald-50 px-3 py-2 text-sm text-emerald-800">{aviso}</p>
+      )}
       <Secao
         titulo={`Documentos${lista ? ` · ${lista.length}` : ""}`}
         acao={
@@ -172,6 +182,9 @@ export default function Documentos({ perfil }: { perfil: Perfil }) {
                 onChange={(e) => setArquivo(e.target.files?.[0] ?? null)}
                 className="block w-full text-sm text-stone-600 file:mr-3 file:rounded-md file:border-0 file:bg-[var(--cor-neutra)] file:px-3 file:py-2 file:text-sm file:font-medium file:text-[var(--cor-tema)] hover:file:bg-[var(--cor-neutra-2)]"
               />
+              <p className="text-xs text-stone-500">
+                Dica: digitalize a 150 dpi para o arquivo ficar menor — PDFs já são otimizados automaticamente no envio, sem perder qualidade.
+              </p>
               {erro && <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{erro}</p>}
             </div>
             <div className="mt-5 flex justify-end gap-2">
