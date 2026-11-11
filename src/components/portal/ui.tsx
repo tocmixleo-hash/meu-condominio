@@ -12,6 +12,7 @@
 // ─────────────────────────────────────────────────────────────
 
 import type { ReactNode } from "react";
+import { Inbox } from "lucide-react";
 import {
   EMOJIS_CAMPANHA,
   ROTULO_AUTORIZACAO,
@@ -92,7 +93,11 @@ export function LinhaIndicadores({
             i === 0 ? "sm:pr-6" : i === itens.length - 1 ? "sm:pl-6" : "sm:px-6"
           }`}
         >
-          <p className="text-[27px] font-bold leading-none tabular-nums text-stone-900">
+          <p
+            className={`text-[27px] font-bold leading-none tabular-nums ${
+              item.valor === 0 || item.valor === "0" ? "text-stone-300" : "text-stone-900"
+            }`}
+          >
             {item.valor}
           </p>
           <p className="mt-1.5 text-[11px] font-medium uppercase tracking-[0.12em] text-stone-500">
@@ -142,8 +147,21 @@ export function LinhaLista({
 
 // ── Estados ──────────────────────────────────────────────────
 
-export function EstadoVazio({ mensagem }: { mensagem: string }) {
-  return <p className="py-7 text-center text-sm text-stone-400">{mensagem}</p>;
+// Estado vazio desenhado — marcador discreto + frase curta (e ação opcional).
+// Sem cartão: segue a linguagem de seções abertas do portal.
+export function EstadoVazio({ mensagem, acao }: { mensagem: string; acao?: ReactNode }) {
+  return (
+    <div className="flex flex-col items-center gap-2 py-8 text-center">
+      <span
+        aria-hidden
+        className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--cor-neutra)] bg-white text-stone-300"
+      >
+        <Inbox className="h-4 w-4" />
+      </span>
+      <p className="text-sm text-stone-400">{mensagem}</p>
+      {acao}
+    </div>
+  );
 }
 
 export function Carregando() {

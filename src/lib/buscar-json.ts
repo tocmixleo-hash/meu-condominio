@@ -5,7 +5,7 @@
 // registra o erro no console (com método, URL e status) e devolve null,
 // mantendo o mesmo contrato dos chamadores originais.
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- espelha o `any` de Response.json() que os chamadores já usavam
+ 
 export async function buscarJSON<T = any>(
   url: string,
   init?: RequestInit,

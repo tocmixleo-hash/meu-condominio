@@ -4,11 +4,9 @@ import { useEffect, useState } from "react";
 import {
   Building2,
   CalendarCheck,
-  ChevronDown,
   ClipboardList,
   Eye,
   EyeOff,
-  FileText,
   LoaderCircle,
   Lock,
   Mail,
@@ -16,10 +14,7 @@ import {
   Package,
   ShieldCheck,
   Smartphone,
-  Sparkles,
   User,
-  Vote,
-  Wrench,
   X,
 } from "lucide-react";
 import { cssVarsDoTema, resolverTema } from "@/lib/tema";
@@ -144,8 +139,8 @@ export async function entrarNoApp(dados: {
 }
 
 // Benefícios da plataforma — conteúdo principal do painel esquerdo do
-// login. Área com rolagem própria para caber mais conteúdo sem apertar
-// a mensagem principal nem o QR do portal.
+// login. Três pontos fortes, sem lista exaustiva: a tela respira e a
+// mensagem principal continua sendo o destaque.
 const BENEFICIOS = [
   {
     icone: CalendarCheck,
@@ -161,31 +156,6 @@ const BENEFICIOS = [
     icone: Megaphone,
     titulo: "Comunicados que chegam de verdade",
     texto: "Avisos e campanhas da administração direto no seu painel — sem depender de correntes no grupo do prédio.",
-  },
-  {
-    icone: Vote,
-    titulo: "Assembleias participativas",
-    texto: "Pauta, votações e decisões registradas em um só lugar: participe informado, de onde estiver.",
-  },
-  {
-    icone: FileText,
-    titulo: "Documentos sempre à mão",
-    texto: "Convenção, regimento interno, boletos e circulares organizados, com histórico completo do condomínio.",
-  },
-  {
-    icone: Wrench,
-    titulo: "Ocorrências resolvidas",
-    texto: "Reporte um problema e acompanhe a solução até o fim, com transparência para você e para a administração.",
-  },
-  {
-    icone: ShieldCheck,
-    titulo: "Segurança para a família",
-    texto: "Autorizações de acesso validadas na guarita e histórico de visitantes da sua unidade — tudo registrado.",
-  },
-  {
-    icone: Sparkles,
-    titulo: "Convivência que melhora",
-    texto: "Campanhas de boas práticas e economia de recursos que tornam o dia a dia do condomínio mais leve para todos.",
   },
 ];
 
@@ -421,10 +391,6 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
                   );
                 })}
               </div>
-              <p className="mt-2.5 flex items-center gap-1.5 text-[11px] text-white/55">
-                <ChevronDown className="h-3.5 w-3.5 animate-bounce" />
-                Role o painel para ver todos os benefícios
-              </p>
             </div>
 
             {/* QR do portal no celular */}

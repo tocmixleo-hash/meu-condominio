@@ -4,7 +4,9 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import {
   Badge,
+  BotaoPrimario,
   BotaoSecundario,
+  BotaoTexto,
   Carregando,
   dataHoraCurta,
   EstadoVazio,
@@ -180,21 +182,10 @@ export default function Dashboard({
 
   return (
     <div className="space-y-5">
-      {/* Faixa panorâmica — largura total, degradê suave para o fundo */}
-      <div className="animar-aparecer relative -mx-4 h-[110px] overflow-hidden sm:-mx-6 sm:h-[130px] lg:-mx-8 lg:h-[150px]">
-        <Image
-          src={condominio.foto}
-          alt={`Área comum do ${condominio.nome}`}
-          fill
-          priority
-          className="object-cover object-[50%_42%]"
-          sizes="100vw"
-        />
-        <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-b from-transparent to-[var(--cor-fundo)]" />
-      </div>
-
-      {/* Cabeçalho — saudação em Manrope bold + ações rápidas à direita */}
-      <header className="-mt-4 flex items-end justify-between gap-6">
+      {/* Cabeçalho — saudação em Manrope bold + ações rápidas à direita.
+          Sem faixa panorâmica: a identidade vem do logo, das fotos dos
+          espaços e do conteúdo — o painel começa no que importa. */}
+      <header className="animar-aparecer flex items-end justify-between gap-6">
         <div className="min-w-0 space-y-1.5">
           <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-500">
             {condominio.nome.toUpperCase()} · {dataLonga()}
@@ -223,21 +214,33 @@ export default function Dashboard({
           </p>
         </div>
         <div data-tour="acoes-rapidas" className="hidden shrink-0 items-center gap-2 sm:flex">
-          {ACOES[perfil].map((acao) => (
-            <BotaoSecundario key={acao.destino + acao.rotulo} onClick={() => aoTrocar(acao.destino)}>
-              {acao.rotulo}
-            </BotaoSecundario>
-          ))}
+          {ACOES[perfil].map((acao, indice) =>
+            indice === 0 ? (
+              <BotaoPrimario key={acao.destino + acao.rotulo} onClick={() => aoTrocar(acao.destino)}>
+                {acao.rotulo}
+              </BotaoPrimario>
+            ) : (
+              <BotaoSecundario key={acao.destino + acao.rotulo} onClick={() => aoTrocar(acao.destino)}>
+                {acao.rotulo}
+              </BotaoSecundario>
+            ),
+          )}
         </div>
       </header>
 
       {/* Ações rápidas no celular */}
       <div data-tour="acoes-rapidas" className="flex flex-wrap gap-2 sm:hidden">
-        {ACOES[perfil].map((acao) => (
-          <BotaoSecundario key={"m-" + acao.destino + acao.rotulo} onClick={() => aoTrocar(acao.destino)}>
-            {acao.rotulo}
-          </BotaoSecundario>
-        ))}
+        {ACOES[perfil].map((acao, indice) =>
+          indice === 0 ? (
+            <BotaoPrimario key={"m-" + acao.destino + acao.rotulo} onClick={() => aoTrocar(acao.destino)}>
+              {acao.rotulo}
+            </BotaoPrimario>
+          ) : (
+            <BotaoSecundario key={"m-" + acao.destino + acao.rotulo} onClick={() => aoTrocar(acao.destino)}>
+              {acao.rotulo}
+            </BotaoSecundario>
+          ),
+        )}
       </div>
 
       {/* Campanhas em destaque — conscientização e boas práticas */}
@@ -326,7 +329,14 @@ export default function Dashboard({
                       />
                     ))
                   ) : (
-                    <EstadoVazio mensagem="Nenhuma autorização ativa." />
+                    <EstadoVazio
+                      mensagem="Nenhuma autorização ativa."
+                      acao={
+                        <BotaoTexto onClick={() => aoTrocar("autorizacoes")}>
+                          Autorizar visitante
+                        </BotaoTexto>
+                      }
+                    />
                   )}
                 </Lista>
               </Secao>

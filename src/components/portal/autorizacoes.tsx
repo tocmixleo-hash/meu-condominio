@@ -339,7 +339,7 @@ export default function Autorizacoes({ perfil }: { perfil: Perfil }) {
             <p className="mt-0.5 text-xs text-stone-500">
               Mostre este QR na portaria — a entrada é registrada na hora.
             </p>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
+            { }
             <img src={qr.imagem} alt={`QR Code de entrada de ${qr.nome}`} className="mx-auto mt-3 h-56 w-56" />
             <p className="mt-3 text-2xl font-bold tracking-[0.3em] tabular-nums text-stone-900">
               {qr.codigo}

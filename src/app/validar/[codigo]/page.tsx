@@ -39,7 +39,7 @@ export default function ValidarQR() {
         registrar();
       })
       .catch(() => setResultado({ situacao: "sem_sessao" }));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [codigo]);
 
   async function registrar() {

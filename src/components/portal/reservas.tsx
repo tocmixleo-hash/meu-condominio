@@ -107,7 +107,7 @@ function CartaoEspaco({
           sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, calc(100vw - 3rem)"
           className="object-cover transition-transform duration-500 group-hover:scale-105"
         />
-        <div className="absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-black/50 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/60 via-black/25 to-transparent" />
         <p className="absolute bottom-2 left-3.5 text-[17px] font-semibold leading-tight text-white drop-shadow">
           {rotulo}
         </p>
@@ -258,7 +258,7 @@ export default function Reservas({ perfil }: { perfil: Perfil }) {
                   foto={fotoDoEspaco(k)!}
                   meta={
                     rg
-                      ? `Antecedência de até ${rg.antecedenciaMaxDias} dia(s) · ${rg.limiteMensalUnidade}/mês`
+                      ? `Até ${rg.antecedenciaMaxDias} dias · ${rg.limiteMensalUnidade}x/mês`
                       : "Veja as regras abaixo"
                   }
                   acaoRotulo={perfil === "MORADOR" ? "Reservar" : "Regras"}

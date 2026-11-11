@@ -80,14 +80,25 @@ export default function CampanhaDestaque() {
               onMouseEnter={() => setPausado(true)}
               onMouseLeave={() => setPausado(false)}
             >
-              <span className="mr-1.5 text-xs tabular-nums text-stone-400" aria-hidden>
+              {/* Celular: pontinhos (o toque desliza); desktop: contador + setas */}
+              <span className="mr-1.5 hidden text-xs tabular-nums text-stone-400 sm:inline" aria-hidden>
                 {i + 1} de {total}
+              </span>
+              <span className="mr-1.5 flex items-center gap-1.5 sm:hidden" aria-hidden>
+                {lista.map((c, idx) => (
+                  <span
+                    key={c.id}
+                    className={`h-1.5 w-1.5 rounded-full transition-colors duration-300 ${
+                      idx === i ? "bg-[var(--cor-tema)]" : "bg-[var(--cor-neutra-2)]"
+                    }`}
+                  />
+                ))}
               </span>
               <button
                 type="button"
                 onClick={voltar}
                 aria-label="Campanha anterior"
-                className="flex h-7 w-7 items-center justify-center rounded-lg text-stone-400 transition hover:bg-[var(--cor-tema-a06)] hover:text-[var(--cor-tema)]"
+                className="hidden h-7 w-7 items-center justify-center rounded-lg text-stone-400 transition hover:bg-[var(--cor-tema-a06)] hover:text-[var(--cor-tema)] sm:flex"
               >
                 <ChevronLeft className="h-4 w-4" />
               </button>
@@ -95,7 +106,7 @@ export default function CampanhaDestaque() {
                 type="button"
                 onClick={avancar}
                 aria-label="Próxima campanha"
-                className="flex h-7 w-7 items-center justify-center rounded-lg text-stone-400 transition hover:bg-[var(--cor-tema-a06)] hover:text-[var(--cor-tema)]"
+                className="hidden h-7 w-7 items-center justify-center rounded-lg text-stone-400 transition hover:bg-[var(--cor-tema-a06)] hover:text-[var(--cor-tema)] sm:flex"
               >
                 <ChevronRight className="h-4 w-4" />
               </button>
@@ -136,7 +147,7 @@ export default function CampanhaDestaque() {
               <span className="mt-0.5 line-clamp-2 block text-sm leading-relaxed text-stone-600">
                 {campanha.mensagem}
               </span>
-              <span className="mt-1.5 block text-xs text-stone-400">
+              <span className="mt-1.5 block text-xs text-stone-500">
                 {ROTULO_CATEGORIA_CAMPANHA[campanha.categoria] ?? campanha.categoria}
                 {campanha.fimEm ? ` · Até ${formatarData(campanha.fimEm)}` : ""}
                 <span className="font-medium text-[var(--cor-tema)]">
