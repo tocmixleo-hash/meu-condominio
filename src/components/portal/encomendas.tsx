@@ -20,6 +20,7 @@ import {
 } from "@/components/portal/ui";
 import type { Perfil } from "@/components/portal/app-shell";
 import { corpoJson, mensagemDeErro, mensagemRede } from "@/lib/api-cliente";
+import { buscarJSON } from "@/lib/buscar-json";
 
 type Encomenda = {
   id: string;
@@ -54,20 +55,16 @@ export default function Encomendas({ perfil }: { perfil: Perfil }) {
   const naPortaria = perfil === "PORTARIA" || perfil === "SINDICO" || perfil === "ADMINISTRATIVO";
 
   const carregar = useCallback(() => {
-    fetch("/api/encomendas")
-      .then(async (r) => (r.ok ? r.json() : null))
+    buscarJSON("/api/encomendas")
       .then((d) => d && setLista(d.lista))
-      .catch(() => null);
   }, []);
 
   useEffect(carregar, [carregar]);
 
   useEffect(() => {
     if (!naPortaria) return;
-    fetch("/api/moradores")
-      .then(async (r) => (r.ok ? r.json() : null))
+    buscarJSON("/api/moradores")
       .then((d) => d && setMoradores(d.lista ?? []))
-      .catch(() => null);
   }, [naPortaria]);
 
   async function criar() {

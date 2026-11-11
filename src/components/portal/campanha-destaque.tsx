@@ -10,6 +10,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { Secao, ROTULO_CATEGORIA_CAMPANHA, formatarData } from "@/components/portal/ui";
+import { buscarJSON } from "@/lib/buscar-json";
 
 type Campanha = {
   id: string;
@@ -33,16 +34,25 @@ export default function CampanhaDestaque() {
   const toqueInicio = useRef<number | null>(null);
 
   useEffect(() => {
-    fetch("/api/campanhas")
-      .then(async (r) => (r.ok ? r.json() : null))
-      .then((d) => d && setLista(d.lista))
-      .catch(() => null);
+    buscarJSON("/api/campanhas").then((d) => d && setLista(d.lista));
   }, []);
 
+  // Fecha o detalhe com Esc (e limpa o ouvinte ao fechar)
+  useEffect(() => {
+    if (!detalhe) return;
+    const aoTecla = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setDetalhe(null);
+    };
+    window.addEventListener("keydown", aoTecla);
+    return () => window.removeEventListener("keydown", aoTecla);
+  }, [detalhe]);
+
   const total = lista?.length ?? 0;
-  const avancar = useCallback(() => setIndice((i) => (total ? (i + 1) % total : 0)), [total]);
+  // Índice sempre dentro da faixa — derivado, sem efeito extra de sincronização
+  const i = total ? Math.min(indice, total - 1) : 0;
+  const avancar = useCallback(() => setIndice((atual) => (total ? (atual + 1) % total : 0)), [total]);
   const voltar = useCallback(
-    () => setIndice((i) => (total ? (i - 1 + total) % total : 0)),
+    () => setIndice((atual) => (total ? (atual - 1 + total) % total : 0)),
     [total],
   );
 
@@ -51,16 +61,11 @@ export default function CampanhaDestaque() {
     if (!total || pausado || detalhe || total < 2) return;
     const t = setInterval(avancar, INTERVALO_MS);
     return () => clearInterval(t);
-  }, [total, pausado, detalhe, avancar, indice]);
-
-  // Índice seguro quando a lista muda
-  useEffect(() => {
-    if (total && indice >= total) setIndice(0);
-  }, [total, indice]);
+  }, [total, pausado, detalhe, avancar, i]);
 
   if (!lista || total === 0) return null;
 
-  const campanha = lista[Math.min(indice, total - 1)];
+  const campanha = lista[i];
 
   return (
     <>
@@ -76,7 +81,7 @@ export default function CampanhaDestaque() {
               onMouseLeave={() => setPausado(false)}
             >
               <span className="mr-1.5 text-xs tabular-nums text-stone-400" aria-hidden>
-                {indice + 1} de {total}
+                {i + 1} de {total}
               </span>
               <button
                 type="button"
@@ -134,7 +139,7 @@ export default function CampanhaDestaque() {
               <span className="mt-1.5 block text-xs text-stone-400">
                 {ROTULO_CATEGORIA_CAMPANHA[campanha.categoria] ?? campanha.categoria}
                 {campanha.fimEm ? ` · Até ${formatarData(campanha.fimEm)}` : ""}
-                <span className="font-medium text-[var(--cor-tema)] opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
+                <span className="font-medium text-[var(--cor-tema)]">
                   {" "}
                   · Ler na íntegra
                 </span>

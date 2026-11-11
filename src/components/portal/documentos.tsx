@@ -17,6 +17,7 @@ import {
 } from "@/components/portal/ui";
 import type { Perfil } from "@/components/portal/app-shell";
 import { corpoJson, mensagemDeErro, mensagemRede } from "@/lib/api-cliente";
+import { buscarJSON } from "@/lib/buscar-json";
 
 type Documento = {
   id: string;
@@ -46,10 +47,8 @@ export default function Documentos({ perfil }: { perfil: Perfil }) {
   const podeGerenciar = perfil === "SINDICO" || perfil === "ADMINISTRATIVO";
 
   const carregar = useCallback(() => {
-    fetch("/api/documentos")
-      .then(async (r) => (r.ok ? r.json() : null))
+    buscarJSON("/api/documentos")
       .then((d) => d && setLista(d.lista))
-      .catch(() => null);
   }, []);
 
   useEffect(carregar, [carregar]);

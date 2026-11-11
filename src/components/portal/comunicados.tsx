@@ -19,6 +19,7 @@ import {
 } from "@/components/portal/ui";
 import type { Perfil } from "@/components/portal/app-shell";
 import { corpoJson, mensagemDeErro, mensagemRede } from "@/lib/api-cliente";
+import { buscarJSON } from "@/lib/buscar-json";
 
 type Comunicado = {
   id: string;
@@ -116,17 +117,13 @@ export default function Comunicados({ perfil }: { perfil: Perfil }) {
   const podeGerenciarCampanhas = podePublicar;
 
   const carregar = useCallback(() => {
-    fetch("/api/comunicados")
-      .then(async (r) => (r.ok ? r.json() : null))
+    buscarJSON("/api/comunicados")
       .then((d) => d && setLista(d.lista))
-      .catch(() => null);
   }, []);
 
   const carregarCampanhas = useCallback(() => {
-    fetch(podeGerenciarCampanhas ? "/api/campanhas?todas=1" : "/api/campanhas")
-      .then(async (r) => (r.ok ? r.json() : null))
+    buscarJSON(podeGerenciarCampanhas ? "/api/campanhas?todas=1" : "/api/campanhas")
       .then((d) => d && setCampanhas(d.lista))
-      .catch(() => null);
   }, [podeGerenciarCampanhas]);
 
   useEffect(carregar, [carregar]);

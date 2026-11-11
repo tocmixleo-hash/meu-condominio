@@ -10,6 +10,7 @@ import {
   LinhaLista,
   Secao,
 } from "@/components/portal/ui";
+import { buscarJSON } from "@/lib/buscar-json";
 import { ROTULO_ACAO, dataHoraCurta } from "@/lib/rotulos";
 
 type Registro = {
@@ -41,10 +42,7 @@ export default function Auditoria() {
 
   const carregar = useCallback(() => {
     const qs = filtro ? `?acao=${encodeURIComponent(filtro)}` : "";
-    fetch(`/api/auditoria${qs}`)
-      .then(async (r) => (r.ok ? r.json() : null))
-      .then((d) => d && setLista(d.lista))
-      .catch(() => setLista([]));
+    buscarJSON(`/api/auditoria${qs}`).then((d) => setLista(d?.lista ?? []));
   }, [filtro]);
 
   useEffect(carregar, [carregar]);

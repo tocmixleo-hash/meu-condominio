@@ -1,14 +1,15 @@
 import { db } from "@/lib/db";
-import { json401, json403, pode, usuarioAtual } from "@/lib/auth";
-import { garantirTabelaCampanha } from "@/lib/esquema-campanha";
+import { ehGestao, json401, json403, pode, usuarioAtual } from "@/lib/auth";
+import { garantirSchema } from "@/lib/garantia-schema";
 import { notificarCondominio } from "@/lib/notificacoes";
 import { registrarAcao } from "@/lib/auditoria";
 
 const CATEGORIAS = ["CONVIVENCIA", "PET", "SUSTENTABILIDADE", "SEGURANCA", "SAUDE", "GERAL"];
 
-// Equipe que gerencia campanhas (mesma régua dos comunicados)
+// Equipe de gestão (mesma régua de /api/campanhas) — trava dupla de
+// acesso ao módulo + perfil, ver detalhes lá.
 function podeGerenciar(eu: { perfil: string; permissoes: string[]; ehPlataforma: boolean }) {
-  return pode(eu, "comunicados");
+  return pode(eu, "comunicados") && ehGestao(eu.perfil);
 }
 
 async function campanhaDoCondominio(id: string, condominioId: string) {
@@ -25,7 +26,7 @@ export async function PATCH(req: Request, ctx: { params: Promise<{ id: string }>
   if (!podeGerenciar(eu)) return json403();
 
   const { id } = await ctx.params;
-  await garantirTabelaCampanha();
+  await garantirSchema();
   const campanha = await campanhaDoCondominio(id, eu.condominio.id);
   if (!campanha) return Response.json({ erro: "Campanha não encontrada." }, { status: 404 });
 
@@ -118,7 +119,7 @@ export async function DELETE(_req: Request, ctx: { params: Promise<{ id: string 
   if (!podeGerenciar(eu)) return json403();
 
   const { id } = await ctx.params;
-  await garantirTabelaCampanha();
+  await garantirSchema();
   const campanha = await campanhaDoCondominio(id, eu.condominio.id);
   if (!campanha) return Response.json({ erro: "Campanha não encontrada." }, { status: 404 });
 

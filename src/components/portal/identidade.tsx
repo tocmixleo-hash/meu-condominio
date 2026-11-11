@@ -6,6 +6,7 @@ import { cssVarsDoTema, resolverTema } from "@/lib/tema";
 import { Carregando, Secao } from "@/components/portal/ui";
 import { mensagemDeErro } from "@/lib/api-cliente";
 import type { CondominioUI } from "@/components/portal/login-screen";
+import { buscarJSON } from "@/lib/buscar-json";
 
 type FotoGaleria = {
   id: string;
@@ -69,8 +70,7 @@ export default function Identidade({
   useEffect(() => {
     let vivo = true;
     setDados(null);
-    fetch(`/api/condominios/${condominio.id}`)
-      .then(async (r) => (r.ok ? r.json() : null))
+    buscarJSON(`/api/condominios/${condominio.id}`)
       .then((d) => {
         if (!vivo || !d?.condominio) return;
         const c = d.condominio as IdentidadeCompleta;
@@ -78,7 +78,6 @@ export default function Identidade({
         setForm(formularioInicial(c));
         setEspacoFotos(Object.fromEntries((c.espacoFotos ?? []).map((f) => [f.espaco, f.url])));
       })
-      .catch(() => null);
     return () => {
       vivo = false;
     };

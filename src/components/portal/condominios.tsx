@@ -5,6 +5,7 @@ import { LoaderCircle, Plus } from "lucide-react";
 import { Carregando, Secao } from "@/components/portal/ui";
 import { mensagemDeErro } from "@/lib/api-cliente";
 import type { CondominioUI } from "@/components/portal/login-screen";
+import { buscarJSON } from "@/lib/buscar-json";
 
 /**
  * Console de condomínios do Administrador da Plataforma: lista todos os
@@ -30,10 +31,8 @@ export default function Condominios({
   }, []);
 
   function carregar() {
-    fetch("/api/condominios")
-      .then(async (r) => (r.ok ? r.json() : null))
+    buscarJSON("/api/condominios")
       .then((d) => d?.lista && setLista(d.lista))
-      .catch(() => null);
   }
 
   async function criar() {

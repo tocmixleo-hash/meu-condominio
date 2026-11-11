@@ -28,6 +28,7 @@ import {
 import type { ModuloId, Perfil } from "@/components/portal/app-shell";
 
 import CampanhaDestaque from "@/components/portal/campanha-destaque";
+import { buscarJSON } from "@/lib/buscar-json";
 
 type Encomenda = {
   id: string;
@@ -173,10 +174,8 @@ export default function Dashboard({
   const [dados, setDados] = useState<DashboardData | null>(null);
 
   useEffect(() => {
-    fetch("/api/dashboard")
-      .then(async (r) => (r.ok ? r.json() : null))
+    buscarJSON("/api/dashboard")
       .then((d) => d && setDados(d))
-      .catch(() => null);
   }, []);
 
   return (

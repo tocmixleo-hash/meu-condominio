@@ -90,11 +90,21 @@ login mantém o seletor de condomínios e os acessos rápidos de demonstração 
 o link testa livremente; o administrador da plataforma nunca aparece nos atalhos e entra
 apenas pelo e-mail e senha próprios.
 
-> **Nota (módulos novos):** tabelas de recursos acrescentados depois do schema do Turso
-> (ex.: **Campanhas**, do painel inicial) passam a ser garantidas em runtime — a primeira
-> consulta aplica `CREATE TABLE/INDEX IF NOT EXISTS` e o módulo entra no ar sem passo
-> manual de migração. O conteúdo ainda é semeado quando quiser (`semear-campanhas.mjs`,
-> com `--producao` ou pela própria gestão do portal em *Comunicados → Nova campanha*).
+> **Nota (módulos novos):** o portal tem um **guardião de schema** em runtime — a primeira
+> consulta compara as tabelas do banco com o DDL gerado do `schema.prisma`
+> (`scripts/gerar-ddl-garantia.mjs` regenera o mapa após mudanças de schema) e cria o que
+> faltar (`CREATE TABLE/INDEX IF NOT EXISTS`). Módulos novos entram no ar sem passo manual
+> de migração; tabelas antigas com colunas faltantes seguem os `migrar-turso-*`. O
+> conteúdo institucional se semeia quando quiser (`semear-campanhas.mjs`, com `--producao`
+> ou pela própria gestão do portal em *Comunicados → Nova campanha*).
+
+### Backup automático (GitHub Actions)
+
+O workflow `.github/workflows/backup-turso.yml` exporta o banco todo em JSON, todo dia
+(03:17, horário de Brasília) e guarda a cópia como artifact privado por 30 dias. Para
+ativar, cadastre `TURSO_DATABASE_URL` e `TURSO_AUTH_TOKEN` nos secrets do repositório
+(Settings → Secrets and variables → Actions) — sem eles o job apenas avisa que está
+inativo. Rodar à mão: aba *Actions* → *Backup diário do banco* → *Run workflow*.
 
 ## 5. Limitações do modo demonstração (SQLite em `/tmp`)
 

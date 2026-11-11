@@ -20,6 +20,7 @@ import {
 } from "@/components/portal/ui";
 import type { Perfil } from "@/components/portal/app-shell";
 import { corpoJson, mensagemDeErro, mensagemRede } from "@/lib/api-cliente";
+import { buscarJSON } from "@/lib/buscar-json";
 
 type Reserva = {
   id: string;
@@ -144,14 +145,10 @@ export default function Reservas({ perfil }: { perfil: Perfil }) {
   const ehGestao = perfil === "SINDICO" || perfil === "ADMINISTRATIVO";
 
   const carregar = useCallback(() => {
-    fetch("/api/reservas")
-      .then(async (r) => (r.ok ? r.json() : null))
+    buscarJSON("/api/reservas")
       .then((d) => d && setLista(d.lista))
-      .catch(() => null);
-    fetch("/api/reservas/regras")
-      .then(async (r) => (r.ok ? r.json() : null))
+    buscarJSON("/api/reservas/regras")
       .then((d) => d && setRegras(d.lista ?? []))
-      .catch(() => null);
   }, []);
 
   useEffect(carregar, [carregar]);

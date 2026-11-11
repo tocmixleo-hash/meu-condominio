@@ -18,6 +18,7 @@ import {
   tomSituacaoManutencao,
 } from "@/components/portal/ui";
 import { corpoJson, mensagemDeErro, mensagemRede } from "@/lib/api-cliente";
+import { buscarJSON } from "@/lib/buscar-json";
 
 type Manutencao = {
   id: string;
@@ -42,10 +43,8 @@ export default function Manutencao() {
   const [enviando, setEnviando] = useState(false);
 
   const carregar = useCallback(() => {
-    fetch("/api/manutencao")
-      .then(async (r) => (r.ok ? r.json() : null))
+    buscarJSON("/api/manutencao")
       .then((d) => d && setLista(d.lista))
-      .catch(() => null);
   }, []);
 
   useEffect(carregar, [carregar]);

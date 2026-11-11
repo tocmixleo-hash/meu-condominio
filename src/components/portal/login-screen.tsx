@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { cssVarsDoTema, resolverTema } from "@/lib/tema";
 import { corpoJson, mensagemDeErro, mensagemRede } from "@/lib/api-cliente";
+import { buscarJSON } from "@/lib/buscar-json";
 
 type Usuario = {
   id: string;
@@ -244,12 +245,9 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
   const [enviandoRecuperacao, setEnviandoRecuperacao] = useState(false);
 
   useEffect(() => {
-    fetch("/api/ambiente")
-      .then(async (r) => (r.ok ? r.json() : null))
+    buscarJSON("/api/ambiente")
       .then((d) => setModoDemo(!!d?.demo))
-      .catch(() => null);
-    fetch("/api/condominios")
-      .then(async (r) => (r.ok ? r.json() : null))
+    buscarJSON("/api/condominios")
       .then((d) => {
         const lista = (d?.lista ?? []) as CondominioUI[];
         if (lista.length > 0) {
@@ -257,7 +255,6 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
           setCondo((atual) => lista.find((c) => c.id === atual.id) ?? lista[0]);
         }
       })
-      .catch(() => null);
   }, []);
 
   async function submeter(dados?: { email: string; senha: string; tipo?: TipoUsuario }) {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 
 // ── Mini tutorial do primeiro acesso (passeio guiado com holofote) ──
@@ -27,11 +27,15 @@ export default function TourGuiado({
 }) {
   const [i, setI] = useState(0);
   const [rect, setRect] = useState<DOMRect | null>(null);
-  const [montado, setMontado] = useState(false);
   const alvoRef = useRef<HTMLElement | null>(null);
 
-  // Alvos só existem no navegador — evita divergência de renderização
-  useEffect(() => setMontado(true), []);
+  // "Montado" via useSyncExternalStore: falso no servidor, verdadeiro no
+  // navegador — sem setState em efeito e sem divergência de hidratação.
+  const montado = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
 
   const procurarAlvo = useCallback((alvos?: string[]): HTMLElement | null => {
     if (!alvos?.length) return null;

@@ -14,6 +14,7 @@ import {
   Secao,
 } from "@/components/portal/ui";
 import { corpoJson, mensagemDeErro, mensagemRede } from "@/lib/api-cliente";
+import { buscarJSON } from "@/lib/buscar-json";
 
 type Funcao = {
   id: string;
@@ -49,10 +50,8 @@ export default function Funcoes() {
   const [enviando, setEnviando] = useState(false);
 
   const carregar = useCallback(() => {
-    fetch("/api/funcoes")
-      .then(async (r) => (r.ok ? r.json() : null))
+    buscarJSON("/api/funcoes")
       .then((d) => d && setLista(d.lista))
-      .catch(() => null);
   }, []);
 
   useEffect(carregar, [carregar]);

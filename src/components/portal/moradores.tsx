@@ -14,6 +14,7 @@ import {
   Secao,
 } from "@/components/portal/ui";
 import { corpoJson, mensagemDeErro, mensagemRede } from "@/lib/api-cliente";
+import { buscarJSON } from "@/lib/buscar-json";
 
 type Morador = {
   id: string;
@@ -58,22 +59,18 @@ export default function Moradores() {
   const [enviando, setEnviando] = useState(false);
 
   const carregar = useCallback(() => {
-    fetch("/api/moradores")
-      .then(async (r) => (r.ok ? r.json() : null))
+    buscarJSON("/api/moradores")
       .then((d) => {
         if (d) {
           setLista(d.lista);
           setEquipe(d.equipe ?? []);
         }
       })
-      .catch(() => null);
   }, []);
 
   const carregarFuncoes = useCallback(() => {
-    fetch("/api/funcoes")
-      .then(async (r) => (r.ok ? r.json() : null))
+    buscarJSON("/api/funcoes")
       .then((d) => d && setFuncoes((d.lista ?? []).filter((f: FuncaoResumo & { ativo: boolean }) => f.ativo)))
-      .catch(() => null);
   }, []);
 
   useEffect(() => {

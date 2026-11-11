@@ -1,14 +1,17 @@
 import { db } from "@/lib/db";
-import { json401, json403, pode, usuarioAtual } from "@/lib/auth";
-import { garantirTabelaCampanha } from "@/lib/esquema-campanha";
+import { ehGestao, json401, json403, pode, usuarioAtual } from "@/lib/auth";
+import { garantirSchema } from "@/lib/garantia-schema";
 import { notificarCondominio } from "@/lib/notificacoes";
 import { registrarAcao } from "@/lib/auditoria";
 
 const CATEGORIAS = ["CONVIVENCIA", "PET", "SUSTENTABILIDADE", "SEGURANCA", "SAUDE", "GERAL"];
 
-// Equipe que gerencia campanhas (mesma régua dos comunicados)
+// Equipe de gestão que gerencia campanhas — mesma régua dos comunicados:
+// acesso ao módulo E perfil de gestão (síndico/administrativo/plataforma).
+// A trava dupla impede que perfis com acesso só de leitura (ex.: MORADOR,
+// que tem "comunicados" para LER) publiquem pela API direto.
 function podeGerenciar(eu: { perfil: string; permissoes: string[]; ehPlataforma: boolean }) {
-  return pode(eu, "comunicados");
+  return pode(eu, "comunicados") && ehGestao(eu.perfil);
 }
 
 // Lista as campanhas do condomínio ativo.
@@ -22,8 +25,8 @@ export async function GET(req: Request) {
   const querTodas = url.searchParams.get("todas") === "1";
   const agora = new Date();
 
-  // Produção (Turso) pode ainda não ter a tabela — garante antes de consultar
-  await garantirTabelaCampanha();
+  // Produção (Turso) pode estar sem tabelas de módulos novos — garante antes de consultar
+  await garantirSchema();
 
   const lista = await db.campanha.findMany({
     where: {
@@ -69,7 +72,7 @@ export async function POST(req: Request) {
   }
 
   // Período de veiculação opcional
-  await garantirTabelaCampanha();
+  await garantirSchema();
 
   let inicioEm: Date | null = null;
   let fimEm: Date | null = null;

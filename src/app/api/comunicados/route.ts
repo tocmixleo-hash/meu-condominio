@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { json401, json403, pode, usuarioAtual } from "@/lib/auth";
+import { ehGestao, json401, json403, pode, usuarioAtual } from "@/lib/auth";
 import { notificarCondominio } from "@/lib/notificacoes";
 import { registrarAcao } from "@/lib/auditoria";
 
@@ -18,7 +18,10 @@ export async function GET() {
 export async function POST(req: Request) {
   const eu = await usuarioAtual();
   if (!eu) return json401();
-  if (!pode(eu, "comunicados")) return json403();
+  // Publicar é tarefa da gestão: MORADOR lê comunicados, mas não cria
+  // (a trava dupla espelha o botão da interface — sem ela, a API aceitava
+  // criação de qualquer perfil com acesso ao módulo).
+  if (!pode(eu, "comunicados") || !ehGestao(eu.perfil)) return json403();
 
   const { titulo, conteudo, categoria, prioridade } = await req.json().catch(() => ({}) as never);
   if (!titulo?.trim() || !conteudo?.trim()) {

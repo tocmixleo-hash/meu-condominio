@@ -18,6 +18,7 @@ import {
 } from "@/components/portal/ui";
 import type { Perfil } from "@/components/portal/app-shell";
 import { corpoJson, mensagemDeErro, mensagemRede } from "@/lib/api-cliente";
+import { buscarJSON } from "@/lib/buscar-json";
 
 type Assembleia = {
   id: string;
@@ -62,10 +63,8 @@ export default function Assembleias({ perfil }: { perfil: Perfil }) {
   const podeGerenciar = perfil === "SINDICO" || perfil === "ADMINISTRATIVO";
 
   const carregar = useCallback(() => {
-    fetch("/api/assembleias")
-      .then(async (r) => (r.ok ? r.json() : null))
+    buscarJSON("/api/assembleias")
       .then((d) => d && setLista(d.lista))
-      .catch(() => null);
   }, []);
 
   useEffect(carregar, [carregar]);

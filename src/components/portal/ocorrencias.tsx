@@ -20,6 +20,7 @@ import {
 } from "@/components/portal/ui";
 import type { Perfil } from "@/components/portal/app-shell";
 import { corpoJson, mensagemDeErro, mensagemRede } from "@/lib/api-cliente";
+import { buscarJSON } from "@/lib/buscar-json";
 
 type Ocorrencia = {
   id: string;
@@ -52,10 +53,8 @@ export default function Ocorrencias({ perfil }: { perfil: Perfil }) {
   const ehEquipeGestao = perfil === "SINDICO" || perfil === "ADMINISTRATIVO" || perfil === "PLATAFORMA";
 
   const carregar = useCallback(() => {
-    fetch("/api/ocorrencias")
-      .then(async (r) => (r.ok ? r.json() : null))
+    buscarJSON("/api/ocorrencias")
       .then((d) => d && setLista(d.lista))
-      .catch(() => null);
   }, []);
 
   useEffect(carregar, [carregar]);
