@@ -1,5 +1,6 @@
 import type { NextConfig } from "next";
 
+// (comentário de rebuild: invalida cache de build da Vercel após rota removida)
 const nextConfig: NextConfig = {
   output: "standalone",
   // Garante que o banco de demonstração entre no bundle serverless do Vercel.
