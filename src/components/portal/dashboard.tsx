@@ -182,10 +182,24 @@ export default function Dashboard({
 
   return (
     <div className="space-y-5">
-      {/* Cabeçalho — saudação em Manrope bold + ações rápidas à direita.
-          Sem faixa panorâmica: a identidade vem do logo, das fotos dos
-          espaços e do conteúdo — o painel começa no que importa. */}
-      <header className="animar-aparecer flex items-end justify-between gap-6">
+      {/* Faixa panorâmica — a fotografia do condomínio de volta ao topo do
+          painel. Degradê suave para o fundo (var(--cor-fundo) já possui a
+          versão noturna derivada em tema.ts) e brilho levemente reduzido
+          no tema escuro para não ofuscar à noite. */}
+      <div className="animar-aparecer relative -mx-4 h-[110px] overflow-hidden sm:-mx-6 sm:h-[130px] lg:-mx-8 lg:h-[150px]">
+        <Image
+          src={condominio.foto}
+          alt={`Área comum do ${condominio.nome}`}
+          fill
+          priority
+          className="object-cover object-[50%_42%] dark:brightness-[0.82]"
+          sizes="100vw"
+        />
+        <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-b from-transparent to-[var(--cor-fundo)]" />
+      </div>
+
+      {/* Cabeçalho — saudação em Manrope bold + ações rápidas à direita */}
+      <header className="-mt-4 flex items-end justify-between gap-6">
         <div className="min-w-0 space-y-1.5">
           <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-500 dark:text-stone-400">
             {condominio.nome.toUpperCase()} · {dataLonga()}
