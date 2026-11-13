@@ -169,8 +169,8 @@ export default function Inicio() {
   if (carregando) {
     return (
       <div className="flex h-dvh items-center justify-center bg-[var(--cor-fundo,#f7f6f3)]">
-        <div className="flex items-center gap-3 text-sm text-stone-500">
-          <span className="h-4 w-4 animate-spin rounded-full border border-stone-300 border-t-[#4D403A]" />
+        <div className="flex items-center gap-3 text-sm text-stone-500 dark:text-stone-400">
+          <span className="h-4 w-4 animate-spin rounded-full border border-stone-300 dark:border-stone-700 border-t-[#4D403A]" />
           Carregando…
         </div>
       </div>
@@ -214,7 +214,7 @@ export default function Inicio() {
       aoSair={sair}
     >
       {aviso && (
-        <p role="alert" className="mb-4 rounded-xl bg-red-50 px-3.5 py-2.5 text-sm text-red-700">
+        <p role="alert" className="mb-4 rounded-xl bg-red-50 dark:bg-red-950/40 px-3.5 py-2.5 text-sm text-red-700 dark:text-red-300">
           {aviso}
         </p>
       )}

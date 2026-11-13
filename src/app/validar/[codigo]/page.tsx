@@ -69,38 +69,38 @@ export default function ValidarQR() {
   }
 
   return (
-    <div className="flex min-h-dvh items-center justify-center bg-stone-50 p-4">
-      <div className="w-full max-w-md rounded-xl border border-stone-200 bg-white p-8 text-center shadow-sm">
+    <div className="flex min-h-dvh items-center justify-center bg-stone-50 dark:bg-stone-900/50 p-4">
+      <div className="w-full max-w-md rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-8 text-center shadow-sm">
         {resultado.situacao === "verificando" && (
-          <p className="flex items-center justify-center gap-2 text-sm text-stone-500">
+          <p className="flex items-center justify-center gap-2 text-sm text-stone-500 dark:text-stone-400">
             <LoaderCircle className="h-4 w-4 animate-spin" /> Verificando código…
           </p>
         )}
 
         {resultado.situacao === "ok" && (
           <>
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-green-100 text-2xl text-green-700">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-green-100 text-2xl text-green-700 dark:text-green-300">
               ✓
             </div>
-            <h1 className="mt-4 text-lg font-semibold text-stone-900">{resultado.titulo}</h1>
-            <p className="mt-1 text-sm text-stone-500">{resultado.texto}</p>
+            <h1 className="mt-4 text-lg font-semibold text-stone-900 dark:text-stone-100">{resultado.titulo}</h1>
+            <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">{resultado.texto}</p>
           </>
         )}
 
         {resultado.situacao === "erro" && (
           <>
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-red-100 text-2xl text-red-700">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-red-100 text-2xl text-red-700 dark:text-red-300">
               !
             </div>
-            <h1 className="mt-4 text-lg font-semibold text-stone-900">Não foi possível registrar</h1>
-            <p className="mt-1 text-sm text-red-700">{resultado.texto}</p>
+            <h1 className="mt-4 text-lg font-semibold text-stone-900 dark:text-stone-100">Não foi possível registrar</h1>
+            <p className="mt-1 text-sm text-red-700 dark:text-red-300">{resultado.texto}</p>
           </>
         )}
 
         {resultado.situacao === "sem_sessao" && (
           <>
-            <h1 className="text-lg font-semibold text-stone-900">Entre como portaria</h1>
-            <p className="mt-1 text-sm text-stone-500">
+            <h1 className="text-lg font-semibold text-stone-900 dark:text-stone-100">Entre como portaria</h1>
+            <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">
               Este QR registra a entrada do visitante. Faça login com uma conta de equipe
               (portaria, síndico ou administrativo) para concluir.
             </p>
@@ -115,13 +115,13 @@ export default function ValidarQR() {
 
         {resultado.situacao === "sem_permissao" && (
           <>
-            <h1 className="text-lg font-semibold text-stone-900">{resultado.titulo}</h1>
-            <p className="mt-1 text-sm text-stone-500">{resultado.texto}</p>
+            <h1 className="text-lg font-semibold text-stone-900 dark:text-stone-100">{resultado.titulo}</h1>
+            <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">{resultado.texto}</p>
           </>
         )}
 
         {enviando && (
-          <p className="mt-4 flex items-center justify-center gap-2 text-sm text-stone-500">
+          <p className="mt-4 flex items-center justify-center gap-2 text-sm text-stone-500 dark:text-stone-400">
             <LoaderCircle className="h-4 w-4 animate-spin" /> Registrando…
           </p>
         )}

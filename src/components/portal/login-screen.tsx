@@ -18,6 +18,7 @@ import {
   X,
 } from "lucide-react";
 import { cssVarsDoTema, resolverTema } from "@/lib/tema";
+import { useTema } from "@/lib/preferencia-tema";
 import { corpoJson, mensagemDeErro, mensagemRede } from "@/lib/api-cliente";
 import { buscarJSON } from "@/lib/buscar-json";
 
@@ -276,7 +277,8 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
     }
   }
 
-  const temaVars = cssVarsDoTema(resolverTema(condo.slug, condo.corTema)) as React.CSSProperties;
+  const { escuro: temaEscuro } = useTema();
+  const temaVars = cssVarsDoTema(resolverTema(condo.slug, condo.corTema), temaEscuro) as React.CSSProperties;
 
   // Fase de demonstração: clicar no tipo de acesso entra direto com uma
   // conta real daquele perfil no condomínio selecionado — sem fricção.
@@ -301,12 +303,14 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
     <div style={temaVars} className="flex min-h-dvh flex-col bg-[var(--cor-fundo)] md:h-dvh">
       {/* ── Barra superior: marca à esquerda, Entrar / Fazer cadastro à
           direita (padrão dos grandes sites) ─────────────────────────── */}
-      <header className="z-20 flex items-center justify-between gap-3 border-b border-[var(--cor-neutra)] bg-white px-4 py-3 sm:px-8 sm:py-3.5">
-        <img
-          src="/fotos/logo-meu-condominio-horizontal.png"
-          alt="Meu Condomínio"
-          className="h-7 w-auto object-contain sm:h-9"
-        />
+      <header className="z-20 flex items-center justify-between gap-3 border-b border-[var(--cor-neutra)] bg-white dark:bg-stone-900 px-4 py-3 sm:px-8 sm:py-3.5">
+        <span className="flex shrink-0 items-center rounded-md bg-white px-2 py-1">
+          <img
+            src="/fotos/logo-meu-condominio-horizontal.png"
+            alt="Meu Condomínio"
+            className="h-7 w-auto object-contain sm:h-9"
+          />
+        </span>
         <div className="flex items-center gap-2">
           <button
             type="button"
@@ -327,7 +331,7 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
             className={`flex h-9 items-center rounded-full border px-4 text-sm font-semibold transition-all duration-200 sm:px-5 ${
               tela === "cadastrar"
                 ? "border-[var(--cor-tema)] bg-[var(--cor-tema)] text-white shadow-sm ring-2 ring-[var(--cor-tema)]/25"
-                : "border-stone-300 bg-white text-stone-700 hover:border-stone-400 hover:bg-stone-50"
+                : "border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 text-stone-700 dark:text-stone-200 hover:border-stone-400 hover:bg-stone-50"
             }`}
           >
             Fazer cadastro
@@ -444,20 +448,20 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
                   key={c.id}
                   type="button"
                   onClick={() => setCondo(c)}
-                  className={`flex items-center gap-3 rounded-xl border bg-white px-4 py-3 text-left transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md ${
+                  className={`flex items-center gap-3 rounded-xl border bg-white dark:bg-stone-900 px-4 py-3 text-left transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md ${
                     ativo
                       ? "border-[var(--cor-tema)] ring-2 ring-[var(--cor-tema)]/25"
-                      : "border-stone-200 hover:border-stone-300"
+                      : "border-stone-200 dark:border-stone-800 hover:border-stone-300"
                   }`}
                 >
                   <img
                     src={c.logo}
                     alt=""
-                    className="h-10 w-10 shrink-0 rounded-lg bg-white object-contain p-0.5"
+                    className="h-10 w-10 shrink-0 rounded-lg bg-white dark:bg-stone-900 object-contain p-0.5"
                   />
                   <span className="min-w-0">
-                    <span className="block text-sm font-semibold leading-tight text-stone-900">{c.nome}</span>
-                    <span className="flex items-center gap-1.5 text-xs text-stone-500">
+                    <span className="block text-sm font-semibold leading-tight text-stone-900 dark:text-stone-100">{c.nome}</span>
+                    <span className="flex items-center gap-1.5 text-xs text-stone-500 dark:text-stone-400">
                       <span
                         aria-hidden
                         className="inline-block h-2 w-2 rounded-full"
@@ -474,16 +478,16 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
           {/* Cartão de acesso — três telas: tipos (clique = entra na hora,
                   demonstração), entrar (e-mail e senha, pelo botão do topo)
                   e cadastrar */}
-          <div className="animar-entrada mt-3 rounded-xl border border-[var(--cor-neutra)] bg-white p-4 shadow-[var(--sombra-cartao)] sm:p-6">
+          <div className="animar-entrada mt-3 rounded-xl border border-[var(--cor-neutra)] bg-white dark:bg-stone-900 p-4 shadow-[var(--sombra-cartao)] sm:p-6">
             {tela === "tipos" && (
               /* ── Tipos de usuário: na demonstração, o clique já entra
                   logado com uma conta daquele perfil — sem campos de login
                   (que ficam no botão «Entrar» do topo) ── */
               <>
-                <h2 className="text-[21px] font-semibold tracking-tight text-stone-900">
+                <h2 className="text-[21px] font-semibold tracking-tight text-stone-900 dark:text-stone-100">
                   Que tipo de usuário é você?
                 </h2>
-                <p className="mt-1 text-[14px] text-stone-500">
+                <p className="mt-1 text-[14px] text-stone-500 dark:text-stone-400">
                   Toque no seu perfil para entrar agora — estamos em demonstração.
                 </p>
                 <div className="mt-3 grid gap-2 sm:mt-4">
@@ -496,7 +500,7 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
                         type="button"
                         disabled={enviando}
                         onClick={() => entrarDemonstracao(t.id)}
-                        className="flex items-start gap-3 rounded-xl border border-stone-200 bg-white px-3.5 py-2 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-[var(--cor-tema)] hover:bg-stone-50 hover:shadow-md disabled:opacity-60 sm:py-2.5"
+                        className="flex items-start gap-3 rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 px-3.5 py-2 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-[var(--cor-tema)] hover:bg-stone-50 hover:shadow-md disabled:opacity-60 sm:py-2.5"
                       >
                         <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--cor-tema-a10)] text-[var(--cor-tema)]">
                           {logando ? (
@@ -506,10 +510,10 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
                           )}
                         </span>
                         <span className="min-w-0">
-                          <span className="block text-[14px] font-semibold text-stone-900">
+                          <span className="block text-[14px] font-semibold text-stone-900 dark:text-stone-100">
                             {t.rotulo}
                           </span>
-                          <span className="mt-0.5 block text-[12.5px] leading-snug text-stone-500">
+                          <span className="mt-0.5 block text-[12.5px] leading-snug text-stone-500 dark:text-stone-400">
                             {logando ? "Entrando…" : t.descricao}
                           </span>
                         </span>
@@ -518,12 +522,12 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
                   })}
                 </div>
                 {avisoTipo && (
-                  <p role="status" className="mt-4 rounded-xl bg-amber-50 px-3.5 py-2.5 text-sm leading-relaxed text-amber-800">
+                  <p role="status" className="mt-4 rounded-xl bg-amber-50 dark:bg-amber-950/40 px-3.5 py-2.5 text-sm leading-relaxed text-amber-800 dark:text-amber-300">
                     {avisoTipo}
                   </p>
                 )}
                 {erro && (
-                  <p role="alert" className="mt-4 rounded-xl bg-red-50 px-3.5 py-2.5 text-sm text-red-700">
+                  <p role="alert" className="mt-4 rounded-xl bg-red-50 dark:bg-red-950/40 px-3.5 py-2.5 text-sm text-red-700 dark:text-red-300">
                     {erro}
                   </p>
                 )}
@@ -534,7 +538,7 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
               /* ── Entrar: e-mail e senha (aberto pelo botão do topo) ── */
               <>
                 <div className="flex items-center justify-between gap-3">
-                  <h2 className="text-[21px] font-semibold tracking-tight text-stone-900">
+                  <h2 className="text-[21px] font-semibold tracking-tight text-stone-900 dark:text-stone-100">
                     Entrar na plataforma
                   </h2>
                   {tipo && (
@@ -547,14 +551,14 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
                         setTela("tipos");
                       }}
                       title="Voltar para os tipos de usuário"
-                      className="flex shrink-0 items-center gap-1.5 rounded-full bg-stone-100 px-3 py-1.5 text-xs font-semibold text-stone-700 transition hover:bg-stone-200"
+                      className="flex shrink-0 items-center gap-1.5 rounded-full bg-stone-100 dark:bg-stone-800 px-3 py-1.5 text-xs font-semibold text-stone-700 dark:text-stone-200 transition hover:bg-stone-200"
                     >
                       {ROTULO_TIPO[tipo]}
                       <X className="h-3.5 w-3.5" />
                     </button>
                   )}
                 </div>
-                <p className="mt-1.5 text-[15px] text-stone-500">
+                <p className="mt-1.5 text-[15px] text-stone-500 dark:text-stone-400">
                   Acesse com o seu e-mail cadastrado pela administração do {condo.nome}.
                 </p>
 
@@ -566,11 +570,11 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
                   }}
                 >
                   <div>
-                    <label htmlFor="email" className="mb-1.5 block text-[15px] font-semibold text-stone-800">
+                    <label htmlFor="email" className="mb-1.5 block text-[15px] font-semibold text-stone-800 dark:text-stone-100">
                       E-mail
                     </label>
                     <div className="relative">
-                      <Mail className="pointer-events-none absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-stone-400" />
+                      <Mail className="pointer-events-none absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-stone-400 dark:text-stone-500" />
                       <input
                         id="email"
                         type="email"
@@ -578,17 +582,17 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="seu@email.com"
-                        className="h-12 w-full rounded-xl border border-stone-200 bg-white pl-11 pr-4 text-[15px] text-stone-900 outline-none transition placeholder:text-stone-400 focus:border-stone-400 focus:ring-4 focus:ring-stone-400/10"
+                        className="h-12 w-full rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 pl-11 pr-4 text-[15px] text-stone-900 dark:text-stone-100 outline-none transition placeholder:text-stone-400 focus:border-stone-400 focus:ring-4 focus:ring-stone-400/10"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label htmlFor="senha" className="mb-1.5 block text-[15px] font-semibold text-stone-800">
+                    <label htmlFor="senha" className="mb-1.5 block text-[15px] font-semibold text-stone-800 dark:text-stone-100">
                       Senha
                     </label>
                     <div className="relative">
-                      <Lock className="pointer-events-none absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-stone-400" />
+                      <Lock className="pointer-events-none absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-stone-400 dark:text-stone-500" />
                       <input
                         id="senha"
                         type={mostrarSenha ? "text" : "password"}
@@ -596,13 +600,13 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
                         value={senha}
                         onChange={(e) => setSenha(e.target.value)}
                         placeholder="Sua senha"
-                        className="h-12 w-full rounded-xl border border-stone-200 bg-white pl-11 pr-11 text-[15px] text-stone-900 outline-none transition placeholder:text-stone-400 focus:border-stone-400 focus:ring-4 focus:ring-stone-400/10"
+                        className="h-12 w-full rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 pl-11 pr-11 text-[15px] text-stone-900 dark:text-stone-100 outline-none transition placeholder:text-stone-400 focus:border-stone-400 focus:ring-4 focus:ring-stone-400/10"
                       />
                       <button
                         type="button"
                         onClick={() => setMostrarSenha((v) => !v)}
                         aria-label={mostrarSenha ? "Ocultar senha" : "Mostrar senha"}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-stone-400 transition hover:text-stone-600"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-stone-400 dark:text-stone-500 transition hover:text-stone-600"
                       >
                         {mostrarSenha ? <EyeOff className="h-[18px] w-[18px]" /> : <Eye className="h-[18px] w-[18px]" />}
                       </button>
@@ -610,13 +614,13 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
                   </div>
 
                   {erro && (
-                    <p role="alert" className="rounded-xl bg-red-50 px-3.5 py-2.5 text-sm text-red-700">
+                    <p role="alert" className="rounded-xl bg-red-50 dark:bg-red-950/40 px-3.5 py-2.5 text-sm text-red-700 dark:text-red-300">
                       {erro}
                     </p>
                   )}
 
                   {avisoTipo && (
-                    <p role="status" className="rounded-xl bg-amber-50 px-3.5 py-2.5 text-sm text-amber-800">
+                    <p role="status" className="rounded-xl bg-amber-50 dark:bg-amber-950/40 px-3.5 py-2.5 text-sm text-amber-800 dark:text-amber-300">
                       {avisoTipo}
                     </p>
                   )}
@@ -641,14 +645,14 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
                       setRecuperando((v) => !v);
                       setAvisoRecuperacao("");
                     }}
-                    className="w-full text-center text-sm font-medium text-stone-500 underline-offset-4 transition hover:text-stone-700 hover:underline"
+                    className="w-full text-center text-sm font-medium text-stone-500 dark:text-stone-400 underline-offset-4 transition hover:text-stone-700 hover:underline"
                   >
                     Esqueci minha senha
                   </button>
 
                   {recuperando && (
-                    <div className="rounded-xl border border-stone-200 bg-stone-50 p-3.5">
-                      <p className="text-sm text-stone-600">
+                    <div className="rounded-xl border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-900/50 p-3.5">
+                      <p className="text-sm text-stone-600 dark:text-stone-400">
                         Informe o e-mail da conta — enviaremos um link para escolher uma nova senha
                         (vale 1 hora).
                       </p>
@@ -658,7 +662,7 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
                           placeholder="seu@email.com"
                           value={emailRecuperacao}
                           onChange={(e) => setEmailRecuperacao(e.target.value)}
-                          className="h-10 flex-1 rounded-lg border border-stone-200 bg-white px-3 text-sm text-stone-900 outline-none transition placeholder:text-stone-400 focus:border-stone-400 focus:ring-4 focus:ring-stone-400/10"
+                          className="h-10 flex-1 rounded-lg border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 px-3 text-sm text-stone-900 dark:text-stone-100 outline-none transition placeholder:text-stone-400 focus:border-stone-400 focus:ring-4 focus:ring-stone-400/10"
                         />
                         <button
                           type="button"
@@ -670,7 +674,7 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
                         </button>
                       </div>
                       {avisoRecuperacao && (
-                        <p className="mt-2 rounded-lg bg-white px-3 py-2 text-sm text-stone-700">{avisoRecuperacao}</p>
+                        <p className="mt-2 rounded-lg bg-white dark:bg-stone-900 px-3 py-2 text-sm text-stone-700 dark:text-stone-200">{avisoRecuperacao}</p>
                       )}
                     </div>
                   )}
@@ -683,7 +687,7 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
                     setAvisoTipo("");
                     setTela("tipos");
                   }}
-                  className="mt-5 w-full text-center text-sm font-medium text-stone-500 underline-offset-4 transition hover:text-stone-700 hover:underline"
+                  className="mt-5 w-full text-center text-sm font-medium text-stone-500 dark:text-stone-400 underline-offset-4 transition hover:text-stone-700 hover:underline"
                 >
                   Ver os tipos de usuário
                 </button>
@@ -694,17 +698,17 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
               /* ── Cadastrar: contas são criadas pela administração; o
                   cadastro aberto pela internet está em demonstração ── */
               <>
-                <h2 className="text-[21px] font-semibold tracking-tight text-stone-900">
+                <h2 className="text-[21px] font-semibold tracking-tight text-stone-900 dark:text-stone-100">
                   Fazer cadastro
                 </h2>
-                <p className="mt-1.5 text-[15px] leading-relaxed text-stone-500">
+                <p className="mt-1.5 text-[15px] leading-relaxed text-stone-500 dark:text-stone-400">
                   As contas do Meu Condomínio são criadas pela administração do seu condomínio:
                   o síndico ou a administradora cadastra a sua unidade e você recebe o acesso por
                   e-mail.
                 </p>
-                <div className="mt-5 rounded-xl border border-stone-200 bg-stone-50 px-4 py-3.5">
-                  <p className="text-[14px] font-semibold text-stone-800">Cadastro aberto em breve</p>
-                  <p className="mt-1 text-[13px] leading-relaxed text-stone-500">
+                <div className="mt-5 rounded-xl border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-900/50 px-4 py-3.5">
+                  <p className="text-[14px] font-semibold text-stone-800 dark:text-stone-100">Cadastro aberto em breve</p>
+                  <p className="mt-1 text-[13px] leading-relaxed text-stone-500 dark:text-stone-400">
                     O cadastro pela internet (autocadastro de moradores) está em demonstração — por
                     enquanto, fale com a administração do {condo.nome} para criar o seu acesso.
                   </p>
@@ -720,7 +724,7 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
                   <button
                     type="button"
                     onClick={() => setTela("tipos")}
-                    className="flex h-11 w-full items-center justify-center rounded-full border border-stone-300 bg-white text-sm font-semibold text-stone-700 transition hover:border-stone-400 hover:bg-stone-50"
+                    className="flex h-11 w-full items-center justify-center rounded-full border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 text-sm font-semibold text-stone-700 dark:text-stone-200 transition hover:border-stone-400 hover:bg-stone-50"
                   >
                     Explorar os tipos de acesso
                   </button>

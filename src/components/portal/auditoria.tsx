@@ -52,11 +52,11 @@ export default function Auditoria() {
   return (
     <div className="space-y-7">
       <header className="space-y-1.5">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-500">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-500 dark:text-stone-400">
           Gestão
         </p>
-        <h1 className="text-2xl font-semibold leading-tight text-stone-900">Auditoria</h1>
-        <p className="max-w-2xl text-sm leading-relaxed text-stone-500">
+        <h1 className="text-2xl font-semibold leading-tight text-stone-900 dark:text-stone-100">Auditoria</h1>
+        <p className="max-w-2xl text-sm leading-relaxed text-stone-500 dark:text-stone-400">
           Histórico das ações realizadas no portal por síndico, administração e portaria. Use as
           exportações abaixo para arquivar relatórios ou levar os dados a uma assembleia.
         </p>
@@ -79,7 +79,7 @@ export default function Auditoria() {
           <select
             value={filtro}
             onChange={(e) => setFiltro(e.target.value)}
-            className="h-8 rounded-md border border-[var(--cor-neutra-2)] bg-white px-2 text-xs text-stone-700 outline-none focus:border-[var(--cor-tema-suave)]"
+            className="h-8 rounded-md border border-[var(--cor-neutra-2)] bg-white dark:bg-stone-900 px-2 text-xs text-stone-700 dark:text-stone-200 outline-none focus:border-[var(--cor-tema-suave)]"
           >
             <option value="">Todas as ações</option>
             {acoesDisponiveis.map((a) => (
@@ -107,7 +107,7 @@ export default function Auditoria() {
                       ? `${r.usuario.nome} · ${ROTULO_PERFIL[r.usuario.perfil] ?? r.usuario.perfil}`
                       : "Sistema"
                   }
-                  direita={<span className="text-xs text-stone-400">{dataHoraCurta(r.criadoEm)}</span>}
+                  direita={<span className="text-xs text-stone-400 dark:text-stone-500">{dataHoraCurta(r.criadoEm)}</span>}
                 />
               ))
             )}

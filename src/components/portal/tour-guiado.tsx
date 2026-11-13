@@ -154,22 +154,22 @@ export default function TourGuiado({
       {/* Cartão explicativo */}
       <div
         style={cartao}
-        className="rounded-xl bg-white p-5 shadow-2xl transition-all duration-300"
+        className="rounded-xl bg-white dark:bg-stone-900 p-5 shadow-2xl transition-all duration-300"
       >
         <div className="flex items-center justify-between gap-3">
-          <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-400">
+          <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-400 dark:text-stone-500">
             Passo {i + 1} de {passos.length}
           </span>
           <button
             onClick={aoConcluir}
-            className="rounded-md p-1 text-stone-400 transition hover:bg-stone-100 hover:text-stone-600"
+            className="rounded-md p-1 text-stone-400 dark:text-stone-500 transition hover:bg-stone-100 hover:text-stone-600"
             aria-label="Encerrar tutorial"
           >
             <X className="h-4 w-4" />
           </button>
         </div>
-        <h3 className="mt-1.5 text-[17px] font-bold leading-snug text-stone-900">{passo.titulo}</h3>
-        <p className="mt-1.5 text-sm leading-relaxed text-stone-600">{passo.texto}</p>
+        <h3 className="mt-1.5 text-[17px] font-bold leading-snug text-stone-900 dark:text-stone-100">{passo.titulo}</h3>
+        <p className="mt-1.5 text-sm leading-relaxed text-stone-600 dark:text-stone-400">{passo.texto}</p>
 
         {/* Rodapé em duas linhas: cabe em qualquer largura de cartão
             (na versão anterior, Pular + pontos + Voltar + Próximo na mesma
@@ -184,14 +184,14 @@ export default function TourGuiado({
                 <span
                   key={n}
                   className={`h-1.5 rounded-full transition-all ${
-                    n === i ? "w-4 bg-[var(--cor-tema,#4D403A)]" : "w-1.5 bg-stone-200"
+                    n === i ? "w-4 bg-[var(--cor-tema,#4D403A)]" : "w-1.5 bg-stone-200 dark:bg-stone-700"
                   }`}
                 />
               ))}
             </div>
             <button
               onClick={aoConcluir}
-              className="shrink-0 text-sm font-medium text-stone-400 underline-offset-4 transition hover:text-stone-600 hover:underline"
+              className="shrink-0 text-sm font-medium text-stone-400 dark:text-stone-500 underline-offset-4 transition hover:text-stone-600 hover:underline"
             >
               Pular
             </button>
@@ -201,7 +201,7 @@ export default function TourGuiado({
             {i > 0 && (
               <button
                 onClick={() => setI((v) => Math.max(0, v - 1))}
-                className="flex flex-1 items-center justify-center gap-1 whitespace-nowrap rounded-lg border border-stone-200 px-3 py-2 text-sm font-medium text-stone-600 transition hover:bg-stone-50"
+                className="flex flex-1 items-center justify-center gap-1 whitespace-nowrap rounded-lg border border-stone-200 dark:border-stone-800 px-3 py-2 text-sm font-medium text-stone-600 dark:text-stone-400 transition hover:bg-stone-50"
               >
                 <ChevronLeft className="h-4 w-4" /> Voltar
               </button>

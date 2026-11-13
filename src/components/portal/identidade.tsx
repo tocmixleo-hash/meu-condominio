@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { LoaderCircle, RotateCcw, Trash2, Upload } from "lucide-react";
 import { cssVarsDoTema, resolverTema } from "@/lib/tema";
+import { useTema } from "@/lib/preferencia-tema";
 import { Carregando, Secao } from "@/components/portal/ui";
 import { mensagemDeErro } from "@/lib/api-cliente";
 import type { CondominioUI } from "@/components/portal/login-screen";
@@ -58,6 +59,7 @@ export default function Identidade({
 }) {
   const [dados, setDados] = useState<IdentidadeCompleta | null>(null);
   const [form, setForm] = useState<Record<string, string>>({});
+  const { escuro: temaEscuro } = useTema();
   const [salvando, setSalvando] = useState(false);
   const [enviando, setEnviando] = useState<string | null>(null);
   const [mensagem, setMensagem] = useState<{ tipo: "ok" | "erro"; texto: string } | null>(null);
@@ -246,22 +248,22 @@ export default function Identidade({
     corFundo: form.corFundo,
     corTexto: form.corTexto,
   });
-  const varsPreview = cssVarsDoTema(temaPreview) as React.CSSProperties;
+  const varsPreview = cssVarsDoTema(temaPreview, temaEscuro) as React.CSSProperties;
   const areasComuns = (dados.fotos ?? []).filter((f) => f.tipo === "AREA_COMUM");
   const institucionais = (dados.fotos ?? []).filter((f) => f.tipo === "INSTITUCIONAL");
 
   return (
     <div className="space-y-5">
       <header>
-        <h1 className="text-2xl font-semibold tracking-tight text-stone-900">Identidade visual</h1>
-        <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-stone-500">
+        <h1 className="text-2xl font-semibold tracking-tight text-stone-900 dark:text-stone-100">Identidade visual</h1>
+        <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-stone-500 dark:text-stone-400">
           Cores, logotipos, fotografias e informações de {dados.nome} — as mudanças aparecem em
           todas as telas deste condomínio e não afetam os demais.
         </p>
       </header>
 
       {!podeEditar && (
-        <p className="rounded-xl bg-amber-50 px-3.5 py-2.5 text-sm text-amber-800">
+        <p className="rounded-xl bg-amber-50 dark:bg-amber-950/40 px-3.5 py-2.5 text-sm text-amber-800 dark:text-amber-300">
           Apenas Síndico, Administrativo ou o Administrador da Plataforma podem editar a identidade visual.
         </p>
       )}
@@ -270,7 +272,7 @@ export default function Identidade({
         <p
           role="status"
           className={`rounded-xl px-3.5 py-2.5 text-sm ${
-            mensagem.tipo === "ok" ? "bg-emerald-50 text-emerald-800" : "bg-red-50 text-red-700"
+            mensagem.tipo === "ok" ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300" : "bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-300"
           }`}
         >
           {mensagem.texto}
@@ -283,7 +285,7 @@ export default function Identidade({
       <Secao titulo="Pré-visualização">
         <div style={varsPreview} className="mt-1 flex overflow-hidden rounded-xl border border-[var(--cor-neutra)]">
           <div className="w-28 shrink-0 bg-[var(--cor-sidebar)] p-3">
-            <div className="rounded-md bg-white/90 px-2 py-1.5">
+            <div className="rounded-md bg-white/90 dark:bg-stone-900/90 px-2 py-1.5">
               <img
                 src={dados.logoMenu || dados.logo}
                 alt=""
@@ -315,17 +317,17 @@ export default function Identidade({
       <Secao titulo="Paleta de cores">
         <div className="mt-1 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {CORES.map(({ campo, rotulo, ajuda }) => (
-            <label key={campo} className="flex items-center gap-3 rounded-xl border border-[var(--cor-neutra)] bg-white p-3">
+            <label key={campo} className="flex items-center gap-3 rounded-xl border border-[var(--cor-neutra)] bg-white dark:bg-stone-900 p-3">
               <input
                 type="color"
                 value={form[campo] ?? "#000000"}
                 onChange={(e) => setForm((f) => ({ ...f, [campo]: e.target.value }))}
-                className="h-10 w-10 shrink-0 cursor-pointer rounded-lg border border-[var(--cor-neutra)] bg-white p-0.5"
+                className="h-10 w-10 shrink-0 cursor-pointer rounded-lg border border-[var(--cor-neutra)] bg-white dark:bg-stone-900 p-0.5"
                 aria-label={rotulo}
               />
               <span className="min-w-0">
-                <span className="block text-sm font-medium text-stone-800">{rotulo}</span>
-                <span className="block truncate text-xs text-stone-500">{ajuda}</span>
+                <span className="block text-sm font-medium text-stone-800 dark:text-stone-100">{rotulo}</span>
+                <span className="block truncate text-xs text-stone-500 dark:text-stone-400">{ajuda}</span>
               </span>
             </label>
           ))}
@@ -342,11 +344,11 @@ export default function Identidade({
           ].map(({ tipo, rotulo, campo, padrao, podeRemover }) => {
             const url = (dados[campo] as string | null) || padrao;
             return (
-              <div key={tipo} className="rounded-xl border border-[var(--cor-neutra)] bg-white p-3">
-                <div className="flex h-20 items-center justify-center rounded-lg bg-stone-50 p-2">
+              <div key={tipo} className="rounded-xl border border-[var(--cor-neutra)] bg-white dark:bg-stone-900 p-3">
+                <div className="flex h-20 items-center justify-center rounded-lg bg-stone-50 dark:bg-stone-900/50 p-2">
                   <img src={url} alt={rotulo} className="max-h-16 w-auto object-contain" />
                 </div>
-                <p className="mt-2 text-sm font-medium text-stone-800">{rotulo}</p>
+                <p className="mt-2 text-sm font-medium text-stone-800 dark:text-stone-100">{rotulo}</p>
                 <div className="mt-2 flex items-center gap-2">
                   <button
                     onClick={() => abrirSeletor(tipo)}
@@ -364,13 +366,13 @@ export default function Identidade({
                     <button
                       onClick={() => removerArquivo(tipo)}
                       disabled={!!enviando}
-                      className="flex items-center gap-1.5 rounded-lg border border-stone-200 px-2.5 py-1.5 text-xs font-medium text-stone-600 transition hover:bg-stone-50 disabled:opacity-60"
+                      className="flex items-center gap-1.5 rounded-lg border border-stone-200 dark:border-stone-800 px-2.5 py-1.5 text-xs font-medium text-stone-600 dark:text-stone-400 transition hover:bg-stone-50 disabled:opacity-60"
                     >
                       <Trash2 className="h-3.5 w-3.5" /> Remover
                     </button>
                   )}
                 </div>
-                <p className="mt-2 text-[11px] text-stone-400">PNG, JPG, WEBP ou SVG até 3 MB</p>
+                <p className="mt-2 text-[11px] text-stone-400 dark:text-stone-500">PNG, JPG, WEBP ou SVG até 3 MB</p>
               </div>
             );
           })}
@@ -380,12 +382,12 @@ export default function Identidade({
       {/* ── Fotografias ───────────────────────────────────────────── */}
       <Secao titulo="Fotografias">
         <div className="mt-1 grid gap-3 sm:grid-cols-2">
-          <div className="rounded-xl border border-[var(--cor-neutra)] bg-white p-3">
-            <div className="h-32 overflow-hidden rounded-lg bg-stone-100">
+          <div className="rounded-xl border border-[var(--cor-neutra)] bg-white dark:bg-stone-900 p-3">
+            <div className="h-32 overflow-hidden rounded-lg bg-stone-100 dark:bg-stone-800">
               <img src={dados.foto} alt="Fotografia principal" className="h-full w-full object-cover" />
             </div>
-            <p className="mt-2 text-sm font-medium text-stone-800">Fotografia principal</p>
-            <p className="text-xs text-stone-500">Aparece no painel de entrada do condomínio.</p>
+            <p className="mt-2 text-sm font-medium text-stone-800 dark:text-stone-100">Fotografia principal</p>
+            <p className="text-xs text-stone-500 dark:text-stone-400">Aparece no painel de entrada do condomínio.</p>
             <div className="mt-2 flex items-center gap-2">
               <button
                 onClick={() => abrirSeletor("foto_principal")}
@@ -400,7 +402,7 @@ export default function Identidade({
                 Substituir
               </button>
             </div>
-            <p className="mt-2 text-[11px] text-stone-400">PNG, JPG ou WEBP até 8 MB</p>
+            <p className="mt-2 text-[11px] text-stone-400 dark:text-stone-500">PNG, JPG ou WEBP até 8 MB</p>
           </div>
 
           <Galeria
@@ -426,19 +428,19 @@ export default function Identidade({
       </Secao>
 
       {/* ── Fotos dos espaços comuns (Reservas) ───────────────────── */}
-      <Secao titulo="Fotos dos espaços comuns" acao={<span className="text-xs text-stone-400">Aparecem nos cartões de reserva</span>}>
+      <Secao titulo="Fotos dos espaços comuns" acao={<span className="text-xs text-stone-400 dark:text-stone-500">Aparecem nos cartões de reserva</span>}>
         <div className="mt-1 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {ESPACOS_EDITAVEIS.map(({ id, rotulo, padrao }) => {
             const configurada = espacoFotos[id];
             const url = configurada ?? padrao;
             const alvo = `foto_espaco:${id}`;
             return (
-              <div key={id} className="rounded-xl border border-[var(--cor-neutra)] bg-white p-2.5">
-                <div className="relative h-24 overflow-hidden rounded-lg bg-stone-100">
+              <div key={id} className="rounded-xl border border-[var(--cor-neutra)] bg-white dark:bg-stone-900 p-2.5">
+                <div className="relative h-24 overflow-hidden rounded-lg bg-stone-100 dark:bg-stone-800">
                   <img src={url} alt={rotulo} className="h-full w-full object-cover" />
                 </div>
-                <p className="mt-2 text-sm font-medium text-stone-800">{rotulo}</p>
-                <p className="text-[11px] text-stone-500">
+                <p className="mt-2 text-sm font-medium text-stone-800 dark:text-stone-100">{rotulo}</p>
+                <p className="text-[11px] text-stone-500 dark:text-stone-400">
                   {configurada ? "Fotografia personalizada" : "Imagem padrão da plataforma"}
                 </p>
                 <div className="mt-2 flex items-center gap-2">
@@ -458,7 +460,7 @@ export default function Identidade({
                     <button
                       onClick={() => removerArquivo(alvo)}
                       disabled={!!enviando}
-                      className="flex items-center gap-1.5 rounded-lg border border-stone-200 px-2.5 py-1.5 text-xs font-medium text-stone-600 transition hover:bg-stone-50 disabled:opacity-60"
+                      className="flex items-center gap-1.5 rounded-lg border border-stone-200 dark:border-stone-800 px-2.5 py-1.5 text-xs font-medium text-stone-600 dark:text-stone-400 transition hover:bg-stone-50 disabled:opacity-60"
                     >
                       <RotateCcw className="h-3.5 w-3.5" /> Padrão
                     </button>
@@ -468,7 +470,7 @@ export default function Identidade({
             );
           })}
         </div>
-        <p className="mt-2 text-[11px] text-stone-400">PNG, JPG ou WEBP até 8 MB</p>
+        <p className="mt-2 text-[11px] text-stone-400 dark:text-stone-500">PNG, JPG ou WEBP até 8 MB</p>
       </Secao>
 
       {/* ── Informações do condomínio ─────────────────────────────── */}
@@ -476,21 +478,21 @@ export default function Identidade({
         <div className="mt-1 grid gap-3 sm:grid-cols-2">
           {CAMPOS_TEXTO.map(({ campo, rotulo, placeholder }) => (
             <label key={campo} className={campo === "descricao" ? "sm:col-span-2" : ""}>
-              <span className="mb-1.5 block text-sm font-medium text-stone-700">{rotulo}</span>
+              <span className="mb-1.5 block text-sm font-medium text-stone-700 dark:text-stone-200">{rotulo}</span>
               {campo === "descricao" ? (
                 <textarea
                   value={form[campo] ?? ""}
                   onChange={(e) => setForm((f) => ({ ...f, [campo]: e.target.value }))}
                   placeholder="Texto institucional exibido na entrada do portal"
                   rows={3}
-                  className="w-full rounded-xl border border-stone-200 bg-white px-3.5 py-2.5 text-sm text-stone-900 outline-none transition placeholder:text-stone-400 focus:border-stone-400 focus:ring-4 focus:ring-stone-400/10"
+                  className="w-full rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 px-3.5 py-2.5 text-sm text-stone-900 dark:text-stone-100 outline-none transition placeholder:text-stone-400 focus:border-stone-400 focus:ring-4 focus:ring-stone-400/10"
                 />
               ) : (
                 <input
                   value={form[campo] ?? ""}
                   onChange={(e) => setForm((f) => ({ ...f, [campo]: e.target.value }))}
                   placeholder={placeholder}
-                  className="h-11 w-full rounded-xl border border-stone-200 bg-white px-3.5 py-2.5 text-sm text-stone-900 outline-none transition placeholder:text-stone-400 focus:border-stone-400 focus:ring-4 focus:ring-stone-400/10"
+                  className="h-11 w-full rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 px-3.5 py-2.5 text-sm text-stone-900 dark:text-stone-100 outline-none transition placeholder:text-stone-400 focus:border-stone-400 focus:ring-4 focus:ring-stone-400/10"
                 />
               )}
             </label>
@@ -512,7 +514,7 @@ export default function Identidade({
           <button
             onClick={restaurarPadroes}
             disabled={salvando || !!enviando}
-            className="h-11 rounded-xl border border-stone-200 bg-white px-5 text-sm font-medium text-stone-700 transition hover:bg-stone-50 disabled:opacity-60"
+            className="h-11 rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 px-5 text-sm font-medium text-stone-700 dark:text-stone-200 transition hover:bg-stone-50 disabled:opacity-60"
           >
             Restaurar padrão
           </button>
@@ -538,13 +540,13 @@ function Galeria({
   aoRemover: (tipo: string, fotoId: string) => void;
 }) {
   return (
-    <div className="rounded-xl border border-[var(--cor-neutra)] bg-white p-3">
+    <div className="rounded-xl border border-[var(--cor-neutra)] bg-white dark:bg-stone-900 p-3">
       <div className="flex items-center justify-between">
-        <p className="text-sm font-medium text-stone-800">{titulo}</p>
+        <p className="text-sm font-medium text-stone-800 dark:text-stone-100">{titulo}</p>
         <button
           onClick={() => aoEnviar(tipo)}
           disabled={!!enviando}
-          className="flex items-center gap-1.5 rounded-lg border border-stone-200 px-2.5 py-1.5 text-xs font-medium text-stone-700 transition hover:bg-stone-50 disabled:opacity-60"
+          className="flex items-center gap-1.5 rounded-lg border border-stone-200 dark:border-stone-800 px-2.5 py-1.5 text-xs font-medium text-stone-700 dark:text-stone-200 transition hover:bg-stone-50 disabled:opacity-60"
         >
           {enviando === tipo ? (
             <LoaderCircle className="h-3.5 w-3.5 animate-spin" />
@@ -555,16 +557,16 @@ function Galeria({
         </button>
       </div>
       {itens.length === 0 ? (
-        <p className="mt-3 text-xs text-stone-400">Nenhuma fotografia nesta galeria ainda.</p>
+        <p className="mt-3 text-xs text-stone-400 dark:text-stone-500">Nenhuma fotografia nesta galeria ainda.</p>
       ) : (
         <div className="mt-3 grid grid-cols-3 gap-2">
           {itens.map((f) => (
-            <div key={f.id} className="group relative overflow-hidden rounded-lg bg-stone-100">
+            <div key={f.id} className="group relative overflow-hidden rounded-lg bg-stone-100 dark:bg-stone-800">
               <img src={f.url} alt={f.legenda ?? "Fotografia"} className="h-20 w-full object-cover" />
               <button
                 aria-label="Remover fotografia"
                 onClick={() => aoRemover(tipo, f.id)}
-                className="absolute right-1.5 top-1.5 rounded-md bg-white/90 p-1 text-stone-600 opacity-0 shadow transition group-hover:opacity-100"
+                className="absolute right-1.5 top-1.5 rounded-md bg-white/90 dark:bg-stone-900/90 p-1 text-stone-600 dark:text-stone-400 opacity-0 shadow transition group-hover:opacity-100"
               >
                 <Trash2 className="h-3.5 w-3.5" />
               </button>

@@ -66,15 +66,15 @@ export default function Condominios({
   return (
     <div className="space-y-5">
       <header>
-        <h1 className="text-2xl font-semibold tracking-tight text-stone-900">Condomínios</h1>
-        <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-stone-500">
+        <h1 className="text-2xl font-semibold tracking-tight text-stone-900 dark:text-stone-100">Condomínios</h1>
+        <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-stone-500 dark:text-stone-400">
           Ambientes independentes da plataforma — cada condomínio tem usuários, dados e
           identidade visual próprios. Selecione um condomínio para operar nele.
         </p>
       </header>
 
-      {erro && <p role="alert" className="rounded-xl bg-red-50 px-3.5 py-2.5 text-sm text-red-700">{erro}</p>}
-      {aviso && <p role="status" className="rounded-xl bg-emerald-50 px-3.5 py-2.5 text-sm text-emerald-800">{aviso}</p>}
+      {erro && <p role="alert" className="rounded-xl bg-red-50 dark:bg-red-950/40 px-3.5 py-2.5 text-sm text-red-700 dark:text-red-300">{erro}</p>}
+      {aviso && <p role="status" className="rounded-xl bg-emerald-50 dark:bg-emerald-950/40 px-3.5 py-2.5 text-sm text-emerald-800 dark:text-emerald-300">{aviso}</p>}
 
       <Secao titulo="Ambientes cadastrados">
         <div className="mt-1 grid gap-3 sm:grid-cols-2">
@@ -83,18 +83,18 @@ export default function Condominios({
             return (
               <div
                 key={c.id}
-                className={`flex items-center gap-3 rounded-xl border bg-white p-4 ${
+                className={`flex items-center gap-3 rounded-xl border bg-white dark:bg-stone-900 p-4 ${
                   ativo ? "border-[var(--cor-tema)] ring-2 ring-[var(--cor-tema)]/20" : "border-[var(--cor-neutra)]"
                 }`}
               >
                 <img
                   src={c.logo}
                   alt={`Logo do ${c.nome}`}
-                  className="h-12 w-12 shrink-0 rounded-lg border border-stone-100 bg-white object-contain p-1"
+                  className="h-12 w-12 shrink-0 rounded-lg border border-stone-100 dark:border-stone-800 bg-white dark:bg-stone-900 object-contain p-1"
                 />
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-semibold text-stone-900">{c.nome}</p>
-                  <p className="flex items-center gap-1.5 text-xs text-stone-500">
+                  <p className="truncate text-sm font-semibold text-stone-900 dark:text-stone-100">{c.nome}</p>
+                  <p className="flex items-center gap-1.5 text-xs text-stone-500 dark:text-stone-400">
                     <span
                       aria-hidden
                       className="inline-block h-2 w-2 rounded-full"
@@ -118,24 +118,24 @@ export default function Condominios({
       </Secao>
 
       <Secao titulo="Cadastrar novo condomínio">
-        <div className="mt-1 rounded-xl border border-[var(--cor-neutra)] bg-white p-4">
+        <div className="mt-1 rounded-xl border border-[var(--cor-neutra)] bg-white dark:bg-stone-900 p-4">
           <div className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
             <label>
-              <span className="mb-1.5 block text-sm font-medium text-stone-700">Nome do condomínio</span>
+              <span className="mb-1.5 block text-sm font-medium text-stone-700 dark:text-stone-200">Nome do condomínio</span>
               <input
                 value={nome}
                 onChange={(e) => setNome(e.target.value)}
                 placeholder="Ex.: Residencial Parque Aurora"
-                className="h-11 w-full rounded-xl border border-stone-200 bg-white px-3.5 py-2.5 text-sm text-stone-900 outline-none transition placeholder:text-stone-400 focus:border-stone-400 focus:ring-4 focus:ring-stone-400/10"
+                className="h-11 w-full rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 px-3.5 py-2.5 text-sm text-stone-900 dark:text-stone-100 outline-none transition placeholder:text-stone-400 focus:border-stone-400 focus:ring-4 focus:ring-stone-400/10"
               />
             </label>
             <label className="flex items-center gap-2">
-              <span className="text-sm font-medium text-stone-700">Cor inicial</span>
+              <span className="text-sm font-medium text-stone-700 dark:text-stone-200">Cor inicial</span>
               <input
                 type="color"
                 value={corTema}
                 onChange={(e) => setCorTema(e.target.value)}
-                className="h-11 w-14 cursor-pointer rounded-lg border border-stone-200 bg-white p-1"
+                className="h-11 w-14 cursor-pointer rounded-lg border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-1"
                 aria-label="Cor inicial"
               />
             </label>
@@ -148,7 +148,7 @@ export default function Condominios({
             {criando ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
             Cadastrar condomínio
           </button>
-          <p className="mt-3 text-xs leading-relaxed text-stone-500">
+          <p className="mt-3 text-xs leading-relaxed text-stone-500 dark:text-stone-400">
             O condomínio nasce vazio e com identidade padrão — nada é copiado de outros ambientes.
             Depois de cadastrar, cadastre a equipe (Síndico, Administrativo, Portaria) e os moradores
             no ambiente dele.

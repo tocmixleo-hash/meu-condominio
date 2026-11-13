@@ -118,14 +118,14 @@ export default function Assembleias({ perfil }: { perfil: Perfil }) {
               <div key={a.id} className="py-4">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-stone-900">{a.titulo}</p>
-                    <p className="mt-0.5 text-sm text-stone-500">
+                    <p className="text-sm font-medium text-stone-900 dark:text-stone-100">{a.titulo}</p>
+                    <p className="mt-0.5 text-sm text-stone-500 dark:text-stone-400">
                       {formatarData(a.data)} às {a.horario} ·{" "}
                       {a.local === "VIRTUAL" ? "Virtual" : (ROTULO_ESPACO[a.local] ?? a.local)}
                       {a.tipo === "EXTRAORDINARIA" ? " · Extraordinária" : " · Ordinária"}
                     </p>
                     {a.descricao && (
-                      <p className="mt-1.5 text-sm leading-relaxed text-stone-600">{a.descricao}</p>
+                      <p className="mt-1.5 text-sm leading-relaxed text-stone-600 dark:text-stone-400">{a.descricao}</p>
                     )}
                   </div>
                   <div className="flex shrink-0 flex-col items-end gap-2">
@@ -152,7 +152,7 @@ export default function Assembleias({ perfil }: { perfil: Perfil }) {
                   )}
                 </div>
                 {pautaAberta === a.id && a.pauta && (
-                  <pre className="mt-3 whitespace-pre-wrap rounded-md bg-[var(--cor-fundo)] px-4 py-3 font-sans text-sm leading-relaxed text-stone-700">
+                  <pre className="mt-3 whitespace-pre-wrap rounded-md bg-[var(--cor-fundo)] px-4 py-3 font-sans text-sm leading-relaxed text-stone-700 dark:text-stone-200">
                     {a.pauta}
                   </pre>
                 )}
@@ -169,9 +169,9 @@ export default function Assembleias({ perfil }: { perfil: Perfil }) {
             className="absolute inset-0 bg-black/40"
             onClick={() => setAberto(false)}
           />
-          <div className="relative max-h-[88dvh] w-full max-w-lg overflow-y-auto rounded-lg border border-[var(--cor-neutra)] bg-white p-6 shadow-xl">
-            <h3 className="text-base font-semibold text-stone-900">Convocar assembleia</h3>
-            <p className="mt-0.5 text-sm text-stone-500">Todos os moradores recebem a convocação.</p>
+          <div className="relative max-h-[88dvh] w-full max-w-lg overflow-y-auto rounded-lg border border-[var(--cor-neutra)] bg-white dark:bg-stone-900 p-6 shadow-xl">
+            <h3 className="text-base font-semibold text-stone-900 dark:text-stone-100">Convocar assembleia</h3>
+            <p className="mt-0.5 text-sm text-stone-500 dark:text-stone-400">Todos os moradores recebem a convocação.</p>
             <div className="mt-4 space-y-3">
               <input
                 placeholder="Título (ex.: Assembleia Geral Ordinária)"
@@ -190,7 +190,7 @@ export default function Assembleias({ perfil }: { perfil: Perfil }) {
                 <select
                   value={form.tipo}
                   onChange={(e) => setForm({ ...form, tipo: e.target.value })}
-                  className="h-10 w-full rounded-md border border-[var(--cor-neutra-2)] bg-white px-3 text-sm outline-none focus:border-[var(--cor-tema-suave)]"
+                  className="h-10 w-full rounded-md border border-[var(--cor-neutra-2)] bg-white dark:bg-stone-900 px-3 text-sm outline-none focus:border-[var(--cor-tema-suave)]"
                 >
                   <option value="ORDINARIA">Ordinária</option>
                   <option value="EXTRAORDINARIA">Extraordinária</option>
@@ -200,18 +200,18 @@ export default function Assembleias({ perfil }: { perfil: Perfil }) {
                   min={hojeISO()}
                   value={form.data}
                   onChange={(e) => setForm({ ...form, data: e.target.value })}
-                  className="h-10 w-full rounded-md border border-[var(--cor-neutra-2)] bg-white px-3 text-sm outline-none focus:border-[var(--cor-tema-suave)]"
+                  className="h-10 w-full rounded-md border border-[var(--cor-neutra-2)] bg-white dark:bg-stone-900 px-3 text-sm outline-none focus:border-[var(--cor-tema-suave)]"
                 />
                 <input
                   type="time"
                   value={form.horario}
                   onChange={(e) => setForm({ ...form, horario: e.target.value })}
-                  className="h-10 w-full rounded-md border border-[var(--cor-neutra-2)] bg-white px-3 text-sm outline-none focus:border-[var(--cor-tema-suave)]"
+                  className="h-10 w-full rounded-md border border-[var(--cor-neutra-2)] bg-white dark:bg-stone-900 px-3 text-sm outline-none focus:border-[var(--cor-tema-suave)]"
                 />
                 <select
                   value={form.local}
                   onChange={(e) => setForm({ ...form, local: e.target.value })}
-                  className="h-10 w-full rounded-md border border-[var(--cor-neutra-2)] bg-white px-3 text-sm outline-none focus:border-[var(--cor-tema-suave)]"
+                  className="h-10 w-full rounded-md border border-[var(--cor-neutra-2)] bg-white dark:bg-stone-900 px-3 text-sm outline-none focus:border-[var(--cor-tema-suave)]"
                 >
                   <option value="SALAO_FESTAS">Salão de festas</option>
                   <option value="VIRTUAL">Virtual</option>
@@ -224,7 +224,7 @@ export default function Assembleias({ perfil }: { perfil: Perfil }) {
                 onChange={(e) => setForm({ ...form, pauta: e.target.value })}
                 className="w-full rounded-md border border-[var(--cor-neutra-2)] px-3 py-2 text-sm outline-none focus:border-[var(--cor-tema-suave)] focus:ring-2 focus:ring-[var(--cor-tema-suave)]/30"
               />
-              {erro && <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{erro}</p>}
+              {erro && <p className="rounded-md bg-red-50 dark:bg-red-950/40 px-3 py-2 text-sm text-red-700 dark:text-red-300">{erro}</p>}
             </div>
             <div className="mt-5 flex justify-end gap-2">
               <BotaoSecundario onClick={() => setAberto(false)}>Cancelar</BotaoSecundario>

@@ -187,7 +187,7 @@ export default function Dashboard({
           espaços e do conteúdo — o painel começa no que importa. */}
       <header className="animar-aparecer flex items-end justify-between gap-6">
         <div className="min-w-0 space-y-1.5">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-500">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-500 dark:text-stone-400">
             {condominio.nome.toUpperCase()} · {dataLonga()}
           </p>
           <div className="flex items-center gap-3">
@@ -196,20 +196,20 @@ export default function Dashboard({
               alt={`Logo do ${condominio.nome}`}
               width={48}
               height={48}
-              className="h-12 w-12 shrink-0 rounded-xl border border-[var(--cor-neutra)] bg-white object-contain p-1 shadow-sm"
+              className="h-12 w-12 shrink-0 rounded-xl border border-[var(--cor-neutra)] bg-white dark:bg-stone-900 object-contain p-1 shadow-sm"
             />
             <div>
-              <h1 className="text-[26px] font-bold leading-tight tracking-tight text-stone-900 sm:text-3xl">
+              <h1 className="text-[26px] font-bold leading-tight tracking-tight text-stone-900 dark:text-stone-100 sm:text-3xl">
                 {saudacao()}, {nome.split(" ")[0]}
               </h1>
               {perfil === "MORADOR" && unidade && (
-                <p className="text-sm text-stone-500">
+                <p className="text-sm text-stone-500 dark:text-stone-400">
                   Unidade {unidade.bloco}-{unidade.numero}
                 </p>
               )}
             </div>
           </div>
-          <p className="max-w-2xl text-sm leading-relaxed text-stone-500">
+          <p className="max-w-2xl text-sm leading-relaxed text-stone-500 dark:text-stone-400">
             {DESCRICAO_PERFIL[perfil]}
           </p>
         </div>
@@ -266,7 +266,7 @@ export default function Dashboard({
                         key={c.id}
                         principal={c.titulo}
                         secundaria={ROTULO_CATEGORIA_COMUNICADO[c.categoria] ?? c.categoria}
-                        direita={<span className="text-xs text-stone-400">{dataHoraCurta(c.criadoEm)}</span>}
+                        direita={<span className="text-xs text-stone-400 dark:text-stone-500">{dataHoraCurta(c.criadoEm)}</span>}
                       />
                     ))
                   ) : (
@@ -421,7 +421,7 @@ export default function Dashboard({
                         key={c.id}
                         principal={c.titulo}
                         secundaria={ROTULO_CATEGORIA_COMUNICADO[c.categoria] ?? c.categoria}
-                        direita={<span className="text-xs text-stone-400">{dataHoraCurta(c.criadoEm)}</span>}
+                        direita={<span className="text-xs text-stone-400 dark:text-stone-500">{dataHoraCurta(c.criadoEm)}</span>}
                       />
                     ))
                   ) : (

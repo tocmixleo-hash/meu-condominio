@@ -144,9 +144,9 @@ export function Financeiro({ usuario, onAtualizarDashboard }: FinanceiroProps) {
       </section>
 
       {/* Lista / tabela */}
-      <Card className="rounded-2xl border-stone-200 shadow-sm">
+      <Card className="rounded-2xl border-stone-200 dark:border-stone-800 shadow-sm">
         <CardHeader className="flex-col gap-3 pb-3 sm:flex-row sm:items-center sm:justify-between">
-          <CardTitle className="text-base font-bold text-stone-900">
+          <CardTitle className="text-base font-bold text-stone-900 dark:text-stone-100">
             {ehAdmin ? 'Boletos por unidade' : 'Seus boletos'}
           </CardTitle>
           <div className="flex flex-wrap gap-1.5" role="tablist" aria-label="Filtrar boletos">
@@ -160,7 +160,7 @@ export function Financeiro({ usuario, onAtualizarDashboard }: FinanceiroProps) {
                   'rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors',
                   filtro === f.id
                     ? 'bg-[#4D403A] text-white'
-                    : 'bg-stone-200 text-stone-600 hover:bg-stone-200',
+                    : 'bg-stone-200 dark:bg-stone-700 text-stone-600 dark:text-stone-400 hover:bg-stone-200',
                 )}
               >
                 {f.rotulo}
@@ -174,24 +174,24 @@ export function Financeiro({ usuario, onAtualizarDashboard }: FinanceiroProps) {
           ) : listaFiltrada.length === 0 ? (
             <EstadoVazio titulo="Nenhum boleto nesta condição" descricao="Tente outro filtro ou volte mais tarde." />
           ) : ehAdmin ? (
-            <div className="overflow-x-auto rounded-xl border border-stone-200">
+            <div className="overflow-x-auto rounded-xl border border-stone-200 dark:border-stone-800">
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-stone-100/80 hover:bg-stone-100/80">
-                    <TableHead className="text-xs font-semibold text-stone-500">Unidade</TableHead>
-                    <TableHead className="text-xs font-semibold text-stone-500">Referência</TableHead>
-                    <TableHead className="text-xs font-semibold text-stone-500">Vencimento</TableHead>
-                    <TableHead className="text-right text-xs font-semibold text-stone-500">Valor</TableHead>
-                    <TableHead className="text-center text-xs font-semibold text-stone-500">Situação</TableHead>
+                  <TableRow className="bg-stone-100/80 dark:bg-stone-800/80 hover:bg-stone-100/80">
+                    <TableHead className="text-xs font-semibold text-stone-500 dark:text-stone-400">Unidade</TableHead>
+                    <TableHead className="text-xs font-semibold text-stone-500 dark:text-stone-400">Referência</TableHead>
+                    <TableHead className="text-xs font-semibold text-stone-500 dark:text-stone-400">Vencimento</TableHead>
+                    <TableHead className="text-right text-xs font-semibold text-stone-500 dark:text-stone-400">Valor</TableHead>
+                    <TableHead className="text-center text-xs font-semibold text-stone-500 dark:text-stone-400">Situação</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {listaFiltrada.map((b) => (
                     <TableRow key={b.id}>
-                      <TableCell className="font-semibold text-stone-800">{b.unidadeLabel}</TableCell>
-                      <TableCell className="text-stone-600">{b.descricao}</TableCell>
-                      <TableCell className="text-stone-600">{formatarData(b.vencimento)}</TableCell>
-                      <TableCell className="text-right font-semibold text-stone-800">{formatarMoeda(b.valor)}</TableCell>
+                      <TableCell className="font-semibold text-stone-800 dark:text-stone-100">{b.unidadeLabel}</TableCell>
+                      <TableCell className="text-stone-600 dark:text-stone-400">{b.descricao}</TableCell>
+                      <TableCell className="text-stone-600 dark:text-stone-400">{formatarData(b.vencimento)}</TableCell>
+                      <TableCell className="text-right font-semibold text-stone-800 dark:text-stone-100">{formatarMoeda(b.valor)}</TableCell>
                       <TableCell className="text-center">
                         <BadgeStatusBoleto status={b.status} />
                       </TableCell>
@@ -207,7 +207,7 @@ export function Financeiro({ usuario, onAtualizarDashboard }: FinanceiroProps) {
                   key={b.id}
                   className={cn(
                     'rounded-2xl border p-4 transition-shadow hover:shadow-md',
-                    b.status === 'VENCIDO' ? 'border-red-200 bg-red-50/40' : 'border-stone-200 bg-white',
+                    b.status === 'VENCIDO' ? 'border-red-200 bg-red-50 dark:bg-red-950/40/40' : 'border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900',
                   )}
                 >
                   <div className="flex items-start justify-between gap-2">
@@ -216,8 +216,8 @@ export function Financeiro({ usuario, onAtualizarDashboard }: FinanceiroProps) {
                         <ReceiptText className="h-5 w-5" aria-hidden />
                       </span>
                       <div>
-                        <p className="text-sm font-semibold text-stone-800">{b.descricao}</p>
-                        <p className="mt-0.5 text-xs text-stone-500">
+                        <p className="text-sm font-semibold text-stone-800 dark:text-stone-100">{b.descricao}</p>
+                        <p className="mt-0.5 text-xs text-stone-500 dark:text-stone-400">
                           Vencimento: {formatarData(b.vencimento)}
                           {b.pagoEm ? ` · pago em ${formatarData(b.pagoEm)}` : ''}
                         </p>
@@ -225,8 +225,8 @@ export function Financeiro({ usuario, onAtualizarDashboard }: FinanceiroProps) {
                     </div>
                     <BadgeStatusBoleto status={b.status} />
                   </div>
-                  <div className="mt-3 flex items-end justify-between gap-2 border-t border-stone-200 pt-3">
-                    <p className="text-xl font-bold text-stone-900">{formatarMoeda(b.valor)}</p>
+                  <div className="mt-3 flex items-end justify-between gap-2 border-t border-stone-200 dark:border-stone-800 pt-3">
+                    <p className="text-xl font-bold text-stone-900 dark:text-stone-100">{formatarMoeda(b.valor)}</p>
                     <div className="flex gap-2">
                       <Button
                         size="sm"
@@ -273,20 +273,20 @@ export function Financeiro({ usuario, onAtualizarDashboard }: FinanceiroProps) {
           </DialogHeader>
           {boleto2Via && (
             <div className="space-y-4">
-              <div className="rounded-xl border border-stone-200 bg-stone-100/70 p-4">
+              <div className="rounded-xl border border-stone-200 dark:border-stone-800 bg-stone-100/70 dark:bg-stone-800/70 p-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-stone-500">Valor</span>
-                  <span className="text-lg font-bold text-stone-900">{formatarMoeda(boleto2Via.valor)}</span>
+                  <span className="text-sm text-stone-500 dark:text-stone-400">Valor</span>
+                  <span className="text-lg font-bold text-stone-900 dark:text-stone-100">{formatarMoeda(boleto2Via.valor)}</span>
                 </div>
                 <div className="mt-1 flex items-center justify-between">
-                  <span className="text-sm text-stone-500">Vencimento</span>
-                  <span className="text-sm font-semibold text-stone-700">{formatarData(boleto2Via.vencimento)}</span>
+                  <span className="text-sm text-stone-500 dark:text-stone-400">Vencimento</span>
+                  <span className="text-sm font-semibold text-stone-700 dark:text-stone-200">{formatarData(boleto2Via.vencimento)}</span>
                 </div>
               </div>
               <div className="space-y-2">
-                <p className="text-xs font-semibold uppercase tracking-wide text-stone-400">Linha digitável</p>
+                <p className="text-xs font-semibold uppercase tracking-wide text-stone-400 dark:text-stone-500">Linha digitável</p>
                 <div className="flex items-center gap-2">
-                  <code className="flex-1 break-all rounded-lg border border-stone-200 bg-white px-3 py-2.5 text-xs text-stone-700">
+                  <code className="flex-1 break-all rounded-lg border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 px-3 py-2.5 text-xs text-stone-700 dark:text-stone-200">
                     {boleto2Via.linhaDigitavel ?? '—'}
                   </code>
                   <Button
@@ -299,7 +299,7 @@ export function Financeiro({ usuario, onAtualizarDashboard }: FinanceiroProps) {
                     <Copy className="h-4 w-4" aria-hidden />
                   </Button>
                 </div>
-                <p className="text-xs text-stone-400">
+                <p className="text-xs text-stone-400 dark:text-stone-500">
                   Pagável em qualquer banco, app do seu banco ou lotérica até o vencimento.
                 </p>
               </div>

@@ -97,7 +97,7 @@ function CartaoEspaco({
     <button
       type="button"
       onClick={aoClicar}
-      className="group overflow-hidden rounded-xl border border-[var(--cor-neutra)] bg-white text-left shadow-[var(--sombra-suave)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[var(--sombra-cartao)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cor-tema-suave)]"
+      className="group overflow-hidden rounded-xl border border-[var(--cor-neutra)] bg-white dark:bg-stone-900 text-left shadow-[var(--sombra-suave)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[var(--sombra-cartao)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cor-tema-suave)]"
     >
       <div className="relative aspect-[16/10] overflow-hidden">
         <Image
@@ -113,7 +113,7 @@ function CartaoEspaco({
         </p>
       </div>
       <div className="flex items-center justify-between gap-2 px-3.5 py-2.5">
-        <p className="min-w-0 truncate text-xs text-stone-500">{meta}</p>
+        <p className="min-w-0 truncate text-xs text-stone-500 dark:text-stone-400">{meta}</p>
         <span className="flex shrink-0 items-center gap-1 text-xs font-semibold text-[var(--cor-tema)]">
           {acaoRotulo}
           <ChevronRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-0.5" />
@@ -241,7 +241,7 @@ export default function Reservas({ perfil }: { perfil: Perfil }) {
       <Secao
         titulo="Espaços do condomínio"
         acao={
-          <span className="text-xs text-stone-400">
+          <span className="text-xs text-stone-400 dark:text-stone-500">
             {perfil === "MORADOR" ? "Toque para reservar" : "Toque para ajustar as regras"}
           </span>
         }
@@ -284,7 +284,7 @@ export default function Reservas({ perfil }: { perfil: Perfil }) {
       </Secao>
 
       <div className="flex items-center justify-between gap-3">
-        <div className="inline-flex rounded-full border border-[var(--cor-neutra-2)] bg-white p-1 shadow-sm">
+        <div className="inline-flex rounded-full border border-[var(--cor-neutra-2)] bg-white dark:bg-stone-900 p-1 shadow-sm">
           {(["lista", "calendario"] as const).map((v) => (
             <button
               key={v}
@@ -292,7 +292,7 @@ export default function Reservas({ perfil }: { perfil: Perfil }) {
               className={`h-8 rounded-full px-4 text-sm font-medium transition-all duration-200 ${
                 visao === v
                   ? "bg-[var(--cor-tema)] text-[var(--cor-fundo)] shadow-sm"
-                  : "text-stone-600 hover:bg-[var(--cor-neutra)]"
+                  : "text-stone-600 dark:text-stone-400 hover:bg-[var(--cor-neutra)]"
               }`}
             >
               {v === "lista" ? "Lista" : "Calendário"}
@@ -310,24 +310,24 @@ export default function Reservas({ perfil }: { perfil: Perfil }) {
             <button
               aria-label="Mês anterior"
               onClick={() => setMesRef((m) => m - 1)}
-              className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-[var(--cor-neutra-2)] bg-white text-stone-600 transition hover:bg-[var(--cor-neutra)]"
+              className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-[var(--cor-neutra-2)] bg-white dark:bg-stone-900 text-stone-600 dark:text-stone-400 transition hover:bg-[var(--cor-neutra)]"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
             <button
               aria-label="Mês seguinte"
               onClick={() => setMesRef((m) => m + 1)}
-              className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-[var(--cor-neutra-2)] bg-white text-stone-600 transition hover:bg-[var(--cor-neutra)]"
+              className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-[var(--cor-neutra-2)] bg-white dark:bg-stone-900 text-stone-600 dark:text-stone-400 transition hover:bg-[var(--cor-neutra)]"
             >
               <ChevronRight className="h-4 w-4" />
             </button>
-            <span className="ml-1 text-xs text-stone-400">
+            <span className="ml-1 text-xs text-stone-400 dark:text-stone-500">
               {ehGestao ? "Todas as reservas ativas do condomínio" : "Suas reservas ativas"}
             </span>
           </div>
           <div className="grid grid-cols-7 gap-px overflow-hidden rounded-md border border-[var(--cor-neutra)] bg-[var(--cor-neutra)] text-center">
             {DIAS_SEMANA.map((d, i) => (
-              <div key={`d${i}`} className="bg-white py-1.5 text-[11px] font-semibold uppercase tracking-wide text-stone-400">
+              <div key={`d${i}`} className="bg-white dark:bg-stone-900 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-stone-400 dark:text-stone-500">
                 {d}
               </div>
             ))}
@@ -338,11 +338,11 @@ export default function Reservas({ perfil }: { perfil: Perfil }) {
               return (
                 <div
                   key={iso}
-                  className={`min-h-[64px] bg-white p-1 text-left sm:min-h-[76px] ${
+                  className={`min-h-[64px] bg-white dark:bg-stone-900 p-1 text-left sm:min-h-[76px] ${
                     passou ? "opacity-45" : ""
                   }`}
                 >
-                  <p className={`text-[11px] tabular-nums ${iso === hojeISO() ? "font-bold text-[var(--cor-tema)]" : "text-stone-400"}`}>
+                  <p className={`text-[11px] tabular-nums ${iso === hojeISO() ? "font-bold text-[var(--cor-tema)]" : "text-stone-400 dark:text-stone-500"}`}>
                     {Number(iso.slice(8))}
                   </p>
                   <div className="mt-0.5 space-y-0.5">
@@ -352,22 +352,22 @@ export default function Reservas({ perfil }: { perfil: Perfil }) {
                         title={`${ROTULO_ESPACO[r.espaco] ?? r.espaco} · ${r.horario} · ${r.solicitante?.nome ?? ""}`}
                         className={`truncate rounded px-1 py-0.5 text-[10px] leading-tight ${
                           r.status === "CONFIRMADA"
-                            ? "bg-green-50 text-green-800"
-                            : "bg-[var(--cor-neutra)] text-stone-600"
+                            ? "bg-green-50 dark:bg-green-950/40 text-green-800 dark:text-green-300"
+                            : "bg-[var(--cor-neutra)] text-stone-600 dark:text-stone-400"
                         }`}
                       >
                         {(ROTULO_ESPACO[r.espaco] ?? r.espaco).split(" ")[0]}
                       </p>
                     ))}
                     {doDia.length > 3 && (
-                      <p className="px-1 text-[10px] text-stone-400">+{doDia.length - 3}</p>
+                      <p className="px-1 text-[10px] text-stone-400 dark:text-stone-500">+{doDia.length - 3}</p>
                     )}
                   </div>
                 </div>
               );
             })}
           </div>
-          <p className="mt-2 text-xs text-stone-400">
+          <p className="mt-2 text-xs text-stone-400 dark:text-stone-500">
             Verde: confirmada · Cinza: aguardando aprovação
           </p>
         </Secao>
@@ -429,7 +429,7 @@ export default function Reservas({ perfil }: { perfil: Perfil }) {
 
       {/* Regras dos espaços — exibidas a todos; editáveis pela gestão */}
       {regras.length > 0 && (
-        <Secao titulo="Regras dos espaços" acao={ehGestao ? <span className="text-xs text-stone-400">Toque em “Editar” para ajustar</span> : undefined}>
+        <Secao titulo="Regras dos espaços" acao={ehGestao ? <span className="text-xs text-stone-400 dark:text-stone-500">Toque em “Editar” para ajustar</span> : undefined}>
           <Lista>
             {regras.map((r) => (
               <LinhaLista
@@ -468,7 +468,7 @@ export default function Reservas({ perfil }: { perfil: Perfil }) {
             className="absolute inset-0 bg-black/40"
             onClick={() => setAberto(false)}
           />
-          <div className="relative flex max-h-[88dvh] w-full max-w-md flex-col overflow-hidden rounded-xl border border-[var(--cor-neutra)] bg-white shadow-[var(--sombra-cartao)]">
+          <div className="relative flex max-h-[88dvh] w-full max-w-md flex-col overflow-hidden rounded-xl border border-[var(--cor-neutra)] bg-white dark:bg-stone-900 shadow-[var(--sombra-cartao)]">
             {/* Foto do espaço escolhido — confirmação visual imediata */}
             <div className="relative h-28 w-full shrink-0 overflow-hidden">
               <Image
@@ -484,7 +484,7 @@ export default function Reservas({ perfil }: { perfil: Perfil }) {
               </p>
             </div>
             <div className="overflow-y-auto p-5 pt-4">
-              <p className="text-sm text-stone-500">
+              <p className="text-sm text-stone-500 dark:text-stone-400">
                 A reserva fica pendente até a aprovação da administração.
                 {(() => {
                   const rg = regraDoEspaco(form.espaco);
@@ -497,7 +497,7 @@ export default function Reservas({ perfil }: { perfil: Perfil }) {
               <select
                 value={form.espaco}
                 onChange={(e) => setForm({ ...form, espaco: e.target.value })}
-                className="h-10 w-full rounded-md border border-[var(--cor-neutra-2)] bg-white px-3 text-sm outline-none focus:border-[var(--cor-tema-suave)]"
+                className="h-10 w-full rounded-md border border-[var(--cor-neutra-2)] bg-white dark:bg-stone-900 px-3 text-sm outline-none focus:border-[var(--cor-tema-suave)]"
               >
                 {Object.entries(ROTULO_ESPACO)
                   .filter(([k]) => k !== "VIRTUAL")
@@ -520,12 +520,12 @@ export default function Reservas({ perfil }: { perfil: Perfil }) {
                 }
                 value={form.data}
                 onChange={(e) => setForm({ ...form, data: e.target.value })}
-                className="h-10 w-full rounded-md border border-[var(--cor-neutra-2)] bg-white px-3 text-sm outline-none focus:border-[var(--cor-tema-suave)]"
+                className="h-10 w-full rounded-md border border-[var(--cor-neutra-2)] bg-white dark:bg-stone-900 px-3 text-sm outline-none focus:border-[var(--cor-tema-suave)]"
               />
               <select
                 value={form.horario}
                 onChange={(e) => setForm({ ...form, horario: e.target.value })}
-                className="h-10 w-full rounded-md border border-[var(--cor-neutra-2)] bg-white px-3 text-sm outline-none focus:border-[var(--cor-tema-suave)]"
+                className="h-10 w-full rounded-md border border-[var(--cor-neutra-2)] bg-white dark:bg-stone-900 px-3 text-sm outline-none focus:border-[var(--cor-tema-suave)]"
               >
                 {HORARIOS.map((h) => (
                   <option key={h} value={h}>
@@ -540,7 +540,7 @@ export default function Reservas({ perfil }: { perfil: Perfil }) {
                 onChange={(e) => setForm({ ...form, observacoes: e.target.value })}
                 className="w-full rounded-md border border-[var(--cor-neutra-2)] px-3 py-2 text-sm outline-none focus:border-[var(--cor-tema-suave)] focus:ring-2 focus:ring-[var(--cor-tema-suave)]/30"
               />
-              {erro && <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{erro}</p>}
+              {erro && <p className="rounded-md bg-red-50 dark:bg-red-950/40 px-3 py-2 text-sm text-red-700 dark:text-red-300">{erro}</p>}
             </div>
             <div className="mt-5 flex justify-end gap-2">
               <BotaoSecundario onClick={() => setAberto(false)}>Cancelar</BotaoSecundario>
@@ -560,13 +560,13 @@ export default function Reservas({ perfil }: { perfil: Perfil }) {
             className="absolute inset-0 bg-black/40"
             onClick={() => setEditandoRegra(null)}
           />
-          <div className="relative max-h-[88dvh] w-full max-w-md overflow-y-auto rounded-xl border border-[var(--cor-neutra)] bg-white p-6 shadow-[var(--sombra-cartao)]">
-            <h3 className="text-base font-semibold text-stone-900">
+          <div className="relative max-h-[88dvh] w-full max-w-md overflow-y-auto rounded-xl border border-[var(--cor-neutra)] bg-white dark:bg-stone-900 p-6 shadow-[var(--sombra-cartao)]">
+            <h3 className="text-base font-semibold text-stone-900 dark:text-stone-100">
               Regras — {editandoRegra.rotulo}
             </h3>
             <div className="mt-4 space-y-3">
               <label className="block">
-                <span className="mb-1 block text-[11px] font-semibold uppercase tracking-[0.12em] text-stone-500">
+                <span className="mb-1 block text-[11px] font-semibold uppercase tracking-[0.12em] text-stone-500 dark:text-stone-400">
                   Antecedência máxima (dias)
                 </span>
                 <input
@@ -575,11 +575,11 @@ export default function Reservas({ perfil }: { perfil: Perfil }) {
                   max={365}
                   value={regraForm.antecedenciaMaxDias}
                   onChange={(e) => setRegraForm({ ...regraForm, antecedenciaMaxDias: Number(e.target.value) })}
-                  className="h-10 w-full rounded-md border border-[var(--cor-neutra-2)] bg-white px-3 text-sm outline-none focus:border-[var(--cor-tema-suave)]"
+                  className="h-10 w-full rounded-md border border-[var(--cor-neutra-2)] bg-white dark:bg-stone-900 px-3 text-sm outline-none focus:border-[var(--cor-tema-suave)]"
                 />
               </label>
               <label className="block">
-                <span className="mb-1 block text-[11px] font-semibold uppercase tracking-[0.12em] text-stone-500">
+                <span className="mb-1 block text-[11px] font-semibold uppercase tracking-[0.12em] text-stone-500 dark:text-stone-400">
                   Reservas por mês por unidade
                 </span>
                 <input
@@ -588,11 +588,11 @@ export default function Reservas({ perfil }: { perfil: Perfil }) {
                   max={31}
                   value={regraForm.limiteMensalUnidade}
                   onChange={(e) => setRegraForm({ ...regraForm, limiteMensalUnidade: Number(e.target.value) })}
-                  className="h-10 w-full rounded-md border border-[var(--cor-neutra-2)] bg-white px-3 text-sm outline-none focus:border-[var(--cor-tema-suave)]"
+                  className="h-10 w-full rounded-md border border-[var(--cor-neutra-2)] bg-white dark:bg-stone-900 px-3 text-sm outline-none focus:border-[var(--cor-tema-suave)]"
                 />
               </label>
               <label className="block">
-                <span className="mb-1 block text-[11px] font-semibold uppercase tracking-[0.12em] text-stone-500">
+                <span className="mb-1 block text-[11px] font-semibold uppercase tracking-[0.12em] text-stone-500 dark:text-stone-400">
                   Regras exibidas ao morador (taxa de limpeza, horários…)
                 </span>
                 <textarea
@@ -602,7 +602,7 @@ export default function Reservas({ perfil }: { perfil: Perfil }) {
                   className="w-full rounded-md border border-[var(--cor-neutra-2)] px-3 py-2 text-sm outline-none focus:border-[var(--cor-tema-suave)] focus:ring-2 focus:ring-[var(--cor-tema-suave)]/30"
                 />
               </label>
-              {erro && <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{erro}</p>}
+              {erro && <p className="rounded-md bg-red-50 dark:bg-red-950/40 px-3 py-2 text-sm text-red-700 dark:text-red-300">{erro}</p>}
             </div>
             <div className="mt-5 flex justify-end gap-2">
               <BotaoSecundario onClick={() => setEditandoRegra(null)}>Cancelar</BotaoSecundario>

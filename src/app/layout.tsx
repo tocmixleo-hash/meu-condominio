@@ -36,11 +36,17 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#4D403A",
-  // Tema sempre claro: navegadores em modo escuro não devem inverter a UI
-  // (sem isso, os seletores do login aparecem escurecidos no celular).
-  colorScheme: "light",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#4D403A" },
+    { media: "(prefers-color-scheme: dark)", color: "#191512" },
+  ],
+  colorScheme: "light dark",
 };
+
+// Pré-pintura do tema: resolve a preferência (localStorage → sistema) e aplica
+// a classe .dark no <html> ANTES da primeira pintura — sem flash claro→escuro.
+// Deve rodar inline no head; React só hidrata por cima.
+const INICIAR_TEMA = `(function(){try{var p=localStorage.getItem('tema-preferencia');var e=p==='escuro'||((!p||p==='sistema')&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.classList.toggle('dark',e);}catch(_){}})()`;
 
 export default function RootLayout({
   children,
@@ -49,6 +55,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: INICIAR_TEMA }} />
+      </head>
       <body
         className={`${manrope.variable} ${geistMono.variable} font-sans antialiased bg-background text-foreground`}
       >

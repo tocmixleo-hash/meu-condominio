@@ -81,7 +81,7 @@ export default function CampanhaDestaque() {
               onMouseLeave={() => setPausado(false)}
             >
               {/* Celular: pontinhos (o toque desliza); desktop: contador + setas */}
-              <span className="mr-1.5 hidden text-xs tabular-nums text-stone-400 sm:inline" aria-hidden>
+              <span className="mr-1.5 hidden text-xs tabular-nums text-stone-400 dark:text-stone-500 sm:inline" aria-hidden>
                 {i + 1} de {total}
               </span>
               <span className="mr-1.5 flex items-center gap-1.5 sm:hidden" aria-hidden>
@@ -98,7 +98,7 @@ export default function CampanhaDestaque() {
                 type="button"
                 onClick={voltar}
                 aria-label="Campanha anterior"
-                className="hidden h-7 w-7 items-center justify-center rounded-lg text-stone-400 transition hover:bg-[var(--cor-tema-a06)] hover:text-[var(--cor-tema)] sm:flex"
+                className="hidden h-7 w-7 items-center justify-center rounded-lg text-stone-400 dark:text-stone-500 transition hover:bg-[var(--cor-tema-a06)] hover:text-[var(--cor-tema)] sm:flex"
               >
                 <ChevronLeft className="h-4 w-4" />
               </button>
@@ -106,7 +106,7 @@ export default function CampanhaDestaque() {
                 type="button"
                 onClick={avancar}
                 aria-label="Próxima campanha"
-                className="hidden h-7 w-7 items-center justify-center rounded-lg text-stone-400 transition hover:bg-[var(--cor-tema-a06)] hover:text-[var(--cor-tema)] sm:flex"
+                className="hidden h-7 w-7 items-center justify-center rounded-lg text-stone-400 dark:text-stone-500 transition hover:bg-[var(--cor-tema-a06)] hover:text-[var(--cor-tema)] sm:flex"
               >
                 <ChevronRight className="h-4 w-4" />
               </button>
@@ -141,13 +141,13 @@ export default function CampanhaDestaque() {
             </span>
 
             <span className="min-w-0 flex-1">
-              <span className="block text-[15px] font-bold leading-snug text-stone-900 sm:text-base">
+              <span className="block text-[15px] font-bold leading-snug text-stone-900 dark:text-stone-100 sm:text-base">
                 {campanha.titulo}
               </span>
-              <span className="mt-0.5 line-clamp-2 block text-sm leading-relaxed text-stone-600">
+              <span className="mt-0.5 line-clamp-2 block text-sm leading-relaxed text-stone-600 dark:text-stone-400">
                 {campanha.mensagem}
               </span>
-              <span className="mt-1.5 block text-xs text-stone-500">
+              <span className="mt-1.5 block text-xs text-stone-500 dark:text-stone-400">
                 {ROTULO_CATEGORIA_CAMPANHA[campanha.categoria] ?? campanha.categoria}
                 {campanha.fimEm ? ` · Até ${formatarData(campanha.fimEm)}` : ""}
                 <span className="font-medium text-[var(--cor-tema)]">
@@ -168,10 +168,10 @@ export default function CampanhaDestaque() {
             className="absolute inset-0 bg-black/40"
             onClick={() => setDetalhe(null)}
           />
-          <div className="relative max-h-[88dvh] w-full max-w-lg overflow-y-auto rounded-xl border border-[var(--cor-neutra)] bg-white p-6 shadow-xl">
+          <div className="relative max-h-[88dvh] w-full max-w-lg overflow-y-auto rounded-xl border border-[var(--cor-neutra)] bg-white dark:bg-stone-900 p-6 shadow-xl">
             <button
               aria-label="Fechar detalhes"
-              className="absolute right-4 top-4 text-stone-400 transition hover:text-stone-700"
+              className="absolute right-4 top-4 text-stone-400 dark:text-stone-500 transition hover:text-stone-700"
               onClick={() => setDetalhe(null)}
             >
               <X className="h-5 w-5" />
@@ -184,23 +184,23 @@ export default function CampanhaDestaque() {
                 <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--cor-tema)]">
                   Campanha · {ROTULO_CATEGORIA_CAMPANHA[detalhe.categoria] ?? detalhe.categoria}
                 </p>
-                <h3 className="text-base font-bold leading-snug text-stone-900">{detalhe.titulo}</h3>
+                <h3 className="text-base font-bold leading-snug text-stone-900 dark:text-stone-100">{detalhe.titulo}</h3>
               </div>
             </div>
-            <p className="mt-4 text-sm leading-relaxed text-stone-700">{detalhe.mensagem}</p>
+            <p className="mt-4 text-sm leading-relaxed text-stone-700 dark:text-stone-200">{detalhe.mensagem}</p>
             {detalhe.descricao && (
-              <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-stone-600">
+              <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-stone-600 dark:text-stone-400">
                 {detalhe.descricao}
               </p>
             )}
             {(detalhe.inicioEm || detalhe.fimEm) && (
-              <p className="mt-4 text-xs font-medium text-stone-400">
+              <p className="mt-4 text-xs font-medium text-stone-400 dark:text-stone-500">
                 {detalhe.inicioEm ? `Veiculação a partir de ${formatarData(detalhe.inicioEm)}` : "Em veiculação"}
                 {detalhe.fimEm ? ` até ${formatarData(detalhe.fimEm)}.` : "."}
               </p>
             )}
             {detalhe.autor?.nome && (
-              <p className="mt-3 text-xs text-stone-400">Divulgada por {detalhe.autor.nome}</p>
+              <p className="mt-3 text-xs text-stone-400 dark:text-stone-500">Divulgada por {detalhe.autor.nome}</p>
             )}
           </div>
         </div>

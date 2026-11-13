@@ -68,7 +68,7 @@ export default function Documentos({ perfil }: { perfil: Perfil }) {
       form.append("categoria", categoria);
       form.append("arquivo", arquivo);
       const r = await fetch("/api/documentos", { method: "POST", body: form });
-      const corpo = await corpoJson(r);
+      const corpo = await corpoJson<{ erro?: string; otimizacao?: { original: number; final: number } | null }>(r);
       if (!corpo) throw new Error(mensagemRede(r.status));
       if (!r.ok) throw new Error(corpo.erro || "Falha ao enviar.");
       setAviso(
@@ -101,7 +101,7 @@ export default function Documentos({ perfil }: { perfil: Perfil }) {
   return (
     <div className="space-y-6">
       {aviso && (
-        <p className="rounded-md bg-emerald-50 px-3 py-2 text-sm text-emerald-800">{aviso}</p>
+        <p className="rounded-md bg-emerald-50 dark:bg-emerald-950/40 px-3 py-2 text-sm text-emerald-800 dark:text-emerald-300">{aviso}</p>
       )}
       <Secao
         titulo={`Documentos${lista ? ` · ${lista.length}` : ""}`}
@@ -154,9 +154,9 @@ export default function Documentos({ perfil }: { perfil: Perfil }) {
             className="absolute inset-0 bg-black/40"
             onClick={() => setAberto(false)}
           />
-          <div className="relative max-h-[88dvh] w-full max-w-md overflow-y-auto rounded-lg border border-[var(--cor-neutra)] bg-white p-6 shadow-xl">
-            <h3 className="text-base font-semibold text-stone-900">Enviar documento</h3>
-            <p className="mt-0.5 text-sm text-stone-500">PDF ou imagem, até 8 MB.</p>
+          <div className="relative max-h-[88dvh] w-full max-w-md overflow-y-auto rounded-lg border border-[var(--cor-neutra)] bg-white dark:bg-stone-900 p-6 shadow-xl">
+            <h3 className="text-base font-semibold text-stone-900 dark:text-stone-100">Enviar documento</h3>
+            <p className="mt-0.5 text-sm text-stone-500 dark:text-stone-400">PDF ou imagem, até 8 MB.</p>
             <div className="mt-4 space-y-3">
               <input
                 placeholder="Título do documento"
@@ -167,7 +167,7 @@ export default function Documentos({ perfil }: { perfil: Perfil }) {
               <select
                 value={categoria}
                 onChange={(e) => setCategoria(e.target.value)}
-                className="h-10 w-full rounded-md border border-[var(--cor-neutra-2)] bg-white px-3 text-sm outline-none focus:border-[var(--cor-tema-suave)]"
+                className="h-10 w-full rounded-md border border-[var(--cor-neutra-2)] bg-white dark:bg-stone-900 px-3 text-sm outline-none focus:border-[var(--cor-tema-suave)]"
               >
                 {Object.entries(ROTULO_CATEGORIA_DOCUMENTO).map(([k, v]) => (
                   <option key={k} value={k}>
@@ -180,12 +180,12 @@ export default function Documentos({ perfil }: { perfil: Perfil }) {
                 type="file"
                 accept=".pdf,image/*"
                 onChange={(e) => setArquivo(e.target.files?.[0] ?? null)}
-                className="block w-full text-sm text-stone-600 file:mr-3 file:rounded-md file:border-0 file:bg-[var(--cor-neutra)] file:px-3 file:py-2 file:text-sm file:font-medium file:text-[var(--cor-tema)] hover:file:bg-[var(--cor-neutra-2)]"
+                className="block w-full text-sm text-stone-600 dark:text-stone-400 file:mr-3 file:rounded-md file:border-0 file:bg-[var(--cor-neutra)] file:px-3 file:py-2 file:text-sm file:font-medium file:text-[var(--cor-tema)] hover:file:bg-[var(--cor-neutra-2)]"
               />
-              <p className="text-xs text-stone-500">
+              <p className="text-xs text-stone-500 dark:text-stone-400">
                 Dica: digitalize a 150 dpi para o arquivo ficar menor — PDFs já são otimizados automaticamente no envio, sem perder qualidade.
               </p>
-              {erro && <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{erro}</p>}
+              {erro && <p className="rounded-md bg-red-50 dark:bg-red-950/40 px-3 py-2 text-sm text-red-700 dark:text-red-300">{erro}</p>}
             </div>
             <div className="mt-5 flex justify-end gap-2">
               <BotaoSecundario onClick={() => setAberto(false)}>Cancelar</BotaoSecundario>

@@ -61,7 +61,7 @@ export function Secao({
   return (
     <section data-tour={tour} className={className}>
       <div className="flex items-center justify-between gap-3 border-b border-[var(--cor-neutra)] pb-2.5">
-        <h2 className="flex items-center gap-2.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-500">
+        <h2 className="flex items-center gap-2.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-500 dark:text-stone-400">
           <span
             aria-hidden
             className="h-3.5 w-[3px] shrink-0 rounded-full bg-[var(--cor-tema)]"
@@ -95,12 +95,12 @@ export function LinhaIndicadores({
         >
           <p
             className={`text-[27px] font-bold leading-none tabular-nums ${
-              item.valor === 0 || item.valor === "0" ? "text-stone-300" : "text-stone-900"
+              item.valor === 0 || item.valor === "0" ? "text-stone-300 dark:text-stone-700" : "text-stone-900 dark:text-stone-100"
             }`}
           >
             {item.valor}
           </p>
-          <p className="mt-1.5 text-[11px] font-medium uppercase tracking-[0.12em] text-stone-500">
+          <p className="mt-1.5 text-[11px] font-medium uppercase tracking-[0.12em] text-stone-500 dark:text-stone-400">
             {item.rotulo}
           </p>
         </div>
@@ -136,9 +136,9 @@ export function LinhaLista({
     >
       {midia && <div className="shrink-0">{midia}</div>}
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-medium text-stone-900">{principal}</p>
-        {secundaria && <p className="mt-0.5 truncate text-sm text-stone-500">{secundaria}</p>}
-        {detalhe && <div className="mt-1 text-xs text-stone-400">{detalhe}</div>}
+        <p className="truncate text-sm font-medium text-stone-900 dark:text-stone-100">{principal}</p>
+        {secundaria && <p className="mt-0.5 truncate text-sm text-stone-500 dark:text-stone-400">{secundaria}</p>}
+        {detalhe && <div className="mt-1 text-xs text-stone-400 dark:text-stone-500">{detalhe}</div>}
       </div>
       {direita && <div className="shrink-0 text-right">{direita}</div>}
     </div>
@@ -154,11 +154,11 @@ export function EstadoVazio({ mensagem, acao }: { mensagem: string; acao?: React
     <div className="flex flex-col items-center gap-2 py-8 text-center">
       <span
         aria-hidden
-        className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--cor-neutra)] bg-white text-stone-300"
+        className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--cor-neutra)] bg-white dark:bg-stone-900 text-stone-300 dark:text-stone-600"
       >
         <Inbox className="h-4 w-4" />
       </span>
-      <p className="text-sm text-stone-400">{mensagem}</p>
+      <p className="text-sm text-stone-400 dark:text-stone-500">{mensagem}</p>
       {acao}
     </div>
   );
@@ -166,7 +166,7 @@ export function EstadoVazio({ mensagem, acao }: { mensagem: string; acao?: React
 
 export function Carregando() {
   return (
-    <div className="flex items-center gap-2 py-6 text-sm text-stone-400">
+    <div className="flex items-center gap-2 py-6 text-sm text-stone-400 dark:text-stone-500">
       <span className="h-3 w-3 animate-spin rounded-full border border-[var(--cor-neutra-2)] border-t-[var(--cor-tema)]" />
       Carregando…
     </div>
@@ -186,8 +186,8 @@ export function Badge({
 }) {
   const estilos: Record<TomBadge, string> = {
     neutro: "bg-[var(--cor-neutra)] text-[var(--cor-fg-suave)]",
-    verde: "bg-green-50 text-green-700",
-    vermelho: "bg-red-50 text-red-700",
+    verde: "bg-green-50 dark:bg-green-950/40 text-green-700 dark:text-green-300",
+    vermelho: "bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-300",
   };
   return (
     <span
@@ -305,7 +305,7 @@ export function BotaoSecundario({
   className?: string;
   href?: string;
 }) {
-  const classes = `inline-flex h-9 items-center justify-center gap-2 rounded-full border border-[var(--cor-neutra-2)] bg-white px-4 text-sm font-semibold text-stone-700 transition-all duration-200 hover:border-[var(--cor-tema-suave)] hover:bg-[var(--cor-tema-a06)] hover:text-[var(--cor-tema)] active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cor-tema-suave)] disabled:pointer-events-none disabled:opacity-50 ${className}`;
+  const classes = `inline-flex h-9 items-center justify-center gap-2 rounded-full border border-[var(--cor-neutra-2)] bg-white dark:bg-stone-900 px-4 text-sm font-semibold text-stone-700 dark:text-stone-200 transition-all duration-200 hover:border-[var(--cor-tema-suave)] hover:bg-[var(--cor-tema-a06)] hover:text-[var(--cor-tema)] active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--cor-tema-suave)] disabled:pointer-events-none disabled:opacity-50 ${className}`;
   if (href) {
     return (
       <a href={href} className={classes}>
@@ -338,8 +338,8 @@ export function BotaoTexto({
 }) {
   const cores = {
     tema: "text-[var(--cor-tema)] hover:text-[var(--cor-tema-hover)]",
-    vermelho: "text-red-600 hover:text-red-700",
-    verde: "text-green-700 hover:text-green-800",
+    vermelho: "text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300",
+    verde: "text-green-700 dark:text-green-300 hover:text-green-800 dark:hover:text-green-300",
   }[tom];
   return (
     <button

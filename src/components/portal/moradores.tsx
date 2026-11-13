@@ -210,9 +210,9 @@ export default function Moradores() {
             className="absolute inset-0 bg-black/40"
             onClick={() => setAberto(false)}
           />
-          <div className="relative max-h-[90dvh] w-full max-w-md overflow-y-auto rounded-lg border border-[var(--cor-neutra)] bg-white p-6 shadow-xl">
-            <h3 className="text-base font-semibold text-stone-900">Cadastrar pessoa</h3>
-            <p className="mt-0.5 text-sm text-stone-500">
+          <div className="relative max-h-[90dvh] w-full max-w-md overflow-y-auto rounded-lg border border-[var(--cor-neutra)] bg-white dark:bg-stone-900 p-6 shadow-xl">
+            <h3 className="text-base font-semibold text-stone-900 dark:text-stone-100">Cadastrar pessoa</h3>
+            <p className="mt-0.5 text-sm text-stone-500 dark:text-stone-400">
               Morador (com unidade) ou membro da equipe (com função personalizada).
               A pessoa já pode entrar com o e-mail e a senha definidos aqui.
             </p>
@@ -241,7 +241,7 @@ export default function Moradores() {
               <select
                 value={form.funcaoId}
                 onChange={(e) => setForm({ ...form, funcaoId: e.target.value })}
-                className={`${campo} bg-white`}
+                className={`${campo} bg-white dark:bg-stone-900`}
                 aria-label="Tipo de cadastro"
               >
                 <option value="">Morador — com unidade</option>
@@ -252,7 +252,7 @@ export default function Moradores() {
                 ))}
               </select>
               {funcoes.length === 0 && !emModoEquipe && (
-                <p className="text-xs text-stone-500">
+                <p className="text-xs text-stone-500 dark:text-stone-400">
                   Dica: crie funções no menu <strong>Funções</strong> para cadastrar equipe sob medida.
                 </p>
               )}
@@ -261,7 +261,7 @@ export default function Moradores() {
                   <select
                     value={form.bloco}
                     onChange={(e) => setForm({ ...form, bloco: e.target.value })}
-                    className={`${campo} bg-white`}
+                    className={`${campo} bg-white dark:bg-stone-900`}
                   >
                     <option value="A">Bloco A</option>
                     <option value="B">Bloco B</option>
@@ -287,7 +287,7 @@ export default function Moradores() {
                   className={campo}
                 />
               )}
-              {erro && <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{erro}</p>}
+              {erro && <p className="rounded-md bg-red-50 dark:bg-red-950/40 px-3 py-2 text-sm text-red-700 dark:text-red-300">{erro}</p>}
             </div>
             <div className="mt-5 flex justify-end gap-2">
               <BotaoSecundario onClick={() => setAberto(false)}>Cancelar</BotaoSecundario>

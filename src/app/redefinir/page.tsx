@@ -45,25 +45,25 @@ function Conteudo() {
   }
 
   return (
-    <div className="flex min-h-dvh items-center justify-center bg-stone-50 p-4">
-      <div className="w-full max-w-md rounded-xl border border-stone-200 bg-white p-8 shadow-sm">
-        <h1 className="text-xl font-semibold text-stone-900">Escolher nova senha</h1>
+    <div className="flex min-h-dvh items-center justify-center bg-stone-50 dark:bg-stone-900/50 p-4">
+      <div className="w-full max-w-md rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-8 shadow-sm">
+        <h1 className="text-xl font-semibold text-stone-900 dark:text-stone-100">Escolher nova senha</h1>
         {ok ? (
           <div className="mt-4 space-y-3">
-            <p className="rounded-xl bg-green-50 px-3.5 py-2.5 text-sm text-green-700">
+            <p className="rounded-xl bg-green-50 dark:bg-green-950/40 px-3.5 py-2.5 text-sm text-green-700 dark:text-green-300">
               Senha redefinida! Você será levado à tela de entrada…
             </p>
-            <a href="/" className="text-sm font-medium text-stone-600 underline-offset-4 hover:underline">
+            <a href="/" className="text-sm font-medium text-stone-600 dark:text-stone-400 underline-offset-4 hover:underline">
               Ir para o login agora
             </a>
           </div>
         ) : !token ? (
-          <p className="mt-4 rounded-xl bg-red-50 px-3.5 py-2.5 text-sm text-red-700">
+          <p className="mt-4 rounded-xl bg-red-50 dark:bg-red-950/40 px-3.5 py-2.5 text-sm text-red-700 dark:text-red-300">
             Link inválido. Solicite uma nova redefinição na tela de entrada.
           </p>
         ) : (
           <>
-            <p className="mt-1 text-sm text-stone-500">
+            <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">
               Crie uma nova senha para a sua conta. O link vale por 1 hora e só pode ser usado uma vez.
             </p>
             <div className="mt-6 space-y-3">
@@ -73,7 +73,7 @@ function Conteudo() {
                 value={senha}
                 onChange={(e) => setSenha(e.target.value)}
                 autoComplete="new-password"
-                className="h-12 w-full rounded-xl border border-stone-200 bg-white px-4 text-[15px] text-stone-900 outline-none transition placeholder:text-stone-400 focus:border-stone-400 focus:ring-4 focus:ring-stone-400/10"
+                className="h-12 w-full rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 px-4 text-[15px] text-stone-900 dark:text-stone-100 outline-none transition placeholder:text-stone-400 focus:border-stone-400 focus:ring-4 focus:ring-stone-400/10"
               />
               <input
                 type="password"
@@ -81,9 +81,9 @@ function Conteudo() {
                 value={confirmacao}
                 onChange={(e) => setConfirmacao(e.target.value)}
                 autoComplete="new-password"
-                className="h-12 w-full rounded-xl border border-stone-200 bg-white px-4 text-[15px] text-stone-900 outline-none transition placeholder:text-stone-400 focus:border-stone-400 focus:ring-4 focus:ring-stone-400/10"
+                className="h-12 w-full rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 px-4 text-[15px] text-stone-900 dark:text-stone-100 outline-none transition placeholder:text-stone-400 focus:border-stone-400 focus:ring-4 focus:ring-stone-400/10"
               />
-              {erro && <p className="rounded-xl bg-red-50 px-3.5 py-2.5 text-sm text-red-700">{erro}</p>}
+              {erro && <p className="rounded-xl bg-red-50 dark:bg-red-950/40 px-3.5 py-2.5 text-sm text-red-700 dark:text-red-300">{erro}</p>}
               <button
                 onClick={redefinir}
                 disabled={enviando || !senha || !confirmacao}

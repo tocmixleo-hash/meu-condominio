@@ -90,8 +90,8 @@ export default function Faq({
   return (
     <div className="space-y-5">
       <Secao titulo="Perguntas frequentes" className="max-w-2xl">
-        <h1 className="mt-1 text-xl font-bold text-stone-900">Como podemos ajudar?</h1>
-        <p className="mt-1 text-sm leading-relaxed text-stone-600">
+        <h1 className="mt-1 text-xl font-bold text-stone-900 dark:text-stone-100">Como podemos ajudar?</h1>
+        <p className="mt-1 text-sm leading-relaxed text-stone-600 dark:text-stone-400">
           Regras de convivência do {condominio.nome} — horários da piscina, mudanças, descarte de
           lixo e mais. Toque em uma pergunta para ver a resposta.
         </p>
@@ -99,20 +99,20 @@ export default function Faq({
 
       {/* Busca */}
       <div className="relative max-w-2xl">
-        <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400" />
+        <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400 dark:text-stone-500" />
         <input
           type="search"
           value={busca}
           onChange={(e) => setBusca(e.target.value)}
           placeholder="Buscar dúvida (ex.: ducha, papelão, barulho…)"
           aria-label="Buscar nas perguntas frequentes"
-          className="w-full rounded-xl border border-stone-200 bg-white py-2.5 pl-10 pr-10 text-sm text-stone-800 placeholder:text-stone-400 focus:border-[var(--cor-tema,#4D403A)] focus:outline-none focus:ring-2 focus:ring-[var(--cor-tema,#4D403A)]/15"
+          className="w-full rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 py-2.5 pl-10 pr-10 text-sm text-stone-800 dark:text-stone-100 placeholder:text-stone-400 focus:border-[var(--cor-tema,#4D403A)] focus:outline-none focus:ring-2 focus:ring-[var(--cor-tema,#4D403A)]/15"
         />
         {busca && (
           <button
             onClick={() => setBusca("")}
             aria-label="Limpar busca"
-            className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-md p-1 text-stone-400 transition hover:bg-stone-100 hover:text-stone-600"
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-md p-1 text-stone-400 dark:text-stone-500 transition hover:bg-stone-100 hover:text-stone-600"
           >
             <X className="h-4 w-4" />
           </button>
@@ -127,7 +127,7 @@ export default function Faq({
             className={`whitespace-nowrap rounded-full border px-3.5 py-1.5 text-sm font-medium transition ${
               categoria === null
                 ? "border-transparent bg-[var(--cor-tema,#4D403A)] text-white"
-                : "border-stone-200 bg-white text-stone-600 hover:border-stone-300 hover:text-stone-900"
+                : "border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 text-stone-600 dark:text-stone-400 hover:border-stone-300 hover:text-stone-900"
             }`}
           >
             Todas
@@ -142,7 +142,7 @@ export default function Faq({
                 className={`flex items-center gap-1.5 whitespace-nowrap rounded-full border px-3.5 py-1.5 text-sm font-medium transition ${
                   ativa
                     ? "border-transparent bg-[var(--cor-tema,#4D403A)] text-white"
-                    : "border-stone-200 bg-white text-stone-600 hover:border-stone-300 hover:text-stone-900"
+                    : "border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 text-stone-600 dark:text-stone-400 hover:border-stone-300 hover:text-stone-900"
                 }`}
               >
                 <Icone className="h-3.5 w-3.5" />
@@ -161,14 +161,14 @@ export default function Faq({
             return (
               <div
                 key={d.id}
-                className="flex items-start gap-3 rounded-xl border border-stone-200 bg-white p-3.5"
+                className="flex items-start gap-3 rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-3.5"
               >
                 <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--cor-tema-suave,#f0ebe7)] text-[var(--cor-tema,#4D403A)]">
                   <Icone className="h-4 w-4" />
                 </span>
                 <div className="min-w-0">
-                  <p className="text-sm font-semibold text-stone-900">{d.titulo}</p>
-                  <p className="mt-0.5 text-xs leading-relaxed text-stone-500">{d.texto}</p>
+                  <p className="text-sm font-semibold text-stone-900 dark:text-stone-100">{d.titulo}</p>
+                  <p className="mt-0.5 text-xs leading-relaxed text-stone-500 dark:text-stone-400">{d.texto}</p>
                 </div>
               </div>
             );
@@ -186,12 +186,12 @@ export default function Faq({
             return (
               <section key={c.id}>
                 <div className="mb-1.5 flex items-center gap-1.5">
-                  <Icone className="h-3.5 w-3.5 text-stone-400" />
-                  <h2 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-500">
+                  <Icone className="h-3.5 w-3.5 text-stone-400 dark:text-stone-500" />
+                  <h2 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-500 dark:text-stone-400">
                     {c.rotulo} · {c.perguntas.length}
                   </h2>
                 </div>
-                <div className="divide-y divide-stone-100 overflow-hidden rounded-xl border border-stone-200 bg-white">
+                <div className="divide-y divide-stone-100 overflow-hidden rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900">
                   {c.perguntas.map((p, idx) => {
                     const chave = `${c.id}:${idx}`;
                     const aberta = abertas.has(chave);
@@ -202,7 +202,7 @@ export default function Faq({
                           aria-expanded={aberta}
                           className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left transition hover:bg-stone-50"
                         >
-                          <span className="text-sm font-medium leading-snug text-stone-800">
+                          <span className="text-sm font-medium leading-snug text-stone-800 dark:text-stone-100">
                             {p.pergunta}
                           </span>
                           <svg
@@ -213,7 +213,7 @@ export default function Faq({
                             strokeLinecap="round"
                             strokeLinejoin="round"
                             aria-hidden
-                            className={`h-4 w-4 shrink-0 text-stone-400 transition-transform duration-200 ${
+                            className={`h-4 w-4 shrink-0 text-stone-400 dark:text-stone-500 transition-transform duration-200 ${
                               aberta ? "rotate-180" : ""
                             }`}
                           >
@@ -221,7 +221,7 @@ export default function Faq({
                           </svg>
                         </button>
                         {aberta && (
-                          <p className="px-4 pb-4 text-sm leading-relaxed text-stone-600">
+                          <p className="px-4 pb-4 text-sm leading-relaxed text-stone-600 dark:text-stone-400">
                             {p.resposta}
                           </p>
                         )}
@@ -236,9 +236,9 @@ export default function Faq({
       )}
 
       {/* Ainda tem dúvidas? */}
-      <div className="rounded-xl border border-stone-200 bg-[var(--cor-tema-suave,#f7f4f1)] p-4 sm:p-5">
-        <p className="text-sm font-semibold text-stone-900">Não encontrou sua dúvida?</p>
-        <p className="mt-1 text-sm leading-relaxed text-stone-600">
+      <div className="rounded-xl border border-stone-200 dark:border-stone-800 bg-[var(--cor-tema-suave,#f7f4f1)] p-4 sm:p-5">
+        <p className="text-sm font-semibold text-stone-900 dark:text-stone-100">Não encontrou sua dúvida?</p>
+        <p className="mt-1 text-sm leading-relaxed text-stone-600 dark:text-stone-400">
           Fale com a administração
           {condominio.telefoneContato ? ` (${condominio.telefoneContato})` : ""}
           {condominio.emailContato ? ` ou escreva para ${condominio.emailContato}` : ""}. Para
@@ -248,7 +248,7 @@ export default function Faq({
         {aoTrocar && (
           <button
             onClick={() => aoTrocar("ocorrencias")}
-            className="mt-3 rounded-lg border border-stone-300 bg-white px-3.5 py-2 text-sm font-semibold text-[var(--cor-tema,#4D403A)] transition hover:bg-white/80"
+            className="mt-3 rounded-lg border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 px-3.5 py-2 text-sm font-semibold text-[var(--cor-tema,#4D403A)] transition hover:bg-white/80"
           >
             Reportar pelo portal
           </button>

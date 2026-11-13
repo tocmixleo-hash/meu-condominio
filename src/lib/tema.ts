@@ -153,13 +153,60 @@ export function resolverTema(
   return t;
 }
 
-/** Variáveis CSS a aplicar no elemento raiz (login ou shell). */
-export function cssVarsDoTema(t: Tema): Record<string, string> {
+/** Variáveis CSS a aplicar no elemento raiz (login ou shell).
+ *
+ * O parâmetro `escuro` rederiva a paleta para o tema noturno mantendo a
+ * identidade do condomínio: o fundo escuro nasce da própria cor primária
+ * (12% dela sobre uma base quente quase preta), bordas viram véus brancos
+ * translúcidos e os textos sobem para tons de pedra claros. As variáveis
+ * são estilos inline, então a classe .dark não pode sobrescrevê-las —
+ * daí a derivação aqui dentro em vez de no CSS.
+ */
+export function cssVarsDoTema(t: Tema, escuro = false): Record<string, string> {
   const rgb = hexParaRgb(t.tema);
   const hoverRgb = hexParaRgb(t.hover);
   const escuraRgb = hexParaRgb(t.escura);
   const escura2Rgb = hexParaRgb(t.escura2);
   const claraRgb = hexParaRgb(t.clara);
+
+  if (escuro) {
+    // Base quente quase preta — 12% da cor do condomínio dá temperatura
+    // sem virar "cinza lavado". Florida (#404040) resulta num grafite
+    // neutro; California (#4D403A), num marrom-café profundo.
+    const fundoEscuro = misturar(t.tema, "#100D0B", 0.85);
+    const sombraEscura = "0,0,0";
+    return {
+      "--cor-tema": t.tema,
+      "--cor-sidebar": t.sidebar,
+      "--cor-tema-hover": t.hover,
+      "--cor-tema-hover-a60": `rgba(${hoverRgb}, 0.60)`,
+      "--cor-tema-botao-hover": t.botaoHover,
+      "--cor-tema-escura": t.escura,
+      "--cor-tema-escura-a70": `rgba(${escuraRgb}, 0.70)`,
+      "--cor-tema-escura2": t.escura2,
+      "--cor-tema-escura2-a50": `rgba(${escura2Rgb}, 0.50)`,
+      "--cor-tema-a75": `rgba(${rgb}, 0.75)`,
+      "--cor-tema-a55": `rgba(${rgb}, 0.55)`,
+      "--cor-tema-a20": `rgba(${rgb}, 0.20)`,
+      "--cor-tema-a10": `rgba(${rgb}, 0.14)`,
+      "--cor-tema-a06": `rgba(${rgb}, 0.10)`,
+      // Anel de foco precisa clarear para ser visto sobre o fundo escuro
+      "--cor-tema-suave": misturar(t.tema, BRANCO, 0.4),
+      "--cor-fundo": fundoEscuro,
+      "--cor-neutra": "rgba(255,255,255,0.08)",
+      "--cor-neutra-2": "rgba(255,255,255,0.16)",
+      // «Clara» continua clara: é o texto que assenta sobre a cor primária
+      "--cor-clara": t.clara,
+      "--cor-clara-a85": `rgba(${claraRgb}, 0.85)`,
+      "--cor-clara-a70": `rgba(${claraRgb}, 0.70)`,
+      "--cor-clara-a80": `rgba(${claraRgb}, 0.80)`,
+      "--cor-fg": "#ece7e0",
+      "--cor-fg-suave": "#a8a19a",
+      "--sombra-cartao": `0 24px 60px -24px rgba(${sombraEscura}, 0.60)`,
+      "--sombra-suave": `0 1px 2px rgba(${sombraEscura}, 0.40), 0 10px 30px -14px rgba(${sombraEscura}, 0.55)`,
+    };
+  }
+
   return {
     "--cor-tema": t.tema,
     "--cor-sidebar": t.sidebar,

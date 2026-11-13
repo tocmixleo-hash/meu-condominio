@@ -186,11 +186,11 @@ export default function Funcoes() {
       {aberto && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <button aria-label="Fechar" className="absolute inset-0 bg-black/40" onClick={() => setAberto(false)} />
-          <div className="relative max-h-[90dvh] w-full max-w-lg overflow-y-auto rounded-lg border border-[var(--cor-neutra)] bg-white p-6 shadow-xl">
-            <h3 className="text-base font-semibold text-stone-900">
+          <div className="relative max-h-[90dvh] w-full max-w-lg overflow-y-auto rounded-lg border border-[var(--cor-neutra)] bg-white dark:bg-stone-900 p-6 shadow-xl">
+            <h3 className="text-base font-semibold text-stone-900 dark:text-stone-100">
               {form.id ? "Editar função" : "Nova função personalizada"}
             </h3>
-            <p className="mt-0.5 text-sm text-stone-500">
+            <p className="mt-0.5 text-sm text-stone-500 dark:text-stone-400">
               Defina o nome e marque os módulos que esta função pode usar neste condomínio.
             </p>
             <div className="mt-4 space-y-3">
@@ -207,7 +207,7 @@ export default function Funcoes() {
                 className={campo}
               />
               <fieldset className="rounded-lg border border-[var(--cor-neutra)] p-3">
-                <legend className="px-1 text-xs font-semibold uppercase tracking-wide text-stone-500">
+                <legend className="px-1 text-xs font-semibold uppercase tracking-wide text-stone-500 dark:text-stone-400">
                   Módulos concedidos
                 </legend>
                 <div className="mt-1 grid grid-cols-1 gap-1.5 sm:grid-cols-2">
@@ -223,14 +223,14 @@ export default function Funcoes() {
                         className="mt-0.5 h-4 w-4 accent-[var(--cor-tema)]"
                       />
                       <span className="min-w-0">
-                        <span className="block font-medium text-stone-800">{m.rotulo}</span>
-                        <span className="block text-xs text-stone-500">{m.descricao}</span>
+                        <span className="block font-medium text-stone-800 dark:text-stone-100">{m.rotulo}</span>
+                        <span className="block text-xs text-stone-500 dark:text-stone-400">{m.descricao}</span>
                       </span>
                     </label>
                   ))}
                 </div>
               </fieldset>
-              {erro && <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{erro}</p>}
+              {erro && <p className="rounded-md bg-red-50 dark:bg-red-950/40 px-3 py-2 text-sm text-red-700 dark:text-red-300">{erro}</p>}
             </div>
             <div className="mt-5 flex justify-end gap-2">
               <BotaoSecundario onClick={() => setAberto(false)}>Cancelar</BotaoSecundario>

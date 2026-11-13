@@ -162,8 +162,8 @@ export default function Encomendas({ perfil }: { perfil: Perfil }) {
                 direita={
                   <div className="flex items-center gap-3">
                     {e.status === "AGUARDANDO" && (
-                      <span className="text-xs text-stone-500">
-                        Código <span className="font-semibold text-stone-900">{e.codigo}</span>
+                      <span className="text-xs text-stone-500 dark:text-stone-400">
+                        Código <span className="font-semibold text-stone-900 dark:text-stone-100">{e.codigo}</span>
                       </span>
                     )}
                     <Badge tom={tomStatusEncomenda(e.status)}>{rotuloStatusEncomenda(e.status)}</Badge>
@@ -200,9 +200,9 @@ export default function Encomendas({ perfil }: { perfil: Perfil }) {
             className="absolute inset-0 bg-black/40"
             onClick={() => setRegistrar(false)}
           />
-          <div className="relative max-h-[88dvh] w-full max-w-md overflow-y-auto rounded-lg border border-[var(--cor-neutra)] bg-white p-6 shadow-xl">
-            <h3 className="text-base font-semibold text-stone-900">Registrar encomenda</h3>
-            <p className="mt-0.5 text-sm text-stone-500">
+          <div className="relative max-h-[88dvh] w-full max-w-md overflow-y-auto rounded-lg border border-[var(--cor-neutra)] bg-white dark:bg-stone-900 p-6 shadow-xl">
+            <h3 className="text-base font-semibold text-stone-900 dark:text-stone-100">Registrar encomenda</h3>
+            <p className="mt-0.5 text-sm text-stone-500 dark:text-stone-400">
               Um código de retirada é gerado automaticamente para o morador.
             </p>
             <div className="mt-4 space-y-3">
@@ -222,7 +222,7 @@ export default function Encomendas({ perfil }: { perfil: Perfil }) {
                 <select
                   value={form.categoria}
                   onChange={(e) => setForm({ ...form, categoria: e.target.value })}
-                  className="h-10 w-full rounded-md border border-[var(--cor-neutra-2)] bg-white px-3 text-sm outline-none focus:border-[var(--cor-tema-suave)]"
+                  className="h-10 w-full rounded-md border border-[var(--cor-neutra-2)] bg-white dark:bg-stone-900 px-3 text-sm outline-none focus:border-[var(--cor-tema-suave)]"
                 >
                   {Object.entries(ROTULO_CATEGORIA_ENCOMENDA).map(([k, v]) => (
                     <option key={k} value={k}>
@@ -233,7 +233,7 @@ export default function Encomendas({ perfil }: { perfil: Perfil }) {
                 <select
                   value={form.destinatarioId}
                   onChange={(e) => setForm({ ...form, destinatarioId: e.target.value })}
-                  className="h-10 w-full rounded-md border border-[var(--cor-neutra-2)] bg-white px-3 text-sm outline-none focus:border-[var(--cor-tema-suave)]"
+                  className="h-10 w-full rounded-md border border-[var(--cor-neutra-2)] bg-white dark:bg-stone-900 px-3 text-sm outline-none focus:border-[var(--cor-tema-suave)]"
                 >
                   <option value="">Destinatário…</option>
                   {moradores.map((m) => (
@@ -245,7 +245,7 @@ export default function Encomendas({ perfil }: { perfil: Perfil }) {
                 </select>
               </div>
               {erroForm && (
-                <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{erroForm}</p>
+                <p className="rounded-md bg-red-50 dark:bg-red-950/40 px-3 py-2 text-sm text-red-700 dark:text-red-300">{erroForm}</p>
               )}
             </div>
             <div className="mt-5 flex justify-end gap-2">
@@ -265,17 +265,17 @@ export default function Encomendas({ perfil }: { perfil: Perfil }) {
             className="absolute inset-0 bg-black/40"
             onClick={() => setQr(null)}
           />
-          <div className="relative max-h-[88dvh] w-full max-w-xs overflow-y-auto rounded-lg border border-[var(--cor-neutra)] bg-white p-6 text-center shadow-xl">
-            <h3 className="text-base font-semibold text-stone-900">{qr.descricao}</h3>
-            <p className="mt-0.5 text-xs text-stone-500">
+          <div className="relative max-h-[88dvh] w-full max-w-xs overflow-y-auto rounded-lg border border-[var(--cor-neutra)] bg-white dark:bg-stone-900 p-6 text-center shadow-xl">
+            <h3 className="text-base font-semibold text-stone-900 dark:text-stone-100">{qr.descricao}</h3>
+            <p className="mt-0.5 text-xs text-stone-500 dark:text-stone-400">
               Mostre este QR na portaria para liberar a retirada.
             </p>
             { }
             <img src={qr.imagem} alt={`QR Code de retirada da encomenda ${qr.descricao}`} className="mx-auto mt-3 h-56 w-56" />
-            <p className="mt-3 text-2xl font-bold tracking-[0.3em] tabular-nums text-stone-900">
+            <p className="mt-3 text-2xl font-bold tracking-[0.3em] tabular-nums text-stone-900 dark:text-stone-100">
               {qr.codigo}
             </p>
-            <p className="mt-1 text-[11px] uppercase tracking-[0.14em] text-stone-400">
+            <p className="mt-1 text-[11px] uppercase tracking-[0.14em] text-stone-400 dark:text-stone-500">
               Código de retirada
             </p>
             <div className="mt-4 flex justify-center">
@@ -292,11 +292,11 @@ export default function Encomendas({ perfil }: { perfil: Perfil }) {
             className="absolute inset-0 bg-black/40"
             onClick={() => setLiberar(null)}
           />
-          <div className="relative max-h-[88dvh] w-full max-w-sm overflow-y-auto rounded-lg border border-[var(--cor-neutra)] bg-white p-6 shadow-xl">
-            <h3 className="text-base font-semibold text-stone-900">Liberar retirada</h3>
-            <p className="mt-0.5 text-sm text-stone-500">
+          <div className="relative max-h-[88dvh] w-full max-w-sm overflow-y-auto rounded-lg border border-[var(--cor-neutra)] bg-white dark:bg-stone-900 p-6 shadow-xl">
+            <h3 className="text-base font-semibold text-stone-900 dark:text-stone-100">Liberar retirada</h3>
+            <p className="mt-0.5 text-sm text-stone-500 dark:text-stone-400">
               Confirme o código informado pelo morador de{" "}
-              <span className="font-medium text-stone-900">{liberar.destinatario.nome}</span>.
+              <span className="font-medium text-stone-900 dark:text-stone-100">{liberar.destinatario.nome}</span>.
             </p>
             <input
               inputMode="numeric"
@@ -306,7 +306,7 @@ export default function Encomendas({ perfil }: { perfil: Perfil }) {
               className="mt-4 h-11 w-full rounded-md border border-[var(--cor-neutra-2)] px-3 text-center text-lg font-semibold tracking-[0.3em] outline-none focus:border-[var(--cor-tema-suave)] focus:ring-2 focus:ring-[var(--cor-tema-suave)]/30"
             />
             {erroCodigo && (
-              <p className="mt-3 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{erroCodigo}</p>
+              <p className="mt-3 rounded-md bg-red-50 dark:bg-red-950/40 px-3 py-2 text-sm text-red-700 dark:text-red-300">{erroCodigo}</p>
             )}
             <div className="mt-5 flex justify-end gap-2">
               <BotaoSecundario onClick={() => setLiberar(null)}>Cancelar</BotaoSecundario>

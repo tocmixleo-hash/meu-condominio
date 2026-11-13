@@ -169,7 +169,7 @@ export default function Autorizacoes({ perfil }: { perfil: Perfil }) {
           {resultado && (
             <p
               className={`mt-2 rounded-md px-3 py-2 text-sm ${
-                resultado.ok ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"
+                resultado.ok ? "bg-green-50 dark:bg-green-950/40 text-green-700 dark:text-green-300" : "bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-300"
               }`}
             >
               {resultado.texto}
@@ -255,9 +255,9 @@ export default function Autorizacoes({ perfil }: { perfil: Perfil }) {
             className="absolute inset-0 bg-black/40"
             onClick={() => setAberto(false)}
           />
-          <div className="relative max-h-[88dvh] w-full max-w-md overflow-y-auto rounded-lg border border-[var(--cor-neutra)] bg-white p-6 shadow-xl">
-            <h3 className="text-base font-semibold text-stone-900">Autorizar acesso</h3>
-            <p className="mt-0.5 text-sm text-stone-500">
+          <div className="relative max-h-[88dvh] w-full max-w-md overflow-y-auto rounded-lg border border-[var(--cor-neutra)] bg-white dark:bg-stone-900 p-6 shadow-xl">
+            <h3 className="text-base font-semibold text-stone-900 dark:text-stone-100">Autorizar acesso</h3>
+            <p className="mt-0.5 text-sm text-stone-500 dark:text-stone-400">
               A portaria recebe a autorização imediatamente.
             </p>
             <div className="mt-4 space-y-3">
@@ -271,7 +271,7 @@ export default function Autorizacoes({ perfil }: { perfil: Perfil }) {
                 <select
                   value={form.tipo}
                   onChange={(e) => setForm({ ...form, tipo: e.target.value })}
-                  className={`${campo} bg-white`}
+                  className={`${campo} bg-white dark:bg-stone-900`}
                 >
                   <option value="VISITANTE">Visitante</option>
                   <option value="PRESTADOR">Prestador de serviço</option>
@@ -291,7 +291,7 @@ export default function Autorizacoes({ perfil }: { perfil: Perfil }) {
               />
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="mb-1 block text-[11px] font-semibold uppercase tracking-[0.12em] text-stone-500">
+                  <label className="mb-1 block text-[11px] font-semibold uppercase tracking-[0.12em] text-stone-500 dark:text-stone-400">
                     De
                   </label>
                   <input
@@ -299,11 +299,11 @@ export default function Autorizacoes({ perfil }: { perfil: Perfil }) {
                     min={hojeISO()}
                     value={form.dataInicio}
                     onChange={(e) => setForm({ ...form, dataInicio: e.target.value })}
-                    className={`${campo} bg-white`}
+                    className={`${campo} bg-white dark:bg-stone-900`}
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-[11px] font-semibold uppercase tracking-[0.12em] text-stone-500">
+                  <label className="mb-1 block text-[11px] font-semibold uppercase tracking-[0.12em] text-stone-500 dark:text-stone-400">
                     Até
                   </label>
                   <input
@@ -311,11 +311,11 @@ export default function Autorizacoes({ perfil }: { perfil: Perfil }) {
                     min={form.dataInicio || hojeISO()}
                     value={form.dataFim}
                     onChange={(e) => setForm({ ...form, dataFim: e.target.value })}
-                    className={`${campo} bg-white`}
+                    className={`${campo} bg-white dark:bg-stone-900`}
                   />
                 </div>
               </div>
-              {erro && <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{erro}</p>}
+              {erro && <p className="rounded-md bg-red-50 dark:bg-red-950/40 px-3 py-2 text-sm text-red-700 dark:text-red-300">{erro}</p>}
             </div>
             <div className="mt-5 flex justify-end gap-2">
               <BotaoSecundario onClick={() => setAberto(false)}>Cancelar</BotaoSecundario>
@@ -334,17 +334,17 @@ export default function Autorizacoes({ perfil }: { perfil: Perfil }) {
             className="absolute inset-0 bg-black/40"
             onClick={() => setQr(null)}
           />
-          <div className="relative max-h-[88dvh] w-full max-w-xs overflow-y-auto rounded-lg border border-[var(--cor-neutra)] bg-white p-6 text-center shadow-xl">
-            <h3 className="text-base font-semibold text-stone-900">{qr.nome}</h3>
-            <p className="mt-0.5 text-xs text-stone-500">
+          <div className="relative max-h-[88dvh] w-full max-w-xs overflow-y-auto rounded-lg border border-[var(--cor-neutra)] bg-white dark:bg-stone-900 p-6 text-center shadow-xl">
+            <h3 className="text-base font-semibold text-stone-900 dark:text-stone-100">{qr.nome}</h3>
+            <p className="mt-0.5 text-xs text-stone-500 dark:text-stone-400">
               Mostre este QR na portaria — a entrada é registrada na hora.
             </p>
             { }
             <img src={qr.imagem} alt={`QR Code de entrada de ${qr.nome}`} className="mx-auto mt-3 h-56 w-56" />
-            <p className="mt-3 text-2xl font-bold tracking-[0.3em] tabular-nums text-stone-900">
+            <p className="mt-3 text-2xl font-bold tracking-[0.3em] tabular-nums text-stone-900 dark:text-stone-100">
               {qr.codigo}
             </p>
-            <p className="mt-1 text-[11px] uppercase tracking-[0.14em] text-stone-400">
+            <p className="mt-1 text-[11px] uppercase tracking-[0.14em] text-stone-400 dark:text-stone-500">
               Código de entrada
             </p>
             <div className="mt-4 flex justify-center">

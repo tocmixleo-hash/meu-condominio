@@ -21,9 +21,11 @@ import {
   LogOut,
   Megaphone,
   Menu,
+  Moon,
   Package,
   Palette,
   ShieldCheck,
+  Sun,
   User,
   UserCog,
   Users,
@@ -31,6 +33,7 @@ import {
   X,
 } from "lucide-react";
 import { cssVarsDoTema, resolverTema } from "@/lib/tema";
+import { alternarTema, useTema } from "@/lib/preferencia-tema";
 import type { CondominioUI } from "@/components/portal/login-screen";
 
 export type ModuloId =
@@ -213,7 +216,7 @@ function SeletorCondominio({
           <ul
             role="listbox"
             aria-label="Condomínios disponíveis"
-            className="absolute inset-x-0 top-full z-20 mt-1 max-h-72 overflow-y-auto rounded-lg border border-[var(--cor-neutra)] bg-white py-1 shadow-xl"
+            className="absolute inset-x-0 top-full z-20 mt-1 max-h-72 overflow-y-auto rounded-lg border border-[var(--cor-neutra)] bg-white dark:bg-stone-900 py-1 shadow-xl"
           >
             {condominios.map((c) => {
               const ativo = c.id === condominio.id;
@@ -236,7 +239,7 @@ function SeletorCondominio({
                       className="h-7 w-7 shrink-0 rounded bg-white object-contain p-0.5"
                     />
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate text-sm font-medium text-stone-800">
+                      <span className="block truncate text-sm font-medium text-stone-800 dark:text-stone-100">
                         {c.nomeCurto || c.nome}
                       </span>
                       {ativo && (
@@ -302,21 +305,21 @@ function DialogoSenha({ aoFechar }: { aoFechar: () => void }) {
   }
 
   const campo =
-    "h-10 w-full rounded-lg border border-stone-200 bg-white px-3 text-sm text-stone-900 outline-none transition focus:border-stone-400 focus:ring-4 focus:ring-stone-400/10";
+    "h-10 w-full rounded-lg border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 px-3 text-sm text-stone-900 dark:text-stone-100 outline-none transition focus:border-stone-400 focus:ring-4 focus:ring-stone-400/10";
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
       <button aria-label="Fechar" className="absolute inset-0 bg-black/40" onClick={aoFechar} />
-      <div className="relative max-h-[88dvh] w-full max-w-sm overflow-y-auto rounded-xl bg-white p-6 shadow-2xl">
-        <h2 className="text-lg font-semibold text-stone-900">Alterar senha</h2>
+      <div className="relative max-h-[88dvh] w-full max-w-sm overflow-y-auto rounded-xl bg-white dark:bg-stone-900 p-6 shadow-2xl">
+        <h2 className="text-lg font-semibold text-stone-900 dark:text-stone-100">Alterar senha</h2>
         <div className="mt-4 space-y-3">
           <input type="password" autoComplete="current-password" placeholder="Senha atual" value={atual} onChange={(e) => setAtual(e.target.value)} className={campo} />
           <input type="password" autoComplete="new-password" placeholder="Nova senha (mín. 8 caracteres)" value={nova} onChange={(e) => setNova(e.target.value)} className={campo} />
           <input type="password" autoComplete="new-password" placeholder="Confirmar nova senha" value={confirma} onChange={(e) => setConfirma(e.target.value)} className={campo} />
-          {erro && <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{erro}</p>}
-          {ok && <p role="status" className="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-800">{ok}</p>}
+          {erro && <p role="alert" className="rounded-lg bg-red-50 dark:bg-red-950/40 px-3 py-2 text-sm text-red-700 dark:text-red-300">{erro}</p>}
+          {ok && <p role="status" className="rounded-lg bg-emerald-50 dark:bg-emerald-950/40 px-3 py-2 text-sm text-emerald-800 dark:text-emerald-300">{ok}</p>}
           <div className="flex items-center justify-end gap-2 pt-1">
-            <button onClick={aoFechar} className="rounded-lg border border-stone-200 px-4 py-2 text-sm font-medium text-stone-700 transition hover:bg-stone-50">
+            <button onClick={aoFechar} className="rounded-lg border border-stone-200 dark:border-stone-800 px-4 py-2 text-sm font-medium text-stone-700 dark:text-stone-200 transition hover:bg-stone-50">
               Fechar
             </button>
             <button onClick={salvar} disabled={enviando} className="flex items-center gap-2 rounded-lg bg-[var(--cor-tema)] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[var(--cor-tema-botao-hover)] disabled:opacity-60">
@@ -374,26 +377,26 @@ function DialogoSimulacao({
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
       <button aria-label="Fechar" className="absolute inset-0 bg-black/40" onClick={aoFechar} />
-      <div className="relative flex max-h-[85dvh] w-full max-w-lg flex-col overflow-hidden rounded-xl bg-white shadow-2xl">
-        <div className="border-b border-stone-100 px-6 py-4">
-          <h2 className="flex items-center gap-2 text-lg font-semibold text-stone-900">
-            <Eye className="h-5 w-5 text-stone-500" /> Simular perfis
+      <div className="relative flex max-h-[85dvh] w-full max-w-lg flex-col overflow-hidden rounded-xl bg-white dark:bg-stone-900 shadow-2xl">
+        <div className="border-b border-stone-100 dark:border-stone-800 px-6 py-4">
+          <h2 className="flex items-center gap-2 text-lg font-semibold text-stone-900 dark:text-stone-100">
+            <Eye className="h-5 w-5 text-stone-500 dark:text-stone-400" /> Simular perfis
           </h2>
-          <p className="mt-1 text-sm text-stone-500">
+          <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">
             Entre no lugar de cada perfil para testar exatamente o que ele vê e pode fazer neste
             condomínio. Seus poderes de administrador ficam suspensos até encerrar a simulação.
           </p>
         </div>
         <div className="flex-1 overflow-y-auto px-6 py-4">
           {carregando && (
-            <p className="flex items-center gap-2 py-6 text-sm text-stone-500">
+            <p className="flex items-center gap-2 py-6 text-sm text-stone-500 dark:text-stone-400">
               <LoaderCircle className="h-4 w-4 animate-spin" /> Carregando perfis…
             </p>
           )}
-          {erro && <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{erro}</p>}
+          {erro && <p role="alert" className="rounded-lg bg-red-50 dark:bg-red-950/40 px-3 py-2 text-sm text-red-700 dark:text-red-300">{erro}</p>}
           {!carregando && !erro && (
             <>
-              <p className="text-xs font-semibold uppercase tracking-wide text-stone-400">Perfis clássicos</p>
+              <p className="text-xs font-semibold uppercase tracking-wide text-stone-400 dark:text-stone-500">Perfis clássicos</p>
               <div className="mt-2 grid gap-2 sm:grid-cols-2">
                 {perfis.map((p) => {
                   const Icone = ICONE[p.perfil] ?? User;
@@ -401,22 +404,22 @@ function DialogoSimulacao({
                     <button
                       key={p.perfil}
                       onClick={() => aoSimular(p.perfil)}
-                      className="rounded-xl border border-stone-200 px-4 py-3 text-left transition hover:border-[var(--cor-tema)] hover:bg-[var(--cor-tema-suave,#faf9f7)]"
+                      className="rounded-xl border border-stone-200 dark:border-stone-800 px-4 py-3 text-left transition hover:border-[var(--cor-tema)] hover:bg-[var(--cor-tema-suave,#faf9f7)]"
                     >
-                      <span className="flex items-center gap-2 text-sm font-semibold text-stone-900">
-                        <Icone className="h-4 w-4 text-stone-500" /> {p.rotulo}
+                      <span className="flex items-center gap-2 text-sm font-semibold text-stone-900 dark:text-stone-100">
+                        <Icone className="h-4 w-4 text-stone-500 dark:text-stone-400" /> {p.rotulo}
                       </span>
-                      <span className="mt-1 block text-xs leading-relaxed text-stone-500">{p.descricao}</span>
+                      <span className="mt-1 block text-xs leading-relaxed text-stone-500 dark:text-stone-400">{p.descricao}</span>
                     </button>
                   );
                 })}
               </div>
 
-              <p className="mt-5 text-xs font-semibold uppercase tracking-wide text-stone-400">
+              <p className="mt-5 text-xs font-semibold uppercase tracking-wide text-stone-400 dark:text-stone-500">
                 Funções personalizadas deste condomínio
               </p>
               {funcoes.length === 0 ? (
-                <p className="mt-2 text-sm text-stone-500">
+                <p className="mt-2 text-sm text-stone-500 dark:text-stone-400">
                   Nenhuma função personalizada criada ainda — cadastre no menu Funções.
                 </p>
               ) : (
@@ -425,12 +428,12 @@ function DialogoSimulacao({
                     <button
                       key={f.id}
                       onClick={() => aoSimular("FUNCAO", f.id)}
-                      className="rounded-xl border border-stone-200 px-4 py-3 text-left transition hover:border-[var(--cor-tema)] hover:bg-[var(--cor-tema-suave,#faf9f7)]"
+                      className="rounded-xl border border-stone-200 dark:border-stone-800 px-4 py-3 text-left transition hover:border-[var(--cor-tema)] hover:bg-[var(--cor-tema-suave,#faf9f7)]"
                     >
-                      <span className="flex items-center gap-2 text-sm font-semibold text-stone-900">
-                        <UserCog className="h-4 w-4 text-stone-500" /> {f.nome}
+                      <span className="flex items-center gap-2 text-sm font-semibold text-stone-900 dark:text-stone-100">
+                        <UserCog className="h-4 w-4 text-stone-500 dark:text-stone-400" /> {f.nome}
                       </span>
-                      <span className="mt-1 block truncate text-xs text-stone-500">
+                      <span className="mt-1 block truncate text-xs text-stone-500 dark:text-stone-400">
                         {f.rotuloModulos || "Somente o Início"}
                       </span>
                     </button>
@@ -440,8 +443,8 @@ function DialogoSimulacao({
             </>
           )}
         </div>
-        <div className="flex justify-end border-t border-stone-100 px-6 py-3">
-          <button onClick={aoFechar} className="rounded-lg border border-stone-200 px-4 py-2 text-sm font-medium text-stone-700 transition hover:bg-stone-50">
+        <div className="flex justify-end border-t border-stone-100 dark:border-stone-800 px-6 py-3">
+          <button onClick={aoFechar} className="rounded-lg border border-stone-200 dark:border-stone-800 px-4 py-2 text-sm font-medium text-stone-700 dark:text-stone-200 transition hover:bg-stone-50">
             Fechar
           </button>
         </div>
@@ -500,8 +503,10 @@ export default function AppShell({
         ]
       : MENUS[perfil] ?? MENUS.MORADOR;
   const IconePerfil = ICONE_PERFIL[perfil] ?? User;
+  const { escuro: temaEscuro } = useTema();
   const temaVars = cssVarsDoTema(
     resolverTema(condominio.slug, condominio.corTema, condominio),
+    temaEscuro,
   ) as React.CSSProperties;
 
   function trocar(m: ModuloId) {
@@ -562,7 +567,7 @@ export default function AppShell({
   // espaço vazio do topo, padrão dos grandes sites. Um único bloco serve
   // desktop e celular — o cabeçalho é compartilhado.
   const itemConta =
-    "flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-stone-700 transition-colors hover:bg-stone-100";
+    "flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-stone-700 dark:text-stone-200 transition-colors hover:bg-stone-100";
   const conta = (
     <div data-tour="usuario" className="relative">
       <button
@@ -583,11 +588,11 @@ export default function AppShell({
         >
           <IconePerfil className="h-4 w-4" />
         </span>
-        <span className="hidden max-w-[10rem] truncate text-sm font-medium text-stone-700 sm:block">
+        <span className="hidden max-w-[10rem] truncate text-sm font-medium text-stone-700 dark:text-stone-200 sm:block">
           {nome}
         </span>
         <ChevronDown
-          className={`h-4 w-4 text-stone-400 transition-transform duration-200 ${
+          className={`h-4 w-4 text-stone-400 dark:text-stone-500 transition-transform duration-200 ${
             contaAberta ? "rotate-180" : ""
           }`}
         />
@@ -601,9 +606,9 @@ export default function AppShell({
           />
           <div
             role="menu"
-            className="animar-aparecer absolute right-0 top-full z-50 mt-2 w-64 overflow-hidden rounded-xl border border-[var(--cor-neutra)] bg-white shadow-xl"
+            className="animar-aparecer absolute right-0 top-full z-50 mt-2 w-64 overflow-hidden rounded-xl border border-[var(--cor-neutra)] bg-white dark:bg-stone-900 shadow-xl"
           >
-            <div className="flex items-center gap-3 border-b border-stone-100 bg-stone-50/70 px-4 py-3">
+            <div className="flex items-center gap-3 border-b border-stone-100 dark:border-stone-800 bg-stone-50/70 dark:bg-stone-900/70 px-4 py-3">
               <span
                 aria-hidden
                 className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-[var(--cor-fundo)] ${
@@ -613,8 +618,8 @@ export default function AppShell({
                 <IconePerfil className="h-[18px] w-[18px]" />
               </span>
               <div className="min-w-0">
-                <p className="truncate text-sm font-medium text-stone-900">{nome}</p>
-                <p className="truncate text-xs text-stone-500">
+                <p className="truncate text-sm font-medium text-stone-900 dark:text-stone-100">{nome}</p>
+                <p className="truncate text-xs text-stone-500 dark:text-stone-400">
                   {perfil === "FUNCAO" && funcaoNome ? funcaoNome : ROTULO_PERFIL[perfil] ?? perfil}
                   {simulando ? " · simulado" : ""}
                   {unidade ? ` · Unidade ${unidade.bloco}-${unidade.numero}` : ""}
@@ -630,7 +635,7 @@ export default function AppShell({
                 }}
                 className={itemConta}
               >
-                <KeyRound className="h-4 w-4 text-stone-400" /> Alterar senha
+                <KeyRound className="h-4 w-4 text-stone-400 dark:text-stone-500" /> Alterar senha
               </button>
               <button
                 role="menuitem"
@@ -640,7 +645,7 @@ export default function AppShell({
                 }}
                 className={itemConta}
               >
-                <GraduationCap className="h-4 w-4 text-stone-400" /> Rever tutorial
+                <GraduationCap className="h-4 w-4 text-stone-400 dark:text-stone-500" /> Rever tutorial
               </button>
               {perfil === "PLATAFORMA" && !simulando && aoSimular && (
                 <button
@@ -651,13 +656,28 @@ export default function AppShell({
                   }}
                   className={itemConta}
                 >
-                  <Eye className="h-4 w-4 text-stone-400" /> Simular perfis
+                  <Eye className="h-4 w-4 text-stone-400 dark:text-stone-500" /> Simular perfis
                 </button>
               )}
               <button
                 role="menuitem"
+                onClick={() => {
+                  setContaAberta(false);
+                  alternarTema();
+                }}
+                className={itemConta}
+              >
+                {temaEscuro ? (
+                  <Sun className="h-4 w-4 text-stone-400 dark:text-stone-500" />
+                ) : (
+                  <Moon className="h-4 w-4 text-stone-400 dark:text-stone-500" />
+                )}
+                {temaEscuro ? "Tema claro" : "Tema escuro"}
+              </button>
+              <button
+                role="menuitem"
                 onClick={aoSair}
-                className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-red-600 transition-colors hover:bg-red-50 hover:text-red-700"
+                className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-red-600 dark:text-red-400 transition-colors hover:bg-red-50 dark:hover:bg-red-950/40 hover:text-red-700 dark:hover:text-red-300"
               >
                 <LogOut className="h-4 w-4" /> Sair da conta
               </button>
@@ -705,7 +725,7 @@ export default function AppShell({
           que os dois lugares sempre digam a mesma coisa. */}
       <nav
         aria-label="Navegação principal"
-        className="fixed inset-x-0 bottom-0 z-40 border-t border-[var(--cor-neutra)] bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden"
+        className="fixed inset-x-0 bottom-0 z-40 border-t border-[var(--cor-neutra)] bg-white/95 dark:bg-stone-900/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden"
       >
         <div className="mx-auto flex max-w-lg items-stretch">
           {itens.slice(0, 4).map((item) => {
@@ -719,11 +739,11 @@ export default function AppShell({
                 className="flex flex-1 flex-col items-center gap-0.5 px-1 pb-1.5 pt-2"
               >
                 <Icone
-                  className={`h-5 w-5 ${ativo ? "text-[var(--cor-tema)]" : "text-stone-400"}`}
+                  className={`h-5 w-5 ${ativo ? "text-[var(--cor-tema)]" : "text-stone-400 dark:text-stone-500"}`}
                 />
                 <span
                   className={`max-w-full truncate text-[10px] font-medium leading-none ${
-                    ativo ? "text-[var(--cor-tema)]" : "text-stone-500"
+                    ativo ? "text-[var(--cor-tema)]" : "text-stone-500 dark:text-stone-400"
                   }`}
                 >
                   {item.rotulo}
@@ -743,8 +763,8 @@ export default function AppShell({
             data-tour="botao-menu"
             className="flex flex-1 flex-col items-center gap-0.5 px-1 pb-1.5 pt-2"
           >
-            <Menu className="h-5 w-5 text-stone-400" />
-            <span className="max-w-full truncate text-[10px] font-medium leading-none text-stone-500">
+            <Menu className="h-5 w-5 text-stone-400 dark:text-stone-500" />
+            <span className="max-w-full truncate text-[10px] font-medium leading-none text-stone-500 dark:text-stone-400">
               Menu
             </span>
             <span aria-hidden className="mt-0.5 h-0.5 w-6 rounded-full bg-transparent" />
@@ -773,7 +793,7 @@ export default function AppShell({
         {/* Barra superior única: no celular mostra a marca do condomínio;
             no desktop fica vazia à esquerda (a marca está na sidebar) e
             recebe o menu da conta no canto superior direito */}
-        <header className="relative z-30 flex items-center gap-3 border-b border-[var(--cor-neutra)] bg-white px-4 py-2.5 sm:px-6">
+        <header className="relative z-30 flex items-center gap-3 border-b border-[var(--cor-neutra)] bg-white dark:bg-stone-900 px-4 py-2.5 sm:px-6">
           <div className="flex min-w-0 flex-1 items-center gap-2.5 md:hidden">
             <Image
               src={condominio.logoCabecalho || condominio.logoMenu || condominio.logo}
@@ -783,14 +803,14 @@ export default function AppShell({
               className="h-8 w-auto object-contain"
               unoptimized={!!(condominio.logoCabecalho || condominio.logoMenu)}
             />
-            <span className="truncate text-xs text-stone-500">{condominio.nome}</span>
+            <span className="truncate text-xs text-stone-500 dark:text-stone-400">{condominio.nome}</span>
           </div>
           <div aria-hidden className="hidden flex-1 md:block" />
           {conta}
         </header>
         {/* Banner da simulação — sempre visível enquanto durar */}
         {simulando && (
-          <div className="flex items-center gap-2.5 border-b border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-900">
+          <div className="flex items-center gap-2.5 border-b border-amber-200 bg-amber-50 dark:border-amber-900/60 dark:bg-amber-950/40 px-4 py-2 text-sm text-amber-900 dark:text-amber-200">
             <Eye className="h-4 w-4 shrink-0" />
             <p className="min-w-0 flex-1 truncate">
               Simulando <strong>{simulando.funcaoNome ?? ROTULO_PERFIL[simulando.perfil as Perfil] ?? simulando.perfil}</strong>
@@ -799,7 +819,7 @@ export default function AppShell({
             {aoEncerrarSimulacao && (
               <button
                 onClick={aoEncerrarSimulacao}
-                className="shrink-0 rounded-md border border-amber-300 bg-white px-2.5 py-1 text-xs font-semibold text-amber-900 transition hover:bg-amber-100"
+                className="shrink-0 rounded-md border border-amber-300 bg-white dark:border-amber-900/60 dark:bg-stone-900 px-2.5 py-1 text-xs font-semibold text-amber-900 dark:text-amber-300 transition hover:bg-amber-100 dark:hover:bg-stone-800"
               >
                 Encerrar simulação
               </button>

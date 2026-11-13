@@ -172,9 +172,9 @@ export default function Ocorrencias({ perfil }: { perfil: Perfil }) {
       {aberto && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <button aria-label="Fechar" className="absolute inset-0 bg-black/40" onClick={() => setAberto(false)} />
-          <div className="relative max-h-[88dvh] w-full max-w-md overflow-y-auto rounded-lg border border-[var(--cor-neutra)] bg-white p-6 shadow-xl">
-            <h3 className="text-base font-semibold text-stone-900">Registrar ocorrência</h3>
-            <p className="mt-0.5 text-sm text-stone-500">
+          <div className="relative max-h-[88dvh] w-full max-w-md overflow-y-auto rounded-lg border border-[var(--cor-neutra)] bg-white dark:bg-stone-900 p-6 shadow-xl">
+            <h3 className="text-base font-semibold text-stone-900 dark:text-stone-100">Registrar ocorrência</h3>
+            <p className="mt-0.5 text-sm text-stone-500 dark:text-stone-400">
               Descreva o problema — quanto mais claro, mais rápido o atendimento.
             </p>
             <div className="mt-4 space-y-3">
@@ -188,7 +188,7 @@ export default function Ocorrencias({ perfil }: { perfil: Perfil }) {
                 <select
                   value={form.categoria}
                   onChange={(e) => setForm({ ...form, categoria: e.target.value })}
-                  className={`${campo} bg-white`}
+                  className={`${campo} bg-white dark:bg-stone-900`}
                 >
                   {Object.entries(ROTULO_CATEGORIA_OCORRENCIA).map(([k, v]) => (
                     <option key={k} value={k}>
@@ -199,7 +199,7 @@ export default function Ocorrencias({ perfil }: { perfil: Perfil }) {
                 <select
                   value={form.prioridade}
                   onChange={(e) => setForm({ ...form, prioridade: e.target.value })}
-                  className={`${campo} bg-white`}
+                  className={`${campo} bg-white dark:bg-stone-900`}
                 >
                   {Object.entries(ROTULO_PRIORIDADE_OCORRENCIA).map(([k, v]) => (
                     <option key={k} value={k}>
@@ -221,7 +221,7 @@ export default function Ocorrencias({ perfil }: { perfil: Perfil }) {
                 onChange={(e) => setForm({ ...form, descricao: e.target.value })}
                 className="w-full rounded-md border border-[var(--cor-neutra-2)] px-3 py-2 text-sm outline-none focus:border-[var(--cor-tema-suave)] focus:ring-2 focus:ring-[var(--cor-tema-suave)]/30"
               />
-              {erro && <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{erro}</p>}
+              {erro && <p className="rounded-md bg-red-50 dark:bg-red-950/40 px-3 py-2 text-sm text-red-700 dark:text-red-300">{erro}</p>}
             </div>
             <div className="mt-5 flex justify-end gap-2">
               <BotaoSecundario onClick={() => setAberto(false)}>Cancelar</BotaoSecundario>
@@ -240,10 +240,10 @@ export default function Ocorrencias({ perfil }: { perfil: Perfil }) {
             className="absolute inset-0 bg-black/40"
             onClick={() => setAtendimento(null)}
           />
-          <div className="relative max-h-[88dvh] w-full max-w-md overflow-y-auto rounded-lg border border-[var(--cor-neutra)] bg-white p-6 shadow-xl">
-            <h3 className="text-base font-semibold text-stone-900">{atendimento.titulo}</h3>
-            <p className="mt-1 text-sm text-stone-600">{atendimento.descricao}</p>
-            <p className="mt-1 text-xs text-stone-400">
+          <div className="relative max-h-[88dvh] w-full max-w-md overflow-y-auto rounded-lg border border-[var(--cor-neutra)] bg-white dark:bg-stone-900 p-6 shadow-xl">
+            <h3 className="text-base font-semibold text-stone-900 dark:text-stone-100">{atendimento.titulo}</h3>
+            <p className="mt-1 text-sm text-stone-600 dark:text-stone-400">{atendimento.descricao}</p>
+            <p className="mt-1 text-xs text-stone-400 dark:text-stone-500">
               {!ehMorador && atendimento.abertaPor.unidade
                 ? `Un. ${atendimento.abertaPor.unidade.bloco}-${atendimento.abertaPor.unidade.numero} · `
                 : ""}
@@ -257,7 +257,7 @@ export default function Ocorrencias({ perfil }: { perfil: Perfil }) {
                 onChange={(e) => setResolucao(e.target.value)}
                 className="w-full rounded-md border border-[var(--cor-neutra-2)] px-3 py-2 text-sm outline-none focus:border-[var(--cor-tema-suave)] focus:ring-2 focus:ring-[var(--cor-tema-suave)]/30"
               />
-              {erro && <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{erro}</p>}
+              {erro && <p className="rounded-md bg-red-50 dark:bg-red-950/40 px-3 py-2 text-sm text-red-700 dark:text-red-300">{erro}</p>}
             </div>
             <div className="mt-5 flex justify-end gap-2">
               <BotaoSecundario onClick={() => setAtendimento(null)}>Fechar</BotaoSecundario>

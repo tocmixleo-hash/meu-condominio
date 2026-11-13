@@ -241,15 +241,15 @@ export default function Comunicados({ perfil }: { perfil: Perfil }) {
                       {c.emoji}
                     </span>
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium text-stone-900">{c.titulo}</p>
-                      <p className="mt-0.5 text-xs text-stone-400">
+                      <p className="text-sm font-medium text-stone-900 dark:text-stone-100">{c.titulo}</p>
+                      <p className="mt-0.5 text-xs text-stone-400 dark:text-stone-500">
                         {ROTULO_CATEGORIA_CAMPANHA[c.categoria] ?? c.categoria} ·{" "}
                         {periodoCampanha(c)}
                         {c.autor?.nome ? ` · ${c.autor.nome}` : ""}
                       </p>
-                      <p className="mt-1.5 text-sm leading-relaxed text-stone-600">{c.mensagem}</p>
+                      <p className="mt-1.5 text-sm leading-relaxed text-stone-600 dark:text-stone-400">{c.mensagem}</p>
                       {c.descricao && (
-                        <p className="mt-1 whitespace-pre-line text-xs leading-relaxed text-stone-500">
+                        <p className="mt-1 whitespace-pre-line text-xs leading-relaxed text-stone-500 dark:text-stone-400">
                           {c.descricao}
                         </p>
                       )}
@@ -307,8 +307,8 @@ export default function Comunicados({ perfil }: { perfil: Perfil }) {
               <div key={c.id} className="py-4">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-stone-900">{c.titulo}</p>
-                    <p className="mt-0.5 text-xs text-stone-400">
+                    <p className="text-sm font-medium text-stone-900 dark:text-stone-100">{c.titulo}</p>
+                    <p className="mt-0.5 text-xs text-stone-400 dark:text-stone-500">
                       {ROTULO_CATEGORIA_COMUNICADO[c.categoria] ?? c.categoria} · {c.autor.nome} ·{" "}
                       {dataHoraCurta(c.criadoEm)}
                     </p>
@@ -321,7 +321,7 @@ export default function Comunicados({ perfil }: { perfil: Perfil }) {
                     )}
                   </div>
                 </div>
-                <p className="mt-2 text-sm leading-relaxed text-stone-600">{c.conteudo}</p>
+                <p className="mt-2 text-sm leading-relaxed text-stone-600 dark:text-stone-400">{c.conteudo}</p>
               </div>
             ))}
           </Lista>
@@ -336,17 +336,17 @@ export default function Comunicados({ perfil }: { perfil: Perfil }) {
             className="absolute inset-0 bg-black/40"
             onClick={() => setCampanhaAberta(false)}
           />
-          <div className="relative max-h-[90dvh] w-full max-w-lg overflow-y-auto rounded-xl border border-[var(--cor-neutra)] bg-white p-6 shadow-xl">
-            <h3 className="text-base font-semibold text-stone-900">
+          <div className="relative max-h-[90dvh] w-full max-w-lg overflow-y-auto rounded-xl border border-[var(--cor-neutra)] bg-white dark:bg-stone-900 p-6 shadow-xl">
+            <h3 className="text-base font-semibold text-stone-900 dark:text-stone-100">
               {editando ? "Editar campanha" : "Nova campanha em destaque"}
             </h3>
-            <p className="mt-0.5 text-sm text-stone-500">
+            <p className="mt-0.5 text-sm text-stone-500 dark:text-stone-400">
               Divulgada com destaque no painel inicial para todos os moradores.
             </p>
             <div className="mt-4 space-y-3">
               {/* Emblema */}
               <div>
-                <p className="mb-1.5 text-xs font-medium text-stone-500">Emblema da campanha</p>
+                <p className="mb-1.5 text-xs font-medium text-stone-500 dark:text-stone-400">Emblema da campanha</p>
                 <div className="flex flex-wrap gap-1.5">
                   {EMOJIS_CAMPANHA.map((e) => (
                     <button
@@ -358,7 +358,7 @@ export default function Comunicados({ perfil }: { perfil: Perfil }) {
                       className={`flex h-9 w-9 items-center justify-center rounded-lg border text-lg transition ${
                         formCampanha.emoji === e
                           ? "border-[var(--cor-tema)] bg-[var(--cor-tema-a06)]"
-                          : "border-[var(--cor-neutra-2)] bg-white hover:border-[var(--cor-tema-suave)]"
+                          : "border-[var(--cor-neutra-2)] bg-white dark:bg-stone-900 hover:border-[var(--cor-tema-suave)]"
                       }`}
                     >
                       {e}
@@ -392,7 +392,7 @@ export default function Comunicados({ perfil }: { perfil: Perfil }) {
                 <select
                   value={formCampanha.categoria}
                   onChange={(e) => setFormCampanha({ ...formCampanha, categoria: e.target.value })}
-                  className="h-10 w-full rounded-md border border-[var(--cor-neutra-2)] bg-white px-3 text-sm outline-none focus:border-[var(--cor-tema-suave)]"
+                  className="h-10 w-full rounded-md border border-[var(--cor-neutra-2)] bg-white dark:bg-stone-900 px-3 text-sm outline-none focus:border-[var(--cor-tema-suave)]"
                 >
                   {Object.entries(ROTULO_CATEGORIA_CAMPANHA).map(([k, v]) => (
                     <option key={k} value={k}>
@@ -406,23 +406,23 @@ export default function Comunicados({ perfil }: { perfil: Perfil }) {
                     aria-label="Início da veiculação"
                     value={formCampanha.inicioEm}
                     onChange={(e) => setFormCampanha({ ...formCampanha, inicioEm: e.target.value })}
-                    className="h-10 w-full rounded-md border border-[var(--cor-neutra-2)] bg-white px-2 text-xs outline-none focus:border-[var(--cor-tema-suave)]"
+                    className="h-10 w-full rounded-md border border-[var(--cor-neutra-2)] bg-white dark:bg-stone-900 px-2 text-xs outline-none focus:border-[var(--cor-tema-suave)]"
                   />
-                  <span className="text-xs text-stone-400">até</span>
+                  <span className="text-xs text-stone-400 dark:text-stone-500">até</span>
                   <input
                     type="date"
                     aria-label="Encerramento da veiculação"
                     value={formCampanha.fimEm}
                     onChange={(e) => setFormCampanha({ ...formCampanha, fimEm: e.target.value })}
-                    className="h-10 w-full rounded-md border border-[var(--cor-neutra-2)] bg-white px-2 text-xs outline-none focus:border-[var(--cor-tema-suave)]"
+                    className="h-10 w-full rounded-md border border-[var(--cor-neutra-2)] bg-white dark:bg-stone-900 px-2 text-xs outline-none focus:border-[var(--cor-tema-suave)]"
                   />
                 </div>
               </div>
-              <p className="text-xs text-stone-400">
+              <p className="text-xs text-stone-400 dark:text-stone-500">
                 Período opcional — sem datas, a campanha fica em veiculação até ser pausada ou excluída.
               </p>
               {erroCampanha && (
-                <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{erroCampanha}</p>
+                <p className="rounded-md bg-red-50 dark:bg-red-950/40 px-3 py-2 text-sm text-red-700 dark:text-red-300">{erroCampanha}</p>
               )}
             </div>
             <div className="mt-5 flex justify-end gap-2">
@@ -444,9 +444,9 @@ export default function Comunicados({ perfil }: { perfil: Perfil }) {
             className="absolute inset-0 bg-black/40"
             onClick={() => setAberto(false)}
           />
-          <div className="relative max-h-[88dvh] w-full max-w-lg overflow-y-auto rounded-lg border border-[var(--cor-neutra)] bg-white p-6 shadow-xl">
-            <h3 className="text-base font-semibold text-stone-900">Publicar comunicado</h3>
-            <p className="mt-0.5 text-sm text-stone-500">
+          <div className="relative max-h-[88dvh] w-full max-w-lg overflow-y-auto rounded-lg border border-[var(--cor-neutra)] bg-white dark:bg-stone-900 p-6 shadow-xl">
+            <h3 className="text-base font-semibold text-stone-900 dark:text-stone-100">Publicar comunicado</h3>
+            <p className="mt-0.5 text-sm text-stone-500 dark:text-stone-400">
               Visível para todos os moradores e funcionários.
             </p>
             <div className="mt-4 space-y-3">
@@ -467,7 +467,7 @@ export default function Comunicados({ perfil }: { perfil: Perfil }) {
                 <select
                   value={form.categoria}
                   onChange={(e) => setForm({ ...form, categoria: e.target.value })}
-                  className="h-10 w-full rounded-md border border-[var(--cor-neutra-2)] bg-white px-3 text-sm outline-none focus:border-[var(--cor-tema-suave)]"
+                  className="h-10 w-full rounded-md border border-[var(--cor-neutra-2)] bg-white dark:bg-stone-900 px-3 text-sm outline-none focus:border-[var(--cor-tema-suave)]"
                 >
                   {Object.entries(ROTULO_CATEGORIA_COMUNICADO).map(([k, v]) => (
                     <option key={k} value={k}>
@@ -478,13 +478,13 @@ export default function Comunicados({ perfil }: { perfil: Perfil }) {
                 <select
                   value={form.prioridade}
                   onChange={(e) => setForm({ ...form, prioridade: e.target.value })}
-                  className="h-10 w-full rounded-md border border-[var(--cor-neutra-2)] bg-white px-3 text-sm outline-none focus:border-[var(--cor-tema-suave)]"
+                  className="h-10 w-full rounded-md border border-[var(--cor-neutra-2)] bg-white dark:bg-stone-900 px-3 text-sm outline-none focus:border-[var(--cor-tema-suave)]"
                 >
                   <option value="NORMAL">Prioridade normal</option>
                   <option value="ALTA">Prioridade alta</option>
                 </select>
               </div>
-              {erro && <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{erro}</p>}
+              {erro && <p className="rounded-md bg-red-50 dark:bg-red-950/40 px-3 py-2 text-sm text-red-700 dark:text-red-300">{erro}</p>}
             </div>
             <div className="mt-5 flex justify-end gap-2">
               <BotaoSecundario onClick={() => setAberto(false)}>Cancelar</BotaoSecundario>
