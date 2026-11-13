@@ -267,8 +267,11 @@ export default function Dashboard({
         <>
           <LinhaIndicadores itens={dados.indicadores} className="-mt-2" />
 
-          {/* Seções em duas colunas — a tela inicial cabe sem rolagem no desktop */}
-          <div className="grid gap-x-10 gap-y-4 lg:grid-cols-2">
+          {/* Seções em duas colunas — a tela inicial cabe sem rolagem no desktop.
+              min-w-0 nos itens: sem isso, linhas com título truncável propagam
+              a largura intrínseca (min-content) para a coluna do grid e o
+              conteúdo estoura/corta na borda direita no celular. */}
+          <div className="grid gap-x-10 gap-y-4 lg:grid-cols-2 [&>*]:min-w-0">
           {/* Morador */}
           {dados.perfil === "MORADOR" && (
             <>

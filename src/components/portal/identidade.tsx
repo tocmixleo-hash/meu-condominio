@@ -298,16 +298,16 @@ export default function Identidade({
               <div className="rounded px-2 py-1 text-[10px] text-[var(--cor-clara-a85)]">Reservas</div>
             </div>
           </div>
-          <div className="flex-1 bg-[var(--cor-fundo)] p-4">
+          <div className="min-w-0 flex-1 bg-[var(--cor-fundo)] p-4">
             <p className="text-sm font-semibold text-[var(--cor-fg)]">Tela inicial</p>
             <p className="mt-1 text-xs text-[var(--cor-fg-suave)]">
               Botões, menu e focos usam a paleta abaixo.
             </p>
-            <div className="mt-3 flex items-center gap-2">
+            <div className="mt-3 flex flex-wrap items-center gap-2">
               <button className="rounded-lg bg-[var(--cor-tema)] px-3 py-1.5 text-xs font-semibold text-white">
                 Botão principal
               </button>
-              <div className="h-9 w-40 rounded-lg border border-[var(--cor-tema-suave)] focus:outline-none focus:ring-2 focus:ring-[var(--cor-tema-suave)]" />
+              <div className="h-9 w-40 min-w-0 max-w-full rounded-lg border border-[var(--cor-tema-suave)] focus:outline-none focus:ring-2 focus:ring-[var(--cor-tema-suave)]" />
             </div>
           </div>
         </div>

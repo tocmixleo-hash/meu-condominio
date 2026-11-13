@@ -45,8 +45,11 @@ export const viewport: Viewport = {
 
 // Pré-pintura do tema: resolve a preferência (localStorage → sistema) e aplica
 // a classe .dark no <html> ANTES da primeira pintura — sem flash claro→escuro.
+// A tela de login é sempre clara, então o escuro só é pré-aplicado quando há
+// marca de sessão prévia (mc-logado, gravada pelo portal) — assim o login
+// nunca pinta escuro e volta aclarado (o componente devolve o tema ao sair).
 // Deve rodar inline no head; React só hidrata por cima.
-const INICIAR_TEMA = `(function(){try{var p=localStorage.getItem('tema-preferencia');var e=p==='escuro'||((!p||p==='sistema')&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.classList.toggle('dark',e);}catch(_){}})()`;
+const INICIAR_TEMA = `(function(){try{var p=localStorage.getItem('tema-preferencia');var l=localStorage.getItem('mc-logado')==='1';var e=l&&(p==='escuro'||((!p||p==='sistema')&&window.matchMedia('(prefers-color-scheme: dark)').matches));document.documentElement.classList.toggle('dark',e);}catch(_){}})()`;
 
 export default function RootLayout({
   children,

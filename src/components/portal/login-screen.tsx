@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import {
   Building2,
   CalendarCheck,
@@ -193,6 +193,10 @@ const FALLBACK: CondominioUI = {
   foto: "/fotos/parque-california.jpg",
 };
 
+// useLayoutEffect roda antes da pintura no cliente (sem flash de tema);
+// no servidor o React avisa — por isso o alias isomórfico padrão.
+const useEfeitoAntesDaPintura = typeof window !== "undefined" ? useLayoutEffect : useEffect;
+
 export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => void }) {
   const [condominios, setCondominios] = useState<CondominioUI[]>([FALLBACK]);
   const [condo, setCondo] = useState<CondominioUI>(FALLBACK);
@@ -214,6 +218,25 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
   const [emailRecuperacao, setEmailRecuperacao] = useState("");
   const [avisoRecuperacao, setAvisoRecuperacao] = useState("");
   const [enviandoRecuperacao, setEnviandoRecuperacao] = useState(false);
+
+  // A tela de login é sempre clara — vitrine da marca sobre a fotografia.
+  // A preferência escuro do usuário continua valendo dentro do portal:
+  // ao desmontar (login feito ou sessão restaurada), devolvemos o tema
+  // guardado. A preferência em si não é alterada.
+  useEfeitoAntesDaPintura(() => {
+    document.documentElement.classList.remove("dark");
+    return () => {
+      try {
+        const p = localStorage.getItem("tema-preferencia");
+        const escuro =
+          p === "escuro" ||
+          ((!p || p === "sistema") && window.matchMedia("(prefers-color-scheme: dark)").matches);
+        document.documentElement.classList.toggle("dark", escuro);
+      } catch {
+        document.documentElement.classList.remove("dark");
+      }
+    };
+  }, []);
 
   useEffect(() => {
     buscarJSON("/api/ambiente")

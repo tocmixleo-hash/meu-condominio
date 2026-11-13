@@ -68,6 +68,19 @@ export default function Inicio() {
 
   useEffect(verificar, [verificar]);
 
+  // A tela de login é sempre clara; o tema escolhido vale dentro do portal.
+  // A marca de sessão prévia (mc-logado) permite ao script de pré-pintura
+  // (layout.tsx) aplicar o escuro sem flash no portal — e deixar o login
+  // pintar claro direto, mesmo para quem prefere o tema escuro.
+  useEffect(() => {
+    try {
+      if (usuario) localStorage.setItem("mc-logado", "1");
+      else localStorage.removeItem("mc-logado");
+    } catch {
+      // armazenamento indisponível: segue só a preferência geral de tema
+    }
+  }, [usuario]);
+
   // Abre o tutorial automaticamente: no primeiro acesso de cada usuário
   // (flag tutorialVisto) e, durante a simulação de perfis, uma vez por
   // navegador/sessão para cada perfil "vestido" — sem gravar nada no banco.
