@@ -285,7 +285,7 @@ export default function Identidade({
       <Secao titulo="Pré-visualização">
         <div style={varsPreview} className="mt-1 flex overflow-hidden rounded-xl border border-[var(--cor-neutra)]">
           <div className="w-28 shrink-0 bg-[var(--cor-sidebar)] p-3">
-            <div className="rounded-md bg-white/90 dark:bg-stone-900/90 px-2 py-1.5">
+            <div className="rounded-md bg-white/90 px-2 py-1.5">
               <img
                 src={dados.logoMenu || dados.logo}
                 alt=""

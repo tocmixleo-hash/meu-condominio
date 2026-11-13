@@ -210,7 +210,7 @@ export default function Dashboard({
               alt={`Logo do ${condominio.nome}`}
               width={48}
               height={48}
-              className="h-12 w-12 shrink-0 rounded-xl border border-[var(--cor-neutra)] bg-white dark:bg-stone-900 object-contain p-1 shadow-sm"
+              className="h-12 w-12 shrink-0 rounded-xl border border-[var(--cor-neutra)] bg-white object-contain p-1 shadow-sm"
             />
             <div>
               <h1 className="text-[26px] font-bold leading-tight tracking-tight text-stone-900 dark:text-stone-100 sm:text-3xl">

@@ -795,14 +795,18 @@ export default function AppShell({
             recebe o menu da conta no canto superior direito */}
         <header className="relative z-30 flex items-center gap-3 border-b border-[var(--cor-neutra)] bg-white dark:bg-stone-900 px-4 py-2.5 sm:px-6">
           <div className="flex min-w-0 flex-1 items-center gap-2.5 md:hidden">
-            <Image
-              src={condominio.logoCabecalho || condominio.logoMenu || condominio.logo}
-              alt={condominio.nome}
-              width={605}
-              height={158}
-              className="h-8 w-auto object-contain"
-              unoptimized={!!(condominio.logoCabecalho || condominio.logoMenu)}
-            />
+            {/* A logo mora sempre numa placa branca (como no menu lateral):
+                no tema escuro não pode ganhar fundo escuro nem mudar de cor */}
+            <span className="flex h-9 shrink-0 items-center rounded-md bg-white px-1.5">
+              <Image
+                src={condominio.logoCabecalho || condominio.logoMenu || condominio.logo}
+                alt={condominio.nome}
+                width={605}
+                height={158}
+                className="h-7 w-auto object-contain"
+                unoptimized={!!(condominio.logoCabecalho || condominio.logoMenu)}
+              />
+            </span>
             <span className="truncate text-xs text-stone-500 dark:text-stone-400">{condominio.nome}</span>
           </div>
           <div aria-hidden className="hidden flex-1 md:block" />

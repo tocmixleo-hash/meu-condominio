@@ -90,7 +90,7 @@ export default function Condominios({
                 <img
                   src={c.logo}
                   alt={`Logo do ${c.nome}`}
-                  className="h-12 w-12 shrink-0 rounded-lg border border-stone-100 dark:border-stone-800 bg-white dark:bg-stone-900 object-contain p-1"
+                  className="h-12 w-12 shrink-0 rounded-lg border border-stone-200 bg-white object-contain p-1"
                 />
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-semibold text-stone-900 dark:text-stone-100">{c.nome}</p>

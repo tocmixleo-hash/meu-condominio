@@ -429,12 +429,17 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
           continua centralizado verticalmente. ─────────────────────────── */}
       <div className="flex w-full flex-col overflow-y-auto px-5 py-4 md:w-1/2 md:px-8 md:py-6">
         <div className="mx-auto w-full max-w-[490px] md:my-auto">
-          {/* Logo do condomínio selecionado */}
-          <img
-            src={condo.logo}
-            alt={condo.nome}
-            className="mx-auto h-12 w-auto mix-blend-multiply md:h-14"
-          />
+          {/* Logo do condomínio selecionado — sempre sobre placa branca
+              (mesmo padrão do menu lateral). O mix-blend-multiply que havia
+              aqui alterava as cores da logo no tema escuro: multiplicar
+              sobre fundo escuro escurece os traços e apaga a marca. */}
+          <span className="mx-auto flex w-fit items-center rounded-xl bg-white px-3 py-2">
+            <img
+              src={condo.logo}
+              alt={condo.nome}
+              className="h-12 w-auto object-contain md:h-14"
+            />
+          </span>
 
           {/* Seletor de condomínio — sempre visível: escolhe a identidade
               visual (logo, foto, tema) e os acessos rápidos de cada parque.
@@ -457,7 +462,7 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
                   <img
                     src={c.logo}
                     alt=""
-                    className="h-10 w-10 shrink-0 rounded-lg bg-white dark:bg-stone-900 object-contain p-0.5"
+                    className="h-10 w-10 shrink-0 rounded-lg bg-white object-contain p-0.5"
                   />
                   <span className="min-w-0">
                     <span className="block text-sm font-semibold leading-tight text-stone-900 dark:text-stone-100">{c.nome}</span>
