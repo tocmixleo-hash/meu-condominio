@@ -380,10 +380,11 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
         </div>
       </header>
 
-      {/* md:min-h-0: deixa a linha ocupar exatamente o restante da viewport
-          no desktop — o painel de benefícios rola por dentro (como planejado)
-          em vez de empurrar a página inteira 74px além da tela. No celular o
-          fluxo normal da página é preservado. */}
+      {/* md:min-h-0: a linha ocupa exatamente o restante da viewport no
+          desktop — a tela de login NÃO rola: overflow-hidden nas duas
+          colunas e conteúdo compacto que cabe (em janelas baixas o painel
+          esquerdo usa a versão compacta e o QR só aparece em monitores
+          altos). No celular o fluxo normal da página é preservado. */}
       <div className="flex flex-1 items-stretch md:min-h-0">
         {/* ── Painel esquerdo: foto do condomínio + benefícios ────────── */}
         <div className="relative hidden w-1/2 md:block">
@@ -395,40 +396,40 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
           <div className="absolute inset-0 bg-[var(--cor-tema-a55)]" />
           <div className="absolute inset-0 bg-gradient-to-t from-[var(--cor-tema-escura-a70)] via-[var(--cor-tema-a20)] to-[var(--cor-tema-escura2-a50)]" />
 
-          <div className="rolagem-fina relative z-10 flex h-full flex-col overflow-y-auto p-10 text-white lg:px-14 lg:py-10">
+          <div className="relative z-10 flex h-full flex-col overflow-hidden p-8 text-white lg:px-14 alto:py-10">
             {/* Mensagem */}
-            <div className="animar-entrada mt-4 lg:mt-6">
-              <h1 className="text-[34px] font-bold leading-[1.16] tracking-tight xl:text-[42px]">
+            <div className="animar-entrada mt-2 alto:mt-4">
+              <h1 className="text-[30px] font-bold leading-[1.16] tracking-tight alto:text-[34px]">
                 Tudo do seu condomínio,
                 <br />
                 <em className="font-light italic">na palma da mão.</em>
               </h1>
-              <p className="animar-entrada animar-atraso-1 mt-5 max-w-[27rem] text-[15px] leading-relaxed text-white/80">
+              <p className="animar-entrada animar-atraso-1 mt-4 max-w-[27rem] text-[14px] leading-relaxed text-white/80 alto:mt-5 alto:text-[15px]">
                 Reservas de espaços comuns, encomendas, documentos, assembleias e comunicados — em um
                 só lugar, com a segurança que a sua família merece.
               </p>
             </div>
 
-            {/* Benefícios da plataforma — lista inteira no scroll único do
-                painel esquerdo (uma só barra, sem rolagem interna) */}
-            <div className="animar-entrada animar-atraso-2 mt-8">
+            {/* Benefícios da plataforma — lista inteira visível, sem rolagem:
+                compacta em janelas baixas, ampla em monitores altos */}
+            <div className="animar-entrada animar-atraso-2 mt-5 alto:mt-8">
               <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-white/60">
                 Benefícios da plataforma
               </p>
-              <div className="mt-3 space-y-2.5">
+              <div className="mt-2.5 space-y-2 alto:mt-3 alto:space-y-2.5">
                 {BENEFICIOS.map((b) => {
                   const Icone = b.icone;
                   return (
                     <div
                       key={b.titulo}
-                      className="flex items-start gap-3 rounded-xl border border-white/10 bg-white/[0.07] p-3 backdrop-blur-sm"
+                      className="flex items-start gap-3 rounded-xl border border-white/10 bg-white/[0.07] p-2.5 backdrop-blur-sm alto:p-3"
                     >
-                      <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white/15 text-emerald-200">
-                        <Icone className="h-[18px] w-[18px]" />
+                      <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/15 text-emerald-200 alto:h-9 alto:w-9">
+                        <Icone className="h-4 w-4 alto:h-[18px] alto:w-[18px]" />
                       </span>
                       <span className="min-w-0">
-                        <span className="block text-[14px] font-semibold text-white">{b.titulo}</span>
-                        <span className="mt-0.5 block text-[12.5px] leading-relaxed text-white/70">
+                        <span className="block text-[13px] font-semibold text-white alto:text-[14px]">{b.titulo}</span>
+                        <span className="mt-0.5 block text-[11.5px] leading-relaxed text-white/70 alto:text-[12.5px]">
                           {b.texto}
                         </span>
                       </span>
@@ -438,8 +439,10 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
               </div>
             </div>
 
-            {/* QR do portal no celular */}
-            <div className="animar-entrada animar-atraso-3 mt-8 flex max-w-[400px] items-start gap-4 rounded-xl border border-white/15 bg-white/10 p-4 backdrop-blur-md">
+            {/* QR do portal no celular — só em monitores altos: em janelas
+                baixas ele é o primeiro item a estourar a viewport, e a tela
+                de login não pode rolar */}
+            <div className="animar-entrada animar-atraso-3 mt-8 hidden max-w-[400px] items-start gap-4 rounded-xl border border-white/15 bg-white/10 p-4 backdrop-blur-md muito-alto:flex">
               {qrPortal ? (
                 <img
                   src={qrPortal}
@@ -461,28 +464,29 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
               </div>
             </div>
 
-            <p className="animar-aparecer mt-auto pt-6 text-xs text-white/55">
+            <p className="animar-aparecer mt-auto pt-4 text-xs text-white/55 alto:pt-6">
               {MODO_DEMO ? `Ambiente de demonstração com dados fictícios — ${condo.nome}.` : condo.descricao || ""}
             </p>
           </div>
         </div>
 
-      {/* ── Painel direito: acesso — compacto, sem rolagem (a rolagem
-          fica apenas na área de benefícios, à esquerda). No celular o
-          conteúdo encosta no topo (sem my-auto, que abria um vão e
-          empurrava o cartão «Portaria» para fora da tela); no desktop
-          continua centralizado verticalmente. ─────────────────────────── */}
-      <div className="flex w-full flex-col overflow-y-auto px-5 py-4 md:w-1/2 md:px-8 md:py-6">
+      {/* ── Painel direito: acesso — também sem rolagem (overflow-hidden):
+          o cartão cabe na viewport em qualquer janela de desktop, com a
+          versão compacta nas baixas. No celular o conteúdo encosta no topo
+          (sem my-auto, que abria um vão e empurrava o cartão «Portaria»
+          para fora da tela); no desktop continua centralizado
+          verticalmente. ─────────────────────────── */}
+      <div className="flex w-full flex-col overflow-hidden px-5 py-4 md:w-1/2 md:px-8 md:py-6">
         <div className="mx-auto w-full max-w-[490px] md:my-auto">
           {/* Logo do condomínio selecionado — sempre sobre placa branca
               (mesmo padrão do menu lateral). O mix-blend-multiply que havia
               aqui alterava as cores da logo no tema escuro: multiplicar
               sobre fundo escuro escurece os traços e apaga a marca. */}
-          <span className="mx-auto flex w-fit items-center rounded-xl bg-white px-3 py-2">
+          <span className="mx-auto flex w-fit items-center rounded-xl bg-white px-3 py-1.5">
             <img
               src={condo.logo}
               alt={condo.nome}
-              className="h-12 w-auto object-contain md:h-14"
+              className="h-11 w-auto object-contain md:h-12"
             />
           </span>
 
@@ -490,7 +494,7 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
               visual (logo, foto, tema) e os acessos rápidos de cada parque.
               Em produção o vínculo real do usuário continua sendo resolvido
               no backend após o login — a escolha nunca bloqueia ninguém. */}
-          <div className="mt-3 grid grid-cols-2 gap-3">
+          <div className="mt-2.5 grid grid-cols-2 gap-3">
             {condominios.map((c) => {
               const ativo = c.id === condo.id;
               return (
@@ -498,7 +502,7 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
                   key={c.id}
                   type="button"
                   onClick={() => setCondo(c)}
-                  className={`flex items-center gap-3 rounded-xl border bg-white dark:bg-stone-900 px-4 py-3 text-left transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md ${
+                  className={`flex items-center gap-3 rounded-xl border bg-white dark:bg-stone-900 px-3.5 py-2.5 text-left transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md ${
                     ativo
                       ? "border-[var(--cor-tema)] ring-2 ring-[var(--cor-tema)]/25"
                       : "border-stone-200 dark:border-stone-800 hover:border-stone-300"
@@ -507,7 +511,7 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
                   <img
                     src={c.logo}
                     alt=""
-                    className="h-10 w-10 shrink-0 rounded-lg bg-white object-contain p-0.5"
+                    className="h-9 w-9 shrink-0 rounded-lg bg-white object-contain p-0.5"
                   />
                   <span className="min-w-0">
                     <span className="block text-sm font-semibold leading-tight text-stone-900 dark:text-stone-100">{c.nome}</span>
@@ -528,19 +532,19 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
           {/* Cartão de acesso — três telas: tipos (clique = entra na hora,
                   demonstração), entrar (e-mail e senha, pelo botão do topo)
                   e cadastrar */}
-          <div className="animar-entrada mt-3 rounded-xl border border-[var(--cor-neutra)] bg-white dark:bg-stone-900 p-4 shadow-[var(--sombra-cartao)] sm:p-6">
+          <div className="animar-entrada mt-2.5 rounded-xl border border-[var(--cor-neutra)] bg-white dark:bg-stone-900 p-4 shadow-[var(--sombra-cartao)] sm:p-5">
             {tela === "tipos" && (
               /* ── Tipos de usuário: na demonstração, o clique já entra
                   logado com uma conta daquele perfil — sem campos de login
                   (que ficam no botão «Entrar» do topo) ── */
               <>
-                <h2 className="text-[21px] font-semibold tracking-tight text-stone-900 dark:text-stone-100">
+                <h2 className="text-[19px] font-semibold tracking-tight text-stone-900 dark:text-stone-100 alto:text-[21px]">
                   Que tipo de usuário é você?
                 </h2>
-                <p className="mt-1 text-[14px] text-stone-500 dark:text-stone-400">
+                <p className="mt-1 text-[13px] text-stone-500 dark:text-stone-400 alto:text-[14px]">
                   Toque no seu perfil para entrar agora — estamos em demonstração.
                 </p>
-                <div className="mt-3 grid gap-2 sm:mt-4">
+                <div className="mt-3 grid gap-2">
                   {TIPOS.map((t) => {
                     const Icone = t.icone;
                     const logando = entrandoTipo === t.id;
@@ -550,7 +554,7 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
                         type="button"
                         disabled={enviando}
                         onClick={() => entrarDemonstracao(t.id)}
-                        className="flex items-start gap-3 rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 px-3.5 py-2 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-[var(--cor-tema)] hover:bg-stone-50 hover:shadow-md disabled:opacity-60 sm:py-2.5"
+                        className="flex items-start gap-3 rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 px-3.5 py-2 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-[var(--cor-tema)] hover:bg-stone-50 hover:shadow-md disabled:opacity-60"
                       >
                         <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--cor-tema-a10)] text-[var(--cor-tema)]">
                           {logando ? (
@@ -588,7 +592,7 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
               /* ── Entrar: e-mail e senha (aberto pelo botão do topo) ── */
               <>
                 <div className="flex items-center justify-between gap-3">
-                  <h2 className="text-[21px] font-semibold tracking-tight text-stone-900 dark:text-stone-100">
+                  <h2 className="text-[19px] font-semibold tracking-tight text-stone-900 dark:text-stone-100 alto:text-[21px]">
                     Entrar na plataforma
                   </h2>
                   {tipo && (
@@ -608,19 +612,19 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
                     </button>
                   )}
                 </div>
-                <p className="mt-1.5 text-[15px] text-stone-500 dark:text-stone-400">
+                <p className="mt-1.5 text-[13.5px] text-stone-500 dark:text-stone-400 alto:text-[15px]">
                   Acesse com o seu e-mail cadastrado pela administração do {condo.nome}.
                 </p>
 
                 <form
-                  className="mt-6 space-y-4"
+                  className="mt-4 space-y-3.5 alto:mt-6 alto:space-y-4"
                   onSubmit={(e) => {
                     e.preventDefault();
                     submeter();
                   }}
                 >
                   <div>
-                    <label htmlFor="email" className="mb-1.5 block text-[15px] font-semibold text-stone-800 dark:text-stone-100">
+                    <label htmlFor="email" className="mb-1.5 block text-[14px] font-semibold text-stone-800 dark:text-stone-100">
                       E-mail
                     </label>
                     <div className="relative">
@@ -632,13 +636,13 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="seu@email.com"
-                        className="h-12 w-full rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 pl-11 pr-4 text-[15px] text-stone-900 dark:text-stone-100 outline-none transition placeholder:text-stone-400 focus:border-stone-400 focus:ring-4 focus:ring-stone-400/10"
+                        className="h-11 w-full rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 pl-11 pr-4 text-[15px] text-stone-900 dark:text-stone-100 outline-none transition placeholder:text-stone-400 focus:border-stone-400 focus:ring-4 focus:ring-stone-400/10 alto:h-12"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label htmlFor="senha" className="mb-1.5 block text-[15px] font-semibold text-stone-800 dark:text-stone-100">
+                    <label htmlFor="senha" className="mb-1.5 block text-[14px] font-semibold text-stone-800 dark:text-stone-100">
                       Senha
                     </label>
                     <div className="relative">
@@ -650,7 +654,7 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
                         value={senha}
                         onChange={(e) => setSenha(e.target.value)}
                         placeholder="Sua senha"
-                        className="h-12 w-full rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 pl-11 pr-11 text-[15px] text-stone-900 dark:text-stone-100 outline-none transition placeholder:text-stone-400 focus:border-stone-400 focus:ring-4 focus:ring-stone-400/10"
+                        className="h-11 w-full rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 pl-11 pr-11 text-[15px] text-stone-900 dark:text-stone-100 outline-none transition placeholder:text-stone-400 focus:border-stone-400 focus:ring-4 focus:ring-stone-400/10 alto:h-12"
                       />
                       <button
                         type="button"
@@ -678,7 +682,7 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
                   <button
                     type="submit"
                     disabled={enviando}
-                    className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-[var(--cor-tema)] text-[15px] font-semibold text-white shadow-sm transition-all duration-200 hover:bg-[var(--cor-tema-botao-hover)] hover:shadow-md active:scale-[0.98] disabled:opacity-60"
+                    className="flex h-11 w-full items-center justify-center gap-2 rounded-full bg-[var(--cor-tema)] text-[15px] font-semibold text-white shadow-sm transition-all duration-200 hover:bg-[var(--cor-tema-botao-hover)] hover:shadow-md active:scale-[0.98] disabled:opacity-60 alto:h-12"
                   >
                     {enviando ? (
                       <>
@@ -748,10 +752,10 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
               /* ── Cadastrar: contas são criadas pela administração; o
                   cadastro aberto pela internet está em demonstração ── */
               <>
-                <h2 className="text-[21px] font-semibold tracking-tight text-stone-900 dark:text-stone-100">
+                <h2 className="text-[19px] font-semibold tracking-tight text-stone-900 dark:text-stone-100 alto:text-[21px]">
                   Fazer cadastro
                 </h2>
-                <p className="mt-1.5 text-[15px] leading-relaxed text-stone-500 dark:text-stone-400">
+                <p className="mt-1.5 text-[13.5px] leading-relaxed text-stone-500 dark:text-stone-400 alto:text-[15px]">
                   As contas do Meu Condomínio são criadas pela administração do seu condomínio:
                   o síndico ou a administradora cadastra a sua unidade e você recebe o acesso por
                   e-mail.
