@@ -3,12 +3,6 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* Variantes por ALTURA da janela (não por largura): a tela de login usa
-   versão compacta em janelas baixas e recupera o visual amplo em monitores
-   altos — sem barras de rolagem em nenhum dos casos. */
-@custom-variant alto (@media (min-height: 900px));
-@custom-variant muito-alto (@media (min-height: 1000px));
-
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
