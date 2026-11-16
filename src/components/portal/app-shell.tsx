@@ -843,8 +843,11 @@ export default function AppShell({
           </div>
         )}
         <main className="flex-1 overflow-y-auto">
-          {/* pb-24 no celular: espaço para a barra inferior de navegação */}
-          <div className="mx-auto w-full max-w-5xl px-4 pb-24 pt-6 sm:px-6 md:pb-6 lg:px-8">{children}</div>
+          {/* pb-24 no celular: espaço para a barra inferior de navegação.
+              Desktop: o teto de largura cresce com a tela (xl/2xl) — assim o
+              conteúdo aproveita o espaço entre o menu lateral e a borda
+              direita em monitores grandes, em vez de sobrar corredores vazios. */}
+          <div className="mx-auto w-full max-w-5xl px-4 pb-24 pt-6 sm:px-6 md:pb-6 lg:px-8 xl:max-w-7xl 2xl:max-w-[110rem]">{children}</div>
         </main>
       </div>
     </div>
