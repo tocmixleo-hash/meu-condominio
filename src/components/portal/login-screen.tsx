@@ -476,17 +476,17 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
           (sem my-auto, que abria um vão e empurrava o cartão «Portaria»
           para fora da tela); no desktop continua centralizado
           verticalmente. ─────────────────────────── */}
-      <div className="flex w-full flex-col overflow-hidden px-5 py-4 md:w-1/2 md:px-8 md:py-6">
+      <div className="flex w-full flex-col overflow-hidden px-5 py-4 md:w-1/2 md:px-8 md:py-4 md:alto:py-6">
         <div className="mx-auto w-full max-w-[490px] md:my-auto">
           {/* Logo do condomínio selecionado — sempre sobre placa branca
               (mesmo padrão do menu lateral). O mix-blend-multiply que havia
               aqui alterava as cores da logo no tema escuro: multiplicar
               sobre fundo escuro escurece os traços e apaga a marca. */}
-          <span className="mx-auto flex w-fit items-center rounded-xl bg-white px-3 py-1.5">
+          <span className="mx-auto flex w-fit items-center rounded-xl bg-white px-3 py-1">
             <img
               src={condo.logo}
               alt={condo.nome}
-              className="h-11 w-auto object-contain md:h-12"
+              className="h-10 w-auto object-contain md:h-11 md:alto:h-12"
             />
           </span>
 
@@ -494,7 +494,7 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
               visual (logo, foto, tema) e os acessos rápidos de cada parque.
               Em produção o vínculo real do usuário continua sendo resolvido
               no backend após o login — a escolha nunca bloqueia ninguém. */}
-          <div className="mt-2.5 grid grid-cols-2 gap-3">
+          <div className="mt-2 grid grid-cols-2 gap-3">
             {condominios.map((c) => {
               const ativo = c.id === condo.id;
               return (
@@ -502,7 +502,7 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
                   key={c.id}
                   type="button"
                   onClick={() => setCondo(c)}
-                  className={`flex items-center gap-3 rounded-xl border bg-white dark:bg-stone-900 px-3.5 py-2.5 text-left transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md ${
+                  className={`flex items-center gap-3 rounded-xl border bg-white dark:bg-stone-900 px-3.5 py-2 text-left transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md md:alto:py-2.5 ${
                     ativo
                       ? "border-[var(--cor-tema)] ring-2 ring-[var(--cor-tema)]/25"
                       : "border-stone-200 dark:border-stone-800 hover:border-stone-300"
@@ -532,7 +532,7 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
           {/* Cartão de acesso — três telas: tipos (clique = entra na hora,
                   demonstração), entrar (e-mail e senha, pelo botão do topo)
                   e cadastrar */}
-          <div className="animar-entrada mt-2.5 rounded-xl border border-[var(--cor-neutra)] bg-white dark:bg-stone-900 p-4 shadow-[var(--sombra-cartao)] sm:p-5">
+          <div className="animar-entrada mt-2 rounded-xl border border-[var(--cor-neutra)] bg-white dark:bg-stone-900 p-4 shadow-[var(--sombra-cartao)] alto:sm:p-6">
             {tela === "tipos" && (
               /* ── Tipos de usuário: na demonstração, o clique já entra
                   logado com uma conta daquele perfil — sem campos de login
@@ -544,7 +544,7 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
                 <p className="mt-1 text-[13px] text-stone-500 dark:text-stone-400 alto:text-[14px]">
                   Toque no seu perfil para entrar agora — estamos em demonstração.
                 </p>
-                <div className="mt-3 grid gap-2">
+                <div className="mt-2.5 grid gap-1.5 alto:mt-3 alto:gap-2">
                   {TIPOS.map((t) => {
                     const Icone = t.icone;
                     const logando = entrandoTipo === t.id;
@@ -554,7 +554,7 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
                         type="button"
                         disabled={enviando}
                         onClick={() => entrarDemonstracao(t.id)}
-                        className="flex items-start gap-3 rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 px-3.5 py-2 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-[var(--cor-tema)] hover:bg-stone-50 hover:shadow-md disabled:opacity-60"
+                        className="flex items-start gap-3 rounded-xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 px-3.5 py-1.5 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-[var(--cor-tema)] hover:bg-stone-50 hover:shadow-md disabled:opacity-60 md:alto:py-2"
                       >
                         <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--cor-tema-a10)] text-[var(--cor-tema)]">
                           {logando ? (
@@ -567,7 +567,7 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
                           <span className="block text-[14px] font-semibold text-stone-900 dark:text-stone-100">
                             {t.rotulo}
                           </span>
-                          <span className="mt-0.5 block text-[12.5px] leading-snug text-stone-500 dark:text-stone-400">
+                          <span className="mt-0.5 block text-[12px] leading-snug text-stone-500 dark:text-stone-400 md:alto:text-[12.5px]">
                             {logando ? "Entrando…" : t.descricao}
                           </span>
                         </span>
@@ -617,7 +617,7 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
                 </p>
 
                 <form
-                  className="mt-4 space-y-3.5 alto:mt-6 alto:space-y-4"
+                  className="mt-3.5 space-y-3 md:alto:mt-6 md:alto:space-y-4"
                   onSubmit={(e) => {
                     e.preventDefault();
                     submeter();
@@ -741,7 +741,7 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
                     setAvisoTipo("");
                     setTela("tipos");
                   }}
-                  className="mt-5 w-full text-center text-sm font-medium text-stone-500 dark:text-stone-400 underline-offset-4 transition hover:text-stone-700 hover:underline"
+                  className="mt-4 w-full text-center text-sm font-medium text-stone-500 dark:text-stone-400 underline-offset-4 transition hover:text-stone-700 hover:underline md:alto:mt-5"
                 >
                   Ver os tipos de usuário
                 </button>
