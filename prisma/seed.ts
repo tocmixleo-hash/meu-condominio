@@ -164,6 +164,9 @@ async function semearCondominio(opts: {
       })),
   );
 
+  // Atalhos para os moradores usados nos dados de exemplo abaixo
+  const [m1, m2, m3, m4] = moradores;
+
   await db.usuarioCondominio.createMany({
     data: moradores.map((m) => ({ usuarioId: m.id, condominioId: cid, perfil: "MORADOR" })),
   });
@@ -194,6 +197,54 @@ async function semearCondominio(opts: {
           "A piscina e o deck ficarão interditados por cerca de duas semanas para troca do revestimento e filtração nova.",
         categoria: "OBRA",
         autorId: sindico.id,
+      },
+    ],
+  });
+
+  // Campanhas institucionais em destaque (banner do painel inicial)
+  await db.campanha.createMany({
+    data: [
+      {
+        condominioId: cid,
+        titulo: "Recolha as fezes do seu pet",
+        mensagem:
+          "Passear com seu melhor amigo é um prazer — recolher as fezes dele é respeito a todos. Leve sempre o saquinho e descarte na lixeira adequada.",
+        descricao:
+          "Boas práticas com o seu pet:\n• Leve saquinhos sempre que sair para passear;\n• Recolha as fezes em todas as áreas comuns;\n• Descarte o saquinho fechado na lixeira correta;\n• Coleira e guia nas áreas comuns.\n\nUm gesto simples deixa o condomínio mais limpo para todos.",
+        categoria: "PET",
+        emoji: "🐾",
+        autorId: sindico.id,
+      },
+      {
+        condominioId: cid,
+        titulo: "Separe o lixo: reciclar é cuidar de todos",
+        mensagem:
+          "Papel, plástico, vidro e metal no coleto correto: o lixo separado vira economia para o condomínio e ganho para o planeta.",
+        descricao:
+          "• Enxágue as embalagens antes de descartar;\n• Papelão desmontado e dobrado ocupa menos espaço;\n• Pilhas e eletrônicos têm ponto de coleta próprio.",
+        categoria: "SUSTENTABILIDADE",
+        emoji: "♻️",
+        autorId: administrativo.id,
+      },
+      {
+        condominioId: cid,
+        titulo: "Visita esperada é visita autorizada",
+        mensagem:
+          "Cadastre seus visitantes com antecedência na área de Autorizações: a portaria libera na hora e o condomínio fica mais seguro para todos.",
+        categoria: "SEGURANCA",
+        emoji: "🦺",
+        destino: "autorizacoes",
+        autorId: sindico.id,
+      },
+      {
+        condominioId: cid,
+        titulo: "Vazamento avisado é dinheiro economizado",
+        mensagem:
+          "Viu goteira, torneira pingando ou água escorrendo na garagem? Registre uma ocorrência no portal — conserto rápido evita obra grande na conta do condomínio.",
+        categoria: "SAUDE",
+        emoji: "💧",
+        destino: "ocorrencias",
+        autorId: administrativo.id,
       },
     ],
   });
@@ -265,14 +316,22 @@ async function main() {
   // Limpeza (ordem segura para o SQLite sem cascade completo)
   await db.notificacao.deleteMany();
   await db.auditoria.deleteMany();
+  await db.campanha.deleteMany();
   await db.comunicado.deleteMany();
   await db.reserva.deleteMany();
+  await db.regraReserva.deleteMany();
   await db.encomenda.deleteMany();
   await db.autorizacao.deleteMany();
   await db.documento.deleteMany();
   await db.assembleia.deleteMany();
+  await db.ocorrencia.deleteMany();
+  await db.manutencao.deleteMany();
+  await db.espacoFoto.deleteMany();
+  await db.redefinicaoSenha.deleteMany();
+  await db.tentativaLogin.deleteMany();
   await db.usuarioCondominio.deleteMany();
   await db.condominioFoto.deleteMany();
+  await db.funcao.deleteMany();
   await db.usuario.deleteMany();
   await db.unidade.deleteMany();
   await db.condominio.deleteMany();

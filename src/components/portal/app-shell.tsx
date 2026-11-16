@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import {
   AlertTriangle,
+  Bell,
   Building2,
   CalendarDays,
   ChevronDown,
@@ -39,6 +40,7 @@ import type { CondominioUI } from "@/components/portal/login-screen";
 export type ModuloId =
   | "inicio"
   | "comunicados"
+  | "campanhas"
   | "reservas"
   | "encomendas"
   | "autorizacoes"
@@ -60,7 +62,8 @@ type ItemMenu = { id: ModuloId; rotulo: string; icone: typeof Home };
 const MENUS: Record<Perfil, ItemMenu[]> = {
   SINDICO: [
     { id: "inicio", rotulo: "Início", icone: Home },
-    { id: "comunicados", rotulo: "Comunicados", icone: Megaphone },
+    { id: "comunicados", rotulo: "Comunicados", icone: Bell },
+    { id: "campanhas", rotulo: "Campanhas", icone: Megaphone },
     { id: "reservas", rotulo: "Reservas", icone: CalendarDays },
     { id: "encomendas", rotulo: "Encomendas", icone: Package },
     { id: "autorizacoes", rotulo: "Autorizações", icone: DoorOpen },
@@ -74,7 +77,8 @@ const MENUS: Record<Perfil, ItemMenu[]> = {
   ],
   ADMINISTRATIVO: [
     { id: "inicio", rotulo: "Início", icone: Home },
-    { id: "comunicados", rotulo: "Comunicados", icone: Megaphone },
+    { id: "comunicados", rotulo: "Comunicados", icone: Bell },
+    { id: "campanhas", rotulo: "Campanhas", icone: Megaphone },
     { id: "reservas", rotulo: "Reservas", icone: CalendarDays },
     { id: "encomendas", rotulo: "Encomendas", icone: Package },
     { id: "autorizacoes", rotulo: "Autorizações", icone: DoorOpen },
@@ -94,7 +98,8 @@ const MENUS: Record<Perfil, ItemMenu[]> = {
   ],
   MORADOR: [
     { id: "inicio", rotulo: "Início", icone: Home },
-    { id: "comunicados", rotulo: "Comunicados", icone: Megaphone },
+    { id: "comunicados", rotulo: "Comunicados", icone: Bell },
+    { id: "campanhas", rotulo: "Campanhas", icone: Megaphone },
     { id: "reservas", rotulo: "Reservas", icone: CalendarDays },
     { id: "encomendas", rotulo: "Encomendas", icone: Package },
     { id: "autorizacoes", rotulo: "Autorizações", icone: DoorOpen },
@@ -137,9 +142,12 @@ const ICONE_PERFIL: Record<Perfil, typeof Home> = {
   FUNCAO: UserCog,
 };
 
-// Catálogo para montar o menu de funções personalizadas (mesma ordem/ícones)
+// Catálogo para montar o menu de funções personalizadas (mesma ordem/ícones).
+// "auditoria" não existe mais aqui nem em MODULOS_CONCEDIVEIS — o histórico
+// de ações é exclusivo de síndico, administração e plataforma.
 const ITEM_POR_MODULO: Record<string, ItemMenu> = {
-  comunicados: { id: "comunicados", rotulo: "Comunicados", icone: Megaphone },
+  comunicados: { id: "comunicados", rotulo: "Comunicados", icone: Bell },
+  campanhas: { id: "campanhas", rotulo: "Campanhas", icone: Megaphone },
   reservas: { id: "reservas", rotulo: "Reservas", icone: CalendarDays },
   encomendas: { id: "encomendas", rotulo: "Encomendas", icone: Package },
   autorizacoes: { id: "autorizacoes", rotulo: "Autorizações", icone: DoorOpen },
@@ -149,7 +157,6 @@ const ITEM_POR_MODULO: Record<string, ItemMenu> = {
   assembleias: { id: "assembleias", rotulo: "Assembleias", icone: Users },
   moradores: { id: "moradores", rotulo: "Moradores", icone: Users },
   identidade: { id: "identidade", rotulo: "Identidade visual", icone: Palette },
-  auditoria: { id: "auditoria", rotulo: "Auditoria", icone: History },
 };
 
 // ── Seletor de condomínio (vínculos múltiplos / plataforma) ──────

@@ -131,22 +131,25 @@ export type UsuarioSessao = {
 // pelo administrador da plataforma. Os módulos "condominios" e "funcoes"
 // são exclusivos do PLATAFORMA — nunca concedíveis a funções.
 export const MODULOS_TODOS = [
-  "inicio", "comunicados", "reservas", "encomendas", "autorizacoes",
+  "inicio", "comunicados", "campanhas", "reservas", "encomendas", "autorizacoes",
   "ocorrencias", "manutencao", "documentos", "assembleias", "moradores",
   "auditoria", "identidade", "condominios", "funcoes",
 ] as const;
 
+// Funções personalizadas NUNCA recebem "auditoria": o histórico de ações é
+// exclusivo de síndico, administração e administrador da plataforma (o acesso
+// é reforçado por ehGestao na própria API de auditoria).
 export const MODULOS_CONCEDIVEIS = [
-  "comunicados", "reservas", "encomendas", "autorizacoes",
+  "comunicados", "campanhas", "reservas", "encomendas", "autorizacoes",
   "ocorrencias", "manutencao", "documentos", "assembleias", "moradores",
-  "auditoria", "identidade",
+  "identidade",
 ] as const;
 
 const PERMISSOES_FIXAS: Record<string, string[]> = {
   SINDICO: [...MODULOS_TODOS.filter((m) => m !== "condominios" && m !== "funcoes")],
   ADMINISTRATIVO: [...MODULOS_TODOS.filter((m) => m !== "condominios" && m !== "funcoes")],
   PORTARIA: ["inicio", "encomendas", "autorizacoes", "ocorrencias", "moradores"],
-  MORADOR: ["inicio", "comunicados", "reservas", "encomendas", "autorizacoes", "ocorrencias", "documentos", "assembleias"],
+  MORADOR: ["inicio", "comunicados", "campanhas", "reservas", "encomendas", "autorizacoes", "ocorrencias", "documentos", "assembleias"],
 };
 
 /** O usuário pode usar o módulo no condomínio ativo? (enforcement do backend) */

@@ -10,9 +10,9 @@ const CATEGORIAS = ["CONVIVENCIA", "PET", "SUSTENTABILIDADE", "SEGURANCA", "SAUD
 // Equipe de gestão que gerencia campanhas — mesma régua dos comunicados:
 // acesso ao módulo E perfil de gestão (síndico/administrativo/plataforma).
 // A trava dupla impede que perfis com acesso só de leitura (ex.: MORADOR,
-// que tem "comunicados" para LER) publiquem pela API direto.
+// que acompanha as campanhas para LER) publiquem pela API direto.
 function podeGerenciar(eu: { perfil: string; permissoes: string[]; ehPlataforma: boolean }) {
-  return pode(eu, "comunicados") && ehGestao(eu.perfil);
+  return pode(eu, "campanhas") && ehGestao(eu.perfil);
 }
 
 // Lista as campanhas do condomínio ativo.

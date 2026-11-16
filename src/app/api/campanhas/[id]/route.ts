@@ -10,7 +10,7 @@ const CATEGORIAS = ["CONVIVENCIA", "PET", "SUSTENTABILIDADE", "SEGURANCA", "SAUD
 // Equipe de gestão (mesma régua de /api/campanhas) — trava dupla de
 // acesso ao módulo + perfil, ver detalhes lá.
 function podeGerenciar(eu: { perfil: string; permissoes: string[]; ehPlataforma: boolean }) {
-  return pode(eu, "comunicados") && ehGestao(eu.perfil);
+  return pode(eu, "campanhas") && ehGestao(eu.perfil);
 }
 
 async function campanhaDoCondominio(id: string, condominioId: string) {

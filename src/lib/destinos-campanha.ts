@@ -3,6 +3,7 @@
 // e dica no banner). Os ids espelham os módulos do app-shell.
 export const DESTINOS_CAMPANHA: { id: string; rotulo: string }[] = [
   { id: "comunicados", rotulo: "Comunicados" },
+  { id: "campanhas", rotulo: "Campanhas" },
   { id: "reservas", rotulo: "Reservas" },
   { id: "encomendas", rotulo: "Encomendas" },
   { id: "autorizacoes", rotulo: "Autorizações" },

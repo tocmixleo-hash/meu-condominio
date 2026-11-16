@@ -80,6 +80,12 @@ export const ROTULO_AUTORIZACAO: Record<string, string> = {
 export const ROTULO_ACAO: Record<string, string> = {
   LOGIN: "Entrou no portal",
   COMUNICADO_CRIADO: "Publicou comunicado",
+  COMUNICADO_REMOVIDO: "Excluiu comunicado",
+  CAMPANHA_CRIADA: "Divulgou campanha",
+  CAMPANHA_ATUALIZADA: "Atualizou campanha",
+  CAMPANHA_ATIVADA: "Retomou campanha",
+  CAMPANHA_PAUSADA: "Pausou campanha",
+  CAMPANHA_REMOVIDA: "Excluiu campanha",
   RESERVA_CRIADA: "Solicitou reserva",
   RESERVA_CONFIRMADA: "Confirmou reserva",
   RESERVA_REJEITADA: "Rejeitou reserva",

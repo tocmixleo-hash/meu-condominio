@@ -26,8 +26,11 @@ type Funcao = {
 };
 
 // Módulos concedíveis a funções — o mesmo conjunto validado no backend.
+// "Auditoria" não está na lista: o histórico de ações é exclusivo de síndico,
+// administração e administrador da plataforma.
 const MODULOS: { id: string; rotulo: string; descricao: string }[] = [
   { id: "comunicados", rotulo: "Comunicados", descricao: "Publicar e excluir comunicados" },
+  { id: "campanhas", rotulo: "Campanhas", descricao: "Divulgar banners em destaque no Início" },
   { id: "reservas", rotulo: "Reservas", descricao: "Confirmar e rejeitar reservas" },
   { id: "encomendas", rotulo: "Encomendas", descricao: "Registrar encomendas e dar baixa" },
   { id: "autorizacoes", rotulo: "Autorizações", descricao: "Ver autorizações de acesso" },
@@ -36,7 +39,6 @@ const MODULOS: { id: string; rotulo: string; descricao: string }[] = [
   { id: "documentos", rotulo: "Documentos", descricao: "Enviar e excluir documentos" },
   { id: "assembleias", rotulo: "Assembleias", descricao: "Agendar e atualizar assembleias" },
   { id: "moradores", rotulo: "Moradores", descricao: "Cadastrar moradores e equipe" },
-  { id: "auditoria", rotulo: "Auditoria", descricao: "Ver o histórico de ações" },
   { id: "identidade", rotulo: "Identidade visual", descricao: "Editar marca, cores e fotos" },
 ];
 

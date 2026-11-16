@@ -7,6 +7,7 @@ import type { SimulacaoUI } from "@/components/portal/app-shell";
 import LoginScreen, { type CondominioUI } from "@/components/portal/login-screen";
 import Dashboard from "@/components/portal/dashboard";
 import Comunicados from "@/components/portal/comunicados";
+import Campanhas from "@/components/portal/campanhas";
 import Reservas from "@/components/portal/reservas";
 import Encomendas from "@/components/portal/encomendas";
 import Autorizacoes from "@/components/portal/autorizacoes";
@@ -266,6 +267,7 @@ export default function Inicio() {
           />
         )}
         {modulo === "comunicados" && <Comunicados perfil={perfilModulos} />}
+        {modulo === "campanhas" && <Campanhas perfil={perfilModulos} />}
         {modulo === "reservas" && <Reservas perfil={perfilModulos} />}
         {modulo === "encomendas" && <Encomendas perfil={perfilModulos} />}
         {modulo === "autorizacoes" && <Autorizacoes perfil={perfilModulos} />}
