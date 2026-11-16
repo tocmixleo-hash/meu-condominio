@@ -21,6 +21,7 @@ import { cssVarsDoTema, resolverTema } from "@/lib/tema";
 import { useTema } from "@/lib/preferencia-tema";
 import { corpoJson, mensagemDeErro, mensagemRede } from "@/lib/api-cliente";
 import { buscarJSON } from "@/lib/buscar-json";
+import QRCode from "qrcode";
 
 type Usuario = {
   id: string;
@@ -218,6 +219,23 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
   const [emailRecuperacao, setEmailRecuperacao] = useState("");
   const [avisoRecuperacao, setAvisoRecuperacao] = useState("");
   const [enviandoRecuperacao, setEnviandoRecuperacao] = useState(false);
+  // QR de acesso pelo celular — gerado em runtime com o endereço atual
+  const [qrPortal, setQrPortal] = useState("");
+
+  // O QR do painel esquerdo aponta para o endereço pelo qual o portal está
+  // sendo acessado agora (na produção, o domínio da Vercel). O PNG estático
+  // que existia aqui gravava «meucondominio.parquecalifornia.com.br», domínio
+  // que não serve o app — quem escaneava caía num endereço errado. Gerado em
+  // runtime, o QR nunca desatualiza.
+  useEffect(() => {
+    QRCode.toDataURL(window.location.origin, {
+      width: 220,
+      margin: 1,
+      color: { dark: "#1c1917", light: "#ffffff" },
+    })
+      .then(setQrPortal)
+      .catch(() => setQrPortal(""));
+  }, []);
 
   // A tela de login é sempre clara — vitrine da marca sobre a fotografia.
   // A preferência escuro do usuário continua valendo dentro do portal:
@@ -422,11 +440,15 @@ export default function LoginScreen({ aoEntrar }: { aoEntrar: (u: Usuario) => vo
 
             {/* QR do portal no celular */}
             <div className="animar-entrada animar-atraso-3 mt-8 flex max-w-[400px] items-start gap-4 rounded-xl border border-white/15 bg-white/10 p-4 backdrop-blur-md">
-              <img
-                src="/fotos/qr-portal.png"
-                alt="QR Code do portal"
-                className="h-[88px] w-[88px] shrink-0 rounded-lg bg-white p-1.5"
-              />
+              {qrPortal ? (
+                <img
+                  src={qrPortal}
+                  alt="QR Code do portal"
+                  className="h-[88px] w-[88px] shrink-0 rounded-lg bg-white p-1.5"
+                />
+              ) : (
+                <span className="h-[88px] w-[88px] shrink-0 animate-pulse rounded-lg bg-white/20" />
+              )}
               <div>
                 <p className="flex items-center gap-2 text-[15px] font-semibold">
                   <Smartphone className="h-4 w-4" />
