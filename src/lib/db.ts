@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { PrismaClient } from '@prisma/client'
 import { PrismaLibSQL } from "@prisma/adapter-libsql";
+import { garantirSchema } from "@/lib/garantia-schema";
 
 // ── Modo duplo de banco de dados ──────────────────────────────────
 //
@@ -39,10 +40,28 @@ const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
 }
 
-export const db =
+const base =
   globalForPrisma.prisma ??
   (process.env.TURSO_DATABASE_URL
     ? new PrismaClient({ adapter: clienteLibSQL(), log: process.env.VERCEL ? [] : ['query'] })
     : new PrismaClient({ log: process.env.VERCEL ? [] : ['query'] }))
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = db
+// Client cru, SEM o guardião — usado pelo próprio guardião (garantia-schema)
+// para inspecionar e corrigir o schema sem se recursar.
+export const dbBase: PrismaClient = base;
+
+// Client público: toda consulta espera o guardião de schema primeiro
+// (memoizado — depois da primeira verificação é apenas uma promise
+// resolvida). Assim qualquer módulo/coluna nova (ex.: Cadastros) cria o
+// que falta no banco remoto antes da primeira consulta que o usaria, em
+// qualquer rota — o guardião antes vivia só nas rotas de campanhas e as
+// demais APIs ficavam 500 quando o schema do Turso ficava para trás.
+export const db = base.$extends({
+  query: {
+    $allOperations({ args, query }) {
+      return (garantirSchema() as Promise<void>).then(() => query(args as never));
+    },
+  },
+})
+
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = base

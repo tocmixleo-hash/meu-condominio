@@ -1,4 +1,6 @@
-import { db } from "@/lib/db";
+// dbBase: client cru, sem o gancho de guardião do db.ts — evita recursão
+// quando o próprio guardião consulta sqlite_master/PRAGMA.
+import { dbBase as db } from "@/lib/db";
 import { DDL_POR_TABELA } from "@/lib/garantia-schema-ddl";
 
 // ── Guardião de schema (idempotente) ──────────────────────────────
