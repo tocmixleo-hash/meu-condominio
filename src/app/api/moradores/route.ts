@@ -35,7 +35,8 @@ export async function POST(req: Request) {
   if (!eu) return json401();
   if (!pode(eu, "moradores")) return json403();
 
-  const { nome, email, senha, telefone, bloco, numero, funcaoId } =
+  const { nome, email, senha, telefone, bloco, numero, funcaoId,
+    possuiPets, petsDetalhe, pessoasNoImovel, vinculoImovel } =
     await req.json().catch(() => ({}) as never);
   if (!nome?.trim() || !email?.trim() || !senha) {
     return Response.json({ erro: "Preencha nome, e-mail e senha." }, { status: 400 });
@@ -115,6 +116,18 @@ export async function POST(req: Request) {
       perfil: "MORADOR",
       telefone: telefone?.trim() || null,
       unidadeId: unidade.id,
+      // Perfil da família na unidade (seção Cadastros)
+      possuiPets: Boolean(possuiPets),
+      petsDetalhe:
+        possuiPets && typeof petsDetalhe === "string" && petsDetalhe.trim()
+          ? petsDetalhe.trim()
+          : null,
+      pessoasNoImovel:
+        pessoasNoImovel !== undefined && pessoasNoImovel !== null && Number(pessoasNoImovel) > 0
+          ? Math.floor(Number(pessoasNoImovel))
+          : null,
+      vinculoImovel:
+        vinculoImovel === "PROPRIETARIO" || vinculoImovel === "INQUILINO" ? vinculoImovel : null,
     },
     include: { unidade: true },
   });
@@ -134,7 +147,56 @@ export async function PATCH(req: Request) {
   if (!eu) return json401();
   if (!pode(eu, "moradores")) return json403();
 
-  const { id, ativo } = await req.json().catch(() => ({}) as never);
+  const { id, ativo, possuiPets, petsDetalhe, pessoasNoImovel, vinculoImovel } =
+    await req.json().catch(() => ({}) as never);
+
+  // Edição do perfil da família (pets, ocupantes, vínculo): só MORADOR,
+  // nunca equipe nem perfis de gestão.
+  if (ativo === undefined) {
+    if (!id) return Response.json({ erro: "Faltou o identificador." }, { status: 400 });
+    const alvo = await db.usuario.findFirst({
+      where: { id, condominioId: eu.condominio.id, perfil: "MORADOR" },
+      include: { unidade: true },
+    });
+    if (!alvo) return Response.json({ erro: "Morador não encontrado." }, { status: 404 });
+
+    const temPets = Boolean(possuiPets);
+    const dados = {
+      possuiPets: temPets,
+      petsDetalhe:
+        temPets && typeof petsDetalhe === "string" && petsDetalhe.trim()
+          ? petsDetalhe.trim()
+          : null,
+      pessoasNoImovel:
+        pessoasNoImovel !== undefined && pessoasNoImovel !== null && Number(pessoasNoImovel) > 0
+          ? Math.floor(Number(pessoasNoImovel))
+          : null,
+      vinculoImovel:
+        vinculoImovel === "PROPRIETARIO" || vinculoImovel === "INQUILINO" ? vinculoImovel : null,
+    };
+    const morador = await db.usuario.update({ where: { id }, data: dados, include: { unidade: true } });
+
+    const partes = [
+      morador.possuiPets
+        ? `pets: sim${morador.petsDetalhe ? ` (${morador.petsDetalhe})` : ""}`
+        : "pets: não",
+      morador.pessoasNoImovel ? `${morador.pessoasNoImovel} pessoas na unidade` : null,
+      morador.vinculoImovel
+        ? morador.vinculoImovel === "PROPRIETARIO"
+          ? "proprietário"
+          : "inquilino"
+        : null,
+    ].filter(Boolean);
+    await registrarAcao({
+      condominioId: eu.condominio.id,
+      usuarioId: eu.id,
+      acao: "MORADOR_ALTERADO",
+      detalhe: `${morador.nome} · ${partes.join(" · ")}`,
+    });
+
+    return Response.json({ morador });
+  }
+
   // Alvo: morador OU membro da equipe (FUNCAO) do próprio condomínio —
   // nunca PLATAFORMA, SINDICO, ADMINISTRATIVO ou PORTARIA por esta rota,
   // e nunca a própria conta.

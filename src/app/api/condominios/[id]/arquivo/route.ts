@@ -41,6 +41,10 @@ const MIME: Record<string, string> = {
   svg: "image/svg+xml",
 };
 
+/** Mensagem exibida quando o armazenamento permanente não está configurado. */
+export const MENSAGEM_ARMAZENAMENTO =
+  "O armazenamento de arquivos não está configurado (falta BLOB_READ_WRITE_TOKEN na Vercel). Configure a variável de ambiente e tente novamente.";
+
 /** Remove scripts, manipuladores de evento e URLs perigosas de um SVG. */
 function sanitizarSvg(texto: string): string {
   return texto
@@ -65,9 +69,17 @@ async function salvarArquivo(slug: string, nomeBase: string, conteudo: Buffer, e
       });
       return { url: blob.url, chave };
     } catch {
-      // Blob indisponível — grava no filesystem como reserva
+      // Blob configurado mas indisponível: na Vercel NÃO caiamos para o
+      // /tmp — cada instância tem o seu e o arquivo desaparece entre
+      // requisições, deixando a URL gravada virada 404 (fotografias
+      // quebradas nas reservas no celular). Falhar com mensagem clara.
+      if (process.env.VERCEL) throw new Error(MENSAGEM_ARMAZENAMENTO);
     }
+  } else if (process.env.VERCEL) {
+    // Sem Blob configurado em produção: rejeitar em vez de gravar em /tmp.
+    throw new Error(MENSAGEM_ARMAZENAMENTO);
   }
+  // Reserva em disco — somente desenvolvimento local (instância única).
   const pasta =
     process.env.PASTA_UPLOADS
       ? path.resolve(process.env.PASTA_UPLOADS, "condominios", slug)
@@ -138,7 +150,15 @@ export async function POST(req: Request, { params }: Ctx) {
   }
 
   const nomeBase = tipo === "foto_espaco" ? `foto_espaco-${espaco.toLowerCase()}` : tipo;
-  const { url } = await salvarArquivo(condominio.slug, nomeBase, conteudo, ext);
+  let url: string;
+  try {
+    url = (await salvarArquivo(condominio.slug, nomeBase, conteudo, ext)).url;
+  } catch (e) {
+    if (e instanceof Error && e.message === MENSAGEM_ARMAZENAMENTO) {
+      return Response.json({ erro: e.message }, { status: 503 });
+    }
+    throw e;
+  }
 
   // Aplica o arquivo no campo correspondente
   if (tipo === "logo_principal") {
@@ -239,16 +259,23 @@ export async function DELETE(req: Request, { params }: Ctx) {
   }
 
   if (tipoStr === "logo_principal" || tipoStr === "foto_principal") {
-    const padrão = tipoStr === "logo_principal" ? "/fotos/logo-meu-condominio.png" : "/fotos/parque-california.jpg";
-    const anterior = await db.condominio.findUnique({
+    // Fotografia padrão por condomínio: /fotos/parque-{slug}.jpg cobre os
+    // parques existentes (california, florida); sem correspondência, cai no
+    // padrão histórico da California.
+    const atual = await db.condominio.findUnique({
       where: { id },
-      select: tipoStr === "logo_principal" ? { logo: true } : { foto: true },
+      select: tipoStr === "logo_principal" ? { logo: true } : { slug: true, foto: true },
     });
+    const slug = "slug" in (atual ?? {}) ? (atual as { slug: string }).slug : undefined;
+    const padrão =
+      tipoStr === "logo_principal"
+        ? "/fotos/logo-meu-condominio.png"
+        : `/fotos/parque-${slug ?? "california"}.jpg`;
     await db.condominio.update({
       where: { id },
       data: tipoStr === "logo_principal" ? { logo: padrão } : { foto: padrão },
     });
-    await removerArquivoRemoto(tipoStr === "logo_principal" ? anterior?.logo : anterior?.foto);
+    await removerArquivoRemoto(tipoStr === "logo_principal" ? atual?.logo : atual?.foto);
     await registrarAcao({
       condominioId: id,
       usuarioId: eu!.id,

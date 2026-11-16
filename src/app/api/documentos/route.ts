@@ -8,8 +8,11 @@ import { otimizarPdf } from "@/lib/pdf-otimizador";
 
 // No Vercel o filesystem é somente leitura (exceto /tmp); local usa public/uploads.
 // Com BLOB_READ_WRITE_TOKEN configurado, arquivos vão para o Vercel Blob
-// (armazenamento persistente) sob chaves organizadas por condomínio e só caem
-// no filesystem como reserva.
+// (armazenamento persistente) sob chaves organizadas por condomínio. Na Vercel
+// SEM Blob o envio é rejeitado com mensagem clara: gravar em /tmp cria URLs
+// que somem entre instâncias (mesma causa das fotografias quebradas).
+const MENSAGEM_ARMAZENAMENTO =
+  "O armazenamento de arquivos não está configurado (falta BLOB_READ_WRITE_TOKEN na Vercel). Configure a variável de ambiente e tente novamente.";
 const PASTA =
   process.env.PASTA_UPLOADS
     ? path.resolve(process.env.PASTA_UPLOADS)
@@ -30,9 +33,14 @@ async function salvarArquivo(slug: string, nomeSeguro: string, conteudo: Buffer)
       });
       return blob.url;
     } catch {
-      // Blob indisponível — grava no filesystem como reserva
+      // Blob configurado mas indisponível: na Vercel não cair para /tmp
+      // (efêmero por instância — a URL gravada viraria 404).
+      if (process.env.VERCEL) throw new Error(MENSAGEM_ARMAZENAMENTO);
     }
+  } else if (process.env.VERCEL) {
+    throw new Error(MENSAGEM_ARMAZENAMENTO);
   }
+  // Reserva em disco — somente desenvolvimento local.
   const pasta = path.join(PASTA, "condominios", slug);
   await mkdir(pasta, { recursive: true });
   await writeFile(path.join(pasta, nomeSeguro), conteudo);
@@ -78,7 +86,15 @@ export async function POST(req: Request) {
   // PDFs passam por otimização estrutural (sem perda de qualidade); outros
   // tipos e PDFs que não encolhem seguem com os bytes originais.
   const otimizacao = await otimizarPdf(Buffer.from(await arquivo.arrayBuffer()));
-  const url = await salvarArquivo(condominio?.slug ?? "geral", nomeSeguro, otimizacao.bytes);
+  let url: string | null;
+  try {
+    url = await salvarArquivo(condominio?.slug ?? "geral", nomeSeguro, otimizacao.bytes);
+  } catch (e) {
+    if (e instanceof Error && e.message === MENSAGEM_ARMAZENAMENTO) {
+      return Response.json({ erro: e.message }, { status: 503 });
+    }
+    throw e;
+  }
 
   const documento = await db.documento.create({
     data: {
