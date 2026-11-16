@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import AppShell, { type ModuloId, type Perfil } from "@/components/portal/app-shell";
 import type { SimulacaoUI } from "@/components/portal/app-shell";
 import LoginScreen, { type CondominioUI } from "@/components/portal/login-screen";
@@ -48,6 +49,7 @@ const CONDOMINIO_PADRAO: CondominioUI = {
 };
 
 export default function Inicio() {
+  const router = useRouter();
   const [usuario, setUsuario] = useState<Usuario | null>(null);
   const [carregando, setCarregando] = useState(true);
   const [modulo, setModulo] = useState<ModuloId>("inicio");
@@ -128,6 +130,9 @@ export default function Inicio() {
     setModulo("inicio");
     setAviso("");
     setTour(false); // encerra o tutorial aberto, se houver
+    try {
+      sessionStorage.removeItem("retorno-pos-login");
+    } catch {}
   }
 
   async function trocarCondominio(id: string) {
@@ -193,7 +198,18 @@ export default function Inicio() {
   if (!usuario) {
     return (
       <LoginScreen
-        aoEntrar={(u) => setUsuario({ ...u, perfil: u.perfil as Perfil })}
+        aoEntrar={(u) => {
+          setUsuario({ ...u, perfil: u.perfil as Perfil });
+          // QR de visitante escaneado antes do login: devolve a portaria
+          // à validação do código em vez de cair no painel inicial.
+          try {
+            const retorno = sessionStorage.getItem("retorno-pos-login");
+            if (retorno && retorno.startsWith("/")) {
+              sessionStorage.removeItem("retorno-pos-login");
+              router.push(retorno);
+            }
+          } catch {}
+        }}
       />
     );
   }

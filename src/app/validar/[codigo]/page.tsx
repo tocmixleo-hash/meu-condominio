@@ -25,6 +25,10 @@ export default function ValidarQR() {
       .then((d) => {
         const usuario = d?.usuario;
         if (!usuario) {
+          // Guarda o destino: o login devolve a portaria à validação deste QR
+          try {
+            sessionStorage.setItem("retorno-pos-login", `/validar/${codigo}`);
+          } catch {}
           setResultado({ situacao: "sem_sessao" });
           return;
         }
@@ -38,7 +42,12 @@ export default function ValidarQR() {
         }
         registrar();
       })
-      .catch(() => setResultado({ situacao: "sem_sessao" }));
+      .catch(() => {
+        try {
+          sessionStorage.setItem("retorno-pos-login", `/validar/${codigo}`);
+        } catch {}
+        setResultado({ situacao: "sem_sessao" });
+      });
      
   }, [codigo]);
 
@@ -102,7 +111,8 @@ export default function ValidarQR() {
             <h1 className="text-lg font-semibold text-stone-900 dark:text-stone-100">Entre como portaria</h1>
             <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">
               Este QR registra a entrada do visitante. Faça login com uma conta de equipe
-              (portaria, síndico ou administrativo) para concluir.
+              (portaria, síndico ou administrativo) e a validação deste código continua
+              automaticamente após o login.
             </p>
             <Link
               href="/"
