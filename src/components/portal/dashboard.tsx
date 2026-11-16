@@ -166,12 +166,15 @@ export default function Dashboard({
   unidade,
   condominio,
   aoTrocar,
+  modulosPermitidos,
 }: {
   nome: string;
   perfil: Perfil;
   unidade?: { bloco: string; numero: string } | null;
   condominio: { nome: string; slug: string; corTema: string; logo: string; foto: string };
   aoTrocar: (m: ModuloId) => void;
+  /** Módulos visíveis no menu deste usuário; null = todos (plataforma). */
+  modulosPermitidos?: Set<string> | null;
 }) {
   const [dados, setDados] = useState<DashboardData | null>(null);
 
@@ -258,7 +261,7 @@ export default function Dashboard({
       </div>
 
       {/* Campanhas em destaque — conscientização e boas práticas */}
-      <CampanhaDestaque />
+      <CampanhaDestaque aoNavegar={aoTrocar} modulosPermitidos={modulosPermitidos} />
 
       {/* Indicadores */}
       {!dados ? (

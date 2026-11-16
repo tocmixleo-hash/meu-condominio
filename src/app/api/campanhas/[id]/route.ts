@@ -3,6 +3,7 @@ import { ehGestao, json401, json403, pode, usuarioAtual } from "@/lib/auth";
 import { garantirSchema } from "@/lib/garantia-schema";
 import { notificarCondominio } from "@/lib/notificacoes";
 import { registrarAcao } from "@/lib/auditoria";
+import { DESTINOS_VALIDOS } from "@/lib/destinos-campanha";
 
 const CATEGORIAS = ["CONVIVENCIA", "PET", "SUSTENTABILIDADE", "SEGURANCA", "SAUDE", "GERAL"];
 
@@ -68,6 +69,13 @@ export async function PATCH(req: Request, ctx: { params: Promise<{ id: string }>
     corpo.emoji !== undefined ? String(corpo.emoji).trim().slice(0, 8) || "📣" : campanha.emoji;
   const descricao =
     corpo.descricao !== undefined ? String(corpo.descricao).trim() || null : campanha.descricao;
+  // Destino do banner (módulo aberto ao clicar) — lista fechada, nulo volta ao padrão
+  const destino =
+    corpo.destino !== undefined
+      ? DESTINOS_VALIDOS.has(corpo.destino)
+        ? corpo.destino
+        : null
+      : campanha.destino;
 
   let inicioEm = campanha.inicioEm;
   let fimEm = campanha.fimEm;
@@ -98,7 +106,7 @@ export async function PATCH(req: Request, ctx: { params: Promise<{ id: string }>
 
   const atualizada = await db.campanha.update({
     where: { id },
-    data: { titulo, mensagem, descricao, categoria, emoji, inicioEm, fimEm },
+    data: { titulo, mensagem, descricao, categoria, emoji, destino, inicioEm, fimEm },
     include: { autor: { select: { nome: true, perfil: true } } },
   });
 

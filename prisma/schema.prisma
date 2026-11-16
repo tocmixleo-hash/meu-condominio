@@ -198,6 +198,7 @@ model Campanha {
   categoria    String     @default("CONVIVENCIA") // CONVIVENCIA | PET | SUSTENTABILIDADE | SEGURANCA | SAUDE | GERAL
   emoji        String     @default("📣") // ícone de identidade da campanha
   ativa        Boolean    @default(true) // pausada = some do destaque sem ser excluída
+  destino      String?    // módulo do portal aberto ao clicar no banner (opcional)
   ordem        Int        @default(0)
   inicioEm     DateTime? // período de veiculação opcional
   fimEm        DateTime?

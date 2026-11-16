@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import AppShell, { type ModuloId, type Perfil } from "@/components/portal/app-shell";
+import AppShell, { modulosDoPerfil, type ModuloId, type Perfil } from "@/components/portal/app-shell";
 import type { SimulacaoUI } from "@/components/portal/app-shell";
 import LoginScreen, { type CondominioUI } from "@/components/portal/login-screen";
 import Dashboard from "@/components/portal/dashboard";
@@ -256,6 +256,13 @@ export default function Inicio() {
             unidade={usuario.unidade}
             condominio={condominio}
             aoTrocar={setModulo}
+            modulosPermitidos={
+              usuario.perfil === "PLATAFORMA"
+                ? null
+                : usuario.perfil === "FUNCAO"
+                  ? new Set(usuario.permissoes ?? [])
+                  : new Set(modulosDoPerfil(usuario.perfil))
+            }
           />
         )}
         {modulo === "comunicados" && <Comunicados perfil={perfilModulos} />}

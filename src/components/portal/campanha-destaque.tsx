@@ -10,7 +10,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { Secao, ROTULO_CATEGORIA_CAMPANHA, formatarData } from "@/components/portal/ui";
+import type { ModuloId } from "@/components/portal/app-shell";
 import { buscarJSON } from "@/lib/buscar-json";
+import { DESTINOS_VALIDOS, rotuloDestino } from "@/lib/destinos-campanha";
 
 type Campanha = {
   id: string;
@@ -19,6 +21,7 @@ type Campanha = {
   descricao: string | null;
   categoria: string;
   emoji: string;
+  destino?: string | null;
   inicioEm: string | null;
   fimEm: string | null;
   autor?: { nome: string } | null;
@@ -26,7 +29,19 @@ type Campanha = {
 
 const INTERVALO_MS = 6500;
 
-export default function CampanhaDestaque() {
+export default function CampanhaDestaque({
+  aoNavegar,
+  modulosPermitidos,
+}: {
+  /** Navega o portal até o módulo de destino da campanha (setModulo do SPA). */
+  aoNavegar: (destino: ModuloId) => void;
+  /** Módulos que o perfil enxerga no menu; null = todos (plataforma). */
+  modulosPermitidos?: Set<string> | null;
+}) {
+  const podeNavegar = (destino: string | null | undefined): destino is ModuloId =>
+    !!destino &&
+    DESTINOS_VALIDOS.has(destino) &&
+    (!modulosPermitidos || modulosPermitidos.has(destino));
   const [lista, setLista] = useState<Campanha[] | null>(null);
   const [indice, setIndice] = useState(0);
   const [pausado, setPausado] = useState(false);
@@ -66,6 +81,11 @@ export default function CampanhaDestaque() {
   if (!lista || total === 0) return null;
 
   const campanha = lista[i];
+  const destinoBanner: ModuloId | null = podeNavegar(campanha.destino)
+    ? campanha.destino
+    : null;
+  const destinoDetalhe: ModuloId | null =
+    detalhe && podeNavegar(detalhe.destino) ? detalhe.destino : null;
 
   return (
     <>
@@ -132,9 +152,9 @@ export default function CampanhaDestaque() {
         >
           <button
             type="button"
-            onClick={() => setDetalhe(campanha)}
+            onClick={() => (destinoBanner ? aoNavegar(destinoBanner) : setDetalhe(campanha))}
             className="group -mx-2 flex w-full items-start gap-3.5 rounded-lg px-2 py-1.5 text-left transition-colors hover:bg-[var(--cor-tema-a06)] focus-visible:outline-none sm:-mx-3 sm:px-3"
-            aria-label={`Campanha: ${campanha.titulo} — abrir detalhes`}
+            aria-label={`Campanha: ${campanha.titulo} — ${destinoBanner ? `ir para ${rotuloDestino(destinoBanner)}` : "abrir detalhes"}`}
           >
             <span aria-hidden className="mt-0.5 shrink-0 text-2xl leading-none">
               {campanha.emoji}
@@ -152,8 +172,20 @@ export default function CampanhaDestaque() {
                 {campanha.fimEm ? ` · Até ${formatarData(campanha.fimEm)}` : ""}
                 <span className="font-medium text-[var(--cor-tema)]">
                   {" "}
-                  · Ler na íntegra
+                  · {destinoBanner ? `Toque para ir a ${rotuloDestino(destinoBanner)}` : "Ler na íntegra"}
                 </span>
+                {destinoBanner && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setDetalhe(campanha);
+                    }}
+                    className="ms-1 rounded font-medium text-stone-400 underline decoration-stone-300 underline-offset-2 transition hover:text-[var(--cor-tema)] focus-visible:outline-none"
+                  >
+                    · detalhes
+                  </button>
+                )}
               </span>
             </span>
           </button>
@@ -192,6 +224,18 @@ export default function CampanhaDestaque() {
               <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-stone-600 dark:text-stone-400">
                 {detalhe.descricao}
               </p>
+            )}
+            {destinoDetalhe && (
+              <button
+                type="button"
+                onClick={() => {
+                  setDetalhe(null);
+                  aoNavegar(destinoDetalhe);
+                }}
+                className="mt-5 inline-flex h-10 items-center gap-2 rounded-xl bg-[var(--cor-tema)] px-4 text-sm font-semibold text-white transition hover:opacity-90 focus-visible:outline-none"
+              >
+                Ir para {rotuloDestino(destinoDetalhe)}
+              </button>
             )}
             {(detalhe.inicioEm || detalhe.fimEm) && (
               <p className="mt-4 text-xs font-medium text-stone-400 dark:text-stone-500">

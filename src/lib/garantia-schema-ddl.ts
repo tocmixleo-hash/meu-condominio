@@ -75,7 +75,7 @@ CREATE TABLE "Campanha" (
     "inicioEm" DATETIME,
     "fimEm" DATETIME,
     "autorId" TEXT,
-    "criadoEm" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "criadoEm" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, "destino" TEXT,
     CONSTRAINT "Campanha_condominioId_fkey" FOREIGN KEY ("condominioId") REFERENCES "Condominio" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT "Campanha_autorId_fkey" FOREIGN KEY ("autorId") REFERENCES "Usuario" ("id") ON DELETE SET NULL ON UPDATE CASCADE
 )`,

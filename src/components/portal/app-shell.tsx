@@ -113,6 +113,11 @@ const MENUS: Record<Perfil, ItemMenu[]> = {
   FUNCAO: [], // menu montado dinamicamente a partir das permissões da função
 };
 
+/** Módulos que o perfil enxerga no menu — base do filtro de destinos do banner de campanhas. */
+export function modulosDoPerfil(perfil: Perfil): ModuloId[] {
+  return (MENUS[perfil] ?? []).map((item) => item.id);
+}
+
 const ROTULO_PERFIL: Record<Perfil, string> = {
   SINDICO: "Síndico",
   ADMINISTRATIVO: "Administrativo",

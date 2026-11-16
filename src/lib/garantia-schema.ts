@@ -8,10 +8,18 @@ import { DDL_POR_TABELA } from "@/lib/garantia-schema-ddl";
 // • Idempotente: só cria o que NÃO existe; seguro em SQLite e Turso.
 // • Memoizado: uma verificação por instância; em falha transiente,
 //   libera a memoização para tentar no próximo acesso.
-// Nota: o guardião cobre tabelas/índices ausentes — não altera tabelas
-// antigas com colunas faltantes (para isso servem os scripts migrar-turso-*).
+// Nota: o guardião cobre tabelas/índices ausentes e colunas novas listadas
+// em COLUNAS_NOVAS — não migra dados nem reestrutura colunas antigas (para
+// isso servem os scripts migrar-turso-*).
 
 let garantia: Promise<void> | null = null;
+
+// Colunas acrescentadas ao schema DEPOIS de as tabelas já existirem no
+// banco de produção: CREATE IF NOT EXISTS não adiciona colunas em tabelas
+// antigas, então o guardião confronta o PRAGMA e aplica o ALTER que faltar.
+const COLUNAS_NOVAS: [tabela: string, definicao: string][] = [
+  ["Campanha", "destino TEXT"], // módulo do portal aberto ao clicar no banner
+];
 
 export function garantirSchema(): Promise<void> {
   garantia ??= (async () => {
@@ -28,6 +36,17 @@ export function garantirSchema(): Promise<void> {
     }
     if (faltantes.length) {
       console.log(`[schema] tabelas criadas agora: ${faltantes.join(", ")}`);
+    }
+
+    for (const [tabela, definicao] of COLUNAS_NOVAS) {
+      if (!existentes.has(tabela)) continue; // criada acima já com a coluna
+      const infos = (await db.$queryRawUnsafe<{ name: string }[]>(
+        `PRAGMA table_info("${tabela}")`,
+      )) as { name: string }[];
+      const nomeColuna = definicao.split(/\s+/)[0];
+      if (infos.some((info) => info.name === nomeColuna)) continue;
+      await db.$executeRawUnsafe(`ALTER TABLE "${tabela}" ADD COLUMN ${definicao}`);
+      console.log(`[schema] coluna acrescentada: ${tabela}.${nomeColuna}`);
     }
   })();
   return garantia.catch((erro) => {

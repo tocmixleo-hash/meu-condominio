@@ -20,6 +20,7 @@ import {
 import type { Perfil } from "@/components/portal/app-shell";
 import { corpoJson, mensagemDeErro, mensagemRede } from "@/lib/api-cliente";
 import { buscarJSON } from "@/lib/buscar-json";
+import { DESTINOS_CAMPANHA } from "@/lib/destinos-campanha";
 
 type Comunicado = {
   id: string;
@@ -44,6 +45,7 @@ type Campanha = {
   descricao: string | null;
   categoria: string;
   emoji: string;
+  destino?: string | null;
   ativa: boolean;
   inicioEm: string | null;
   fimEm: string | null;
@@ -56,6 +58,7 @@ type FormCampanha = {
   descricao: string;
   categoria: string;
   emoji: string;
+  destino: string; // módulo aberto ao clicar no banner ("" = apenas detalhes)
   inicioEm: string; // yyyy-MM-dd ou ""
   fimEm: string;
 };
@@ -66,6 +69,7 @@ const VAZIO_CAMPANHA: FormCampanha = {
   descricao: "",
   categoria: "CONVIVENCIA",
   emoji: "🐾",
+  destino: "",
   inicioEm: "",
   fimEm: "",
 };
@@ -77,6 +81,7 @@ function paraFormCampanha(c: Campanha): FormCampanha {
     descricao: c.descricao ?? "",
     categoria: c.categoria,
     emoji: c.emoji,
+    destino: c.destino ?? "",
     inicioEm: c.inicioEm ? c.inicioEm.slice(0, 10) : "",
     fimEm: c.fimEm ? c.fimEm.slice(0, 10) : "",
   };
@@ -177,6 +182,7 @@ export default function Comunicados({ perfil }: { perfil: Perfil }) {
         descricao: formCampanha.descricao,
         categoria: formCampanha.categoria,
         emoji: formCampanha.emoji,
+        destino: formCampanha.destino || null,
         inicioEm: formCampanha.inicioEm || null,
         fimEm: formCampanha.fimEm || null,
       };
@@ -400,7 +406,20 @@ export default function Comunicados({ perfil }: { perfil: Perfil }) {
                     </option>
                   ))}
                 </select>
-                <div className="flex items-center gap-2">
+                <select
+                  aria-label="Destino do banner ao clicar"
+                  value={formCampanha.destino}
+                  onChange={(e) => setFormCampanha({ ...formCampanha, destino: e.target.value })}
+                  className="h-10 w-full rounded-md border border-[var(--cor-neutra-2)] bg-white dark:bg-stone-900 px-3 text-sm outline-none focus:border-[var(--cor-tema-suave)]"
+                >
+                  <option value="">Ao clicar: só abrir detalhes</option>
+                  {DESTINOS_CAMPANHA.map((d) => (
+                    <option key={d.id} value={d.id}>
+                      Ao clicar: ir para {d.rotulo}
+                    </option>
+                  ))}
+                </select>
+                <div className="col-span-2 flex items-center gap-2">
                   <input
                     type="date"
                     aria-label="Início da veiculação"

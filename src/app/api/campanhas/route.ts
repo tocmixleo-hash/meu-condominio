@@ -3,6 +3,7 @@ import { ehGestao, json401, json403, pode, usuarioAtual } from "@/lib/auth";
 import { garantirSchema } from "@/lib/garantia-schema";
 import { notificarCondominio } from "@/lib/notificacoes";
 import { registrarAcao } from "@/lib/auditoria";
+import { DESTINOS_VALIDOS } from "@/lib/destinos-campanha";
 
 const CATEGORIAS = ["CONVIVENCIA", "PET", "SUSTENTABILIDADE", "SEGURANCA", "SAUDE", "GERAL"];
 
@@ -60,6 +61,8 @@ export async function POST(req: Request) {
   const descricao = String(corpo.descricao ?? "").trim();
   const categoria = CATEGORIAS.includes(corpo.categoria) ? corpo.categoria : "CONVIVENCIA";
   const emoji = String(corpo.emoji ?? "📣").trim().slice(0, 8) || "📣";
+  // Destino do banner: módulo aberto ao clicar (opcional, lista fechada)
+  const destino = DESTINOS_VALIDOS.has(corpo.destino) ? corpo.destino : null;
 
   if (!titulo || !mensagem) {
     return Response.json({ erro: "Informe título e mensagem da campanha." }, { status: 400 });
@@ -101,6 +104,7 @@ export async function POST(req: Request) {
       descricao: descricao || null,
       categoria,
       emoji,
+      destino,
       inicioEm,
       fimEm,
       autorId: eu.id,
