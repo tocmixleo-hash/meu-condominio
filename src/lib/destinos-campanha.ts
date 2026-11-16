@@ -11,7 +11,7 @@ export const DESTINOS_CAMPANHA: { id: string; rotulo: string }[] = [
   { id: "manutencao", rotulo: "Manutenção" },
   { id: "documentos", rotulo: "Documentos" },
   { id: "assembleias", rotulo: "Assembleias" },
-  { id: "moradores", rotulo: "Moradores" },
+  { id: "moradores", rotulo: "Cadastros" },
   { id: "duvidas", rotulo: "Perguntas frequentes" },
 ];
 

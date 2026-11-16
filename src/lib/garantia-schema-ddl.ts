@@ -355,6 +355,10 @@ CREATE TABLE "Usuario" (
     "tutorialVisto" BOOLEAN NOT NULL DEFAULT false,
     "unidadeId" TEXT,
     "criadoEm" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "possuiPets" BOOLEAN NOT NULL DEFAULT false,
+    "petsDetalhe" TEXT,
+    "pessoasNoImovel" INTEGER,
+    "vinculoImovel" TEXT,
     CONSTRAINT "Usuario_condominioId_fkey" FOREIGN KEY ("condominioId") REFERENCES "Condominio" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT "Usuario_unidadeId_fkey" FOREIGN KEY ("unidadeId") REFERENCES "Unidade" ("id") ON DELETE SET NULL ON UPDATE CASCADE
 )`,

@@ -149,6 +149,15 @@ async function semearCondominio(opts: {
     ],
   });
 
+  // Perfil da família dos moradores de demonstração (seção Cadastros):
+  // pets, quantas pessoas vivem no apartamento e vínculo com a unidade.
+  const perfilFamilia = [
+    { possuiPets: true, petsDetalhe: "1 cachorro (poodle)", pessoasNoImovel: 4, vinculoImovel: "PROPRIETARIO" },
+    { possuiPets: false, petsDetalhe: null, pessoasNoImovel: 2, vinculoImovel: "INQUILINO" },
+    { possuiPets: true, petsDetalhe: "2 gatos", pessoasNoImovel: 3, vinculoImovel: "PROPRIETARIO" },
+    { possuiPets: false, petsDetalhe: null, pessoasNoImovel: 5, vinculoImovel: "INQUILINO" },
+  ];
+
   const moradores = await Promise.all(
     elenco.moradores.map((m, i) =>
       db.usuario.create({
@@ -160,6 +169,7 @@ async function semearCondominio(opts: {
           perfil: "MORADOR",
           ...(m.telefone ? { telefone: m.telefone } : {}),
           unidadeId: [uA101.id, uA102.id, uB201.id, uB202.id][i],
+          ...(perfilFamilia[i] ?? {}),
         },
       })),
   );
@@ -169,6 +179,30 @@ async function semearCondominio(opts: {
 
   await db.usuarioCondominio.createMany({
     data: moradores.map((m) => ({ usuarioId: m.id, condominioId: cid, perfil: "MORADOR" })),
+  });
+
+  // Funcionário de demonstração para a aba Funcionários da seção Cadastros:
+  // uma função sob medida (zeladoria) e uma pessoa vinculada a ela.
+  const funcaoZeladoria = await db.funcao.create({
+    data: {
+      condominioId: cid,
+      nome: "Zeladoria",
+      descricao: "Encomendas, autorizações e ocorrências do dia a dia",
+      permissoes: JSON.stringify(["inicio", "encomendas", "autorizacoes", "ocorrencias"]),
+    },
+  });
+  const zelador = await db.usuario.create({
+    data: {
+      condominioId: cid,
+      nome: "Roberto Nunes",
+      email: `zelador@parque${opts.slug}.com.br`,
+      senha: hash("123456"),
+      perfil: "FUNCAO",
+      telefone: "(11) 98888-1234",
+    },
+  });
+  await db.usuarioCondominio.create({
+    data: { usuarioId: zelador.id, condominioId: cid, perfil: "FUNCAO", funcaoId: funcaoZeladoria.id },
   });
 
   await db.comunicado.createMany({

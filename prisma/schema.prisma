@@ -138,6 +138,12 @@ model Usuario {
   unidade      Unidade?   @relation(fields: [unidadeId], references: [id])
   criadoEm     DateTime   @default(now())
 
+  // Cadastro do morador (seção Cadastros): perfil da família na unidade
+  possuiPets      Boolean @default(false) // o morador tem pets?
+  petsDetalhe     String? // quais pets (descrição livre)
+  pessoasNoImovel Int?    // quantas pessoas vivem no apartamento
+  vinculoImovel   String? // PROPRIETARIO | INQUILINO
+
   vinculos     UsuarioCondominio[]
 
   comunicados  Comunicado[]

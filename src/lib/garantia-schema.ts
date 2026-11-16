@@ -19,6 +19,11 @@ let garantia: Promise<void> | null = null;
 // antigas, então o guardião confronta o PRAGMA e aplica o ALTER que faltar.
 const COLUNAS_NOVAS: [tabela: string, definicao: string][] = [
   ["Campanha", "destino TEXT"], // módulo do portal aberto ao clicar no banner
+  // Cadastros: perfil da família do morador (pets, ocupantes, vínculo)
+  ["Usuario", "possuiPets BOOLEAN NOT NULL DEFAULT 0"],
+  ["Usuario", "petsDetalhe TEXT"],
+  ["Usuario", "pessoasNoImovel INTEGER"],
+  ["Usuario", "vinculoImovel TEXT"],
 ];
 
 export function garantirSchema(): Promise<void> {

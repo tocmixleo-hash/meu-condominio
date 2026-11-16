@@ -38,7 +38,7 @@ const MODULOS: { id: string; rotulo: string; descricao: string }[] = [
   { id: "manutencao", rotulo: "Manutenção", descricao: "Agenda de manutenção preventiva" },
   { id: "documentos", rotulo: "Documentos", descricao: "Enviar e excluir documentos" },
   { id: "assembleias", rotulo: "Assembleias", descricao: "Agendar e atualizar assembleias" },
-  { id: "moradores", rotulo: "Moradores", descricao: "Cadastrar moradores e equipe" },
+  { id: "moradores", rotulo: "Cadastros", descricao: "Moradores e funcionários do condomínio" },
   { id: "identidade", rotulo: "Identidade visual", descricao: "Editar marca, cores e fotos" },
 ];
 
